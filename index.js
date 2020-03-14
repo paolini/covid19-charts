@@ -45,6 +45,8 @@ function string_to_int(x) {return parseInt(x)}
 
 function date_to_days(x) {return x.getTime()/(1000.0*60*60*24)}
 
+function dash_to_space(x) {return x.replace(/_/g," ")}
+
 function table_get_column_date(table, column_name) {
     return table_get_column(table, column_name).map(string_to_date);
 }
@@ -69,9 +71,16 @@ $(function () {
 
             var data_x = table_get_column(table, "data").map(string_to_date);
             var data_y = table_get_column(table, column).map(string_to_int);
-            add_data_series(column + " " + region, data_x, data_y);
+            add_data_series(dash_to_space(column) + " " + region, data_x, data_y);
             lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
-            $("#info").append("<li>"+region+" "+column+": exponential R2="+lr.r2.toFixed(2)+" daily increase: "+((Math.exp(lr.m)-1)*100).toFixed(1)+"% (m="+lr.m+" q="+lr.q+")</li>")
+            $("#info").append(
+                "<li>"+region+" "+column+": " 
+                + "fit esponenziale: R2=<b>"+lr.r2.toFixed(2)+"</b> "
+                + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b> "
+                + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1)+"</b> giorni "
+                + "(m="+lr.m+" "
+                + "q="+lr.q+")</li>"
+                );
             chart.render();
         });
     });
