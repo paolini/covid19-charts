@@ -34,10 +34,17 @@ function table_filter(table, column, value) {
     };
 }
 
-function table_get_dateint(table, t_column, y_column) {
-    var i = table.headers.indexOf(t_column);
-    var j = table.headers.indexOf(y_column);
-    return table.rows.map(function (row) {return {'x': new Date(row[i]), 'y': parseInt(row[j])}});
+function table_get_column(table, column_name) {
+    var i = table.headers.indexOf(column_name);
+    return table.rows.map(function(row) {return row[i]});
+}
+
+function table_get_column_date(table, column_name) {
+    return table_get_column(table, column_name).map(function(x){return new Date(x)});
+}
+
+function table_get_column_int(table, column_name) {
+    return table_get_column(table, column_name).map(parseInt);
 }
 
 var chart;
@@ -74,7 +81,8 @@ function toggleDataSeries(e){
     chart.render();
 }
 
-function add_data_series(name, points){
+function add_data_series(name, data_x, data_y){
+    var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
     chart.options.data.push({
         type: "line",
         axisYType: "secondary",
@@ -85,14 +93,6 @@ function add_data_series(name, points){
     });
     chart.render();
 };
-
-function process_data() {
-    var table = data['regioni'];
-    var column = "deceduti";
-    var region = "Lombardia"
-    var series = table_get_dateint(table_filter(table, 'denominazione_regione', region), "data", column);
-    add_data_series(column + " " + region, series);
-}
 
 $(function () {
     chart = new CanvasJS.Chart("chartContainer", chart_cfg);
@@ -107,9 +107,11 @@ $(function () {
         $("button[name='add']").click(function(){
             var region = $region.children("option:selected").val();
             var column = $column.children("option:selected").val();
-            var table = data['regioni'];
-            var series = table_get_dateint(table_filter(table, 'denominazione_regione', region), "data", column);
-            add_data_series(column + " " + region, series);
+            var table = table_filter(data['regioni'], 'denominazione_regione', region);
+
+            var data_x = table_get_column_date(table, "data");
+            var data_y = table_get_column_int(table, column);
+            add_data_series(column + " " + region, data_x, data_y);
             chart.render();
         });
     });
