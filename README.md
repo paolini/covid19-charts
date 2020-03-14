@@ -1,4 +1,4 @@
-online: [index.html](browse covid-19 ITA charts)
+online: [https://paolini.github.io/covid19-charts/](browse covid-19 ITA charts)
 
 To test on your local machine start an http server:
 
