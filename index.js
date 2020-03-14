@@ -34,52 +34,58 @@ function compute_regression(name, data_y, data_x) {
         );
 }
 
+var datasets = [
+    {
+        name: "italia",
+        path: "/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv",
+        label: function(column, value) {return "Italia " + dash_to_space(column);}
+    },
+    {
+        name: "regioni",
+        path: "/dati-regioni/dpc-covid19-ita-regioni.csv",
+        filter_column: "denominazione_regione",
+        label: function(column, value) {return value + " " + dash_to_space(column);}
+    }
+];
+
 $(function () {
     chart_init();
 
-    fetch_data("/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv").then(function(table){
-        var $column = $("select[name='national_column']");
-        $column.find('option').remove();
-        fields.forEach(function(field){
-            $column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
-        });
-
-        $("button[name='national_add']").click(function(){
-            var column = $column.children("option:selected").val();
-
-            var data_x = table_get_column(table, "data").map(string_to_date);
-            var data_y = table_get_column(table, column).map(string_to_int);
-            chart_add_series(dash_to_space(column) + " italia", data_x, data_y);
-            compute_regression("Italia "+dash_to_space(column), data_y, data_x);
-            chart.render();
-        });
+    datasets.forEach(function(dataset){
+        fetch_data(dataset.path).then(function(table){
+            var $column = $("select[name='" + dataset.name + "_column']");
+            var $select = dataset.filter_column ? $("select[name='" + dataset.name + "_" + dataset.filter_column) : null;
+            var $button = $("button[name='" + dataset.name + "_add']");
+    
+            if (dataset.filter_column) {
+                var values = table_get_column_distinct(table, dataset.filter_column);
+                $select.find('option').remove();
+                values.forEach(function(value){
+                    $select.append("<option value='" + value + "'>" + value + "</option>");
+                });
+            }
+            
+            $column.find('option').remove();
+            fields.forEach(function(field){
+                $column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
+            });
+    
+            $button.click(function(){
+                var column = $column.children("option:selected").val();
+                var subtable = table;
+                var value = null;
+                if (dataset.filter_column) {
+                    value = $select.children("option:selected").val();
+                    var subtable = table_filter(table, dataset.filter_column, value);
+                }
+    
+                var data_x = table_get_column(subtable, "data").map(string_to_date);
+                var data_y = table_get_column(subtable, column).map(string_to_int);
+                var name = dataset.label(column, value);
+                chart_add_series(name, data_x, data_y);
+                compute_regression(name, data_y, data_x);
+                chart.render();
+            });
+        });    
     });
-
-    fetch_data("/dati-regioni/dpc-covid19-ita-regioni.csv").then(function(table){
-        var regioni = table_get_column_distinct(table, "denominazione_regione");
-        var $select = $("select[name='denominazione_regione']");
-        $select.find('option').remove();
-        regioni.forEach(function(regione){
-            $select.append("<option value='" + regione + "'>" + regione + "</option>");
-        });
-        
-        var $column = $("select[name='region_column']");
-        $column.find('option').remove();
-        fields.forEach(function(field){
-            $column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
-        });
-
-        $("button[name='region_add']").click(function(){
-            var region = $select.children("option:selected").val();
-            var column = $column.children("option:selected").val();
-            var subtable = table_filter(table, 'denominazione_regione', region);
-
-            var data_x = table_get_column(subtable, "data").map(string_to_date);
-            var data_y = table_get_column(subtable, column).map(string_to_int);
-            chart_add_series(dash_to_space(column) + " " + region, data_x, data_y);
-            compute_regression(region+" "+dash_to_space(column), data_y, data_x);
-            chart.render();
-        });
-    });
-
 });   
