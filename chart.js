@@ -57,7 +57,8 @@ var chart_config = {
                 scaleLabel: {
                     display: true,
                     labelString: 'numero'
-                }
+                },
+                type: 'linear'
             }]
         },
         plugins: {

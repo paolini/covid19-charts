@@ -4,6 +4,8 @@ const REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/maste
 var common_fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
     "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
 
+var today = new Date();
+
 function fetch_data(path) {
     return new Promise(function(resolve,reject) {
         fetch(REPOSITORY_URL + path)
@@ -22,15 +24,22 @@ function fetch_data(path) {
     });
 }
 
+var months = ["", "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+
 function compute_regression(name, data_y, data_x) {
-    lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
+    var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
+    var days_today = date_to_days(today);
+    var days_passed = ((lr.q/lr.m) + days_today);
+    var first_day = new Date((days_today-days_passed)*1000.0*60*60*24);
     $("#info").append(
         "<li> "+name+": " 
-        + "fit esponenziale: R2=<b>"+lr.r2.toFixed(2)+"</b> "
-        + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b> "
-        + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1)+"</b> giorni "
-        + "(m="+lr.m+" "
-        + "q="+lr.q+")</li>"
+        + "fit esponenziale: R2=<b>"+lr.r2.toFixed(2)+"</b>, "
+        + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
+        + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
+        + "inizio: <b>" + days_passed.toFixed(1) + "</b> giorni fa "
+        + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
+        + "<!-- m="+lr.m+" "
+        + "q="+lr.q+" --></li>"
         );
 }
 
@@ -116,5 +125,11 @@ $(function () {
                 chart.render();
             });
         });    
+    });
+
+    $("select[name='chart_scale']").change(function(){
+        var val = $(this).children("option:selected").val();
+        chart.options.scales.yAxes[0].type = val==='log' ? 'logarithmic' : 'linear';
+        chart.update();
     });
 });   
