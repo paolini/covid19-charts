@@ -1,4 +1,4 @@
-[index.html](browse covid-19 ITA charts)
+online: [index.html](browse covid-19 ITA charts)
 
 To test on your local machine start an http server:
 
