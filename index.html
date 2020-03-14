@@ -28,6 +28,7 @@
 	</style>
 </head>
 <body>
+    <h1>covid 19 ITA charts</h1>
     <ul>
        <li>dati della protezione civile (<a href="https://github.com/pcm-dpc/COVID-19">vedi qui</a>)
            <ul>
@@ -53,7 +54,12 @@
             <select name="chart_scale">
                 <option value="linear">lineare</option>
                 <option value="log">logaritmica</option>
-            </select>            
+            </select> 
+            sfalsamento temporale
+            <select name="time_shift">
+                <option value="off">off</option>
+                <option value="on">on</option>
+            </select>
         </li>
     </ul>
 <div style="width:75%;">
@@ -62,5 +68,6 @@
 <ul id="info">
 </ul>
 
+<p>Codice su <a href="">github</a></p>
 </body>
 </html>

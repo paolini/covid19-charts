@@ -43,4 +43,6 @@ function string_to_int(x) {return parseInt(x)}
 
 function date_to_days(x) {return x.getTime()/(1000.0*60*60*24)}
 
+function days_to_date(x) {return new Date(x*1000.0*60*60*24);}
+
 function dash_to_space(x) {return x.replace(/_/g," ")}

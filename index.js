@@ -5,6 +5,7 @@ var common_fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospe
     "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
 
 var today = new Date();
+var days_today = date_to_days(today);
 
 function fetch_data(path) {
     return new Promise(function(resolve,reject) {
@@ -26,9 +27,7 @@ function fetch_data(path) {
 
 var months = ["", "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
 
-function compute_regression(name, data_y, data_x) {
-    var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
-    var days_today = date_to_days(today);
+function display_regression(name, lr) {
     var days_passed = ((lr.q/lr.m) + days_today);
     var first_day = new Date((days_today-days_passed)*1000.0*60*60*24);
     $("#info").append(
@@ -36,7 +35,7 @@ function compute_regression(name, data_y, data_x) {
         + "fit esponenziale: R2=<b>"+lr.r2.toFixed(2)+"</b>, "
         + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
         + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
-        + "inizio: <b>" + days_passed.toFixed(1) + "</b> giorni fa "
+        + "inizio <b>" + days_passed.toFixed(1) + "</b> giorni fa: "
         + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
         + "<!-- m="+lr.m+" "
         + "q="+lr.q+" --></li>"
@@ -80,6 +79,8 @@ var datasets = [
 $(function () {
     chart_init();
 
+    var first_series_offset = null;
+
     datasets.forEach(function(dataset){
         fetch_data(dataset.path).then(function(table){
             if (dataset.table_adjust_hook) {
@@ -116,13 +117,32 @@ $(function () {
     
                 var data_x = table_get_column(subtable, "data").map(string_to_date);
                 var data_y = table_get_column(subtable, column).map(string_to_int);
+
+                var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
+                var my_offset = ((lr.q/lr.m) + days_today);
+
                 var label = dataset.label || (function(column, value) {
                     return value + " " + dash_to_space(column);
                 });
                 var name = label(column, value_name);
+
+    
+                if (first_series_offset === null) {
+                    first_series_offset = my_offset;
+                } else if ($("select[name=time_shift]").children("option:selected").val() === "on") {
+                    var offset =  my_offset - first_series_offset;
+                    data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
+                    if (offset > 0) {
+                        name += " +" + offset.toFixed(1) + " giorni";
+                    } else {
+                        name += " -" + (-offset).toFixed(1) + " giorni";
+                    }
+                }
+
                 chart_add_series(name, data_x, data_y);
-                compute_regression(name, data_y, data_x);
                 chart.render();
+
+                display_regression(name, lr);
             });
         });    
     });
