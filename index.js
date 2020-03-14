@@ -67,7 +67,7 @@ var datasets = [
             var k = table.headers.indexOf("denominazione_provincia");
             var h = table.headers.indexOf("denominazione_regione");
             table.rows.forEach(function(row){
-                row[k] = utf8.decode(row[k]);
+                // row[k] = utf8.decode(row[k]);
                 if (row[j]>900) {
                     row[k] = row[h]+" "+row[k];
                 }
