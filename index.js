@@ -98,6 +98,7 @@ $(function () {
                 var column = $column.children("option:selected").val();
                 var subtable = table;
                 var value = null;
+                var value_name = null;
                 if (dataset.filter_column) {
                     value = $select.children("option:selected").val();
                     value_name = $select.children("option:selected").text();
