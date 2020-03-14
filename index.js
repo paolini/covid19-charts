@@ -1,7 +1,7 @@
 // const REPOSITORY_URL = "..";
 const REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master";
 
-var fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
+var common_fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
     "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
 
 function fetch_data(path) {
@@ -38,13 +38,22 @@ var datasets = [
     {
         name: "italia",
         path: "/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv",
+        fields: common_fields,
         label: function(column, value) {return "Italia " + dash_to_space(column);}
     },
     {
         name: "regioni",
         path: "/dati-regioni/dpc-covid19-ita-regioni.csv",
-        filter_column: "denominazione_regione",
-        label: function(column, value) {return value + " " + dash_to_space(column);}
+        fields: common_fields,
+        filter_name_column: "denominazione_regione",
+        filter_column: "codice_regione"
+    },
+    {
+        name: "province",
+        path: "/dati-province/dpc-covid19-ita-province.csv",
+        fields: ['totale_casi'],
+        filter_name_column: "denominazione_provincia",
+        filter_column: "codice_provincia"
     }
 ];
 
@@ -58,15 +67,15 @@ $(function () {
             var $button = $("button[name='" + dataset.name + "_add']");
     
             if (dataset.filter_column) {
-                var values = table_get_column_distinct(table, dataset.filter_column);
+                var pairs = table_get_column_distinct_pairs(table, dataset.filter_column, dataset.filter_name_column);
                 $select.find('option').remove();
-                values.forEach(function(value){
-                    $select.append("<option value='" + value + "'>" + value + "</option>");
+                pairs.forEach(function(pair){
+                     $select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
                 });
             }
             
             $column.find('option').remove();
-            fields.forEach(function(field){
+            dataset.fields.forEach(function(field){
                 $column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
             });
     
@@ -76,12 +85,16 @@ $(function () {
                 var value = null;
                 if (dataset.filter_column) {
                     value = $select.children("option:selected").val();
+                    value_name = $select.children("option:selected").text();
                     var subtable = table_filter(table, dataset.filter_column, value);
                 }
     
                 var data_x = table_get_column(subtable, "data").map(string_to_date);
                 var data_y = table_get_column(subtable, column).map(string_to_int);
-                var name = dataset.label(column, value);
+                var label = dataset.label || (function(column, value) {
+                    return value + " " + dash_to_space(column);
+                });
+                var name = label(column, value_name);
                 chart_add_series(name, data_x, data_y);
                 compute_regression(name, data_y, data_x);
                 chart.render();
