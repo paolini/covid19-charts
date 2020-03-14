@@ -1,51 +1,98 @@
-var chart;
+var timeFormat = 'MM/DD/YYYY HH:mm';
 
-function chart_init() {
-    chart = new CanvasJS.Chart("chartContainer", chart_cfg);
-    chart.render();
+function newDate(days) {
+    return moment().add(days, 'd').toDate();
 }
 
-var chart_cfg = {
-    title: {
-        text: "ITA Covid-19"
+function newDateString(days) {
+    return moment().add(days, 'd').format(timeFormat);
+}
+
+var config = {
+    type: 'line',
+    data: {
+        datasets: []
     },
-    axisX: {
-        valueFormatString: "DD MMM"
-    },
-    axisY2: {
-        title: "persone",
-    },
-    toolTip: {
-        shared: true
-    },
-    legend: {
-        cursor: "pointer",
-        verticalAlign: "top",
-        horizontalAlign: "center",
-        dockInsidePlotArea: true,
-        itemclick: toggleDataSeries
-    },
-    data: []
+    options: {
+        title: {
+            text: 'Chart.js Time Scale'
+        },
+        scales: {
+            xAxes: [{
+                type: 'time',
+                time: {
+                    tooltipFormat: 'll HH:mm'
+                },
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date'
+                },
+                ticks: {
+                        major: {
+                            enabled: true,
+                            fontStyle: 'bold'
+                        },
+                        source: 'data',
+                        autoSkip: true,
+                        autoSkipPadding: 75,
+                        maxRotation: 0,
+                        sampleSize: 100
+                    },
+                    afterBuildTicks: function(scale, ticks) {
+                        var majorUnit = scale._majorUnit;
+                        if (! ticks) return;
+                        var firstTick = ticks[0];
+                        var i, ilen, val, tick, currMajor, lastMajor;
+
+                        val = moment(ticks[0].value);
+                        if ((majorUnit === 'minute' && val.second() === 0)
+                                || (majorUnit === 'hour' && val.minute() === 0)
+                                || (majorUnit === 'day' && val.hour() === 9)
+                                || (majorUnit === 'month' && val.date() <= 3 && val.isoWeekday() === 1)
+                                || (majorUnit === 'year' && val.month() === 0)) {
+                            firstTick.major = true;
+                        } else {
+                            firstTick.major = false;
+                        }
+                        lastMajor = val.get(majorUnit);
+
+                        for (i = 1, ilen = ticks.length; i < ilen; i++) {
+                            tick = ticks[i];
+                            val = moment(tick.value);
+                            currMajor = val.get(majorUnit);
+                            tick.major = currMajor !== lastMajor;
+                            lastMajor = currMajor;
+                        }
+                        return ticks;
+                    }
+            }],
+            yAxes: [{
+                scaleLabel: {
+                    display: true,
+                    labelString: 'value'
+                }
+            }]
+        },
+    }
 };
 
-function toggleDataSeries(e){
-    if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-        e.dataSeries.visible = false;
-    } else{
-        e.dataSeries.visible = true;
-    }
-    chart.render();
-}
+
+var chart;
 
 function add_data_series(name, data_x, data_y){
     var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
-    chart.options.data.push({
-        type: "line",
-        axisYType: "secondary",
-        name: name,
-        showInLegend: true,
-        markerSize: 2,
-        dataPoints: points
+    // var color = Chart.helpers.color;
+    chart.data.datasets.push({
+        label: name,
+//        backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
+//        borderColor: window.chartColors.green,
+        fill: false,
+        data: points
     });
-    chart.render();
+    chart.update();
 };
+
+function chart_init() {
+    var ctx = document.getElementById('canvas').getContext('2d');
+    chart = new Chart(ctx, config);
+}

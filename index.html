@@ -1,17 +1,32 @@
 <!DOCTYPE HTML>
 <html>
 <head>  
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <title>covid 19 ITA charts</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.js"></script>
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+	<script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+	<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
 
     <script src="chart.js"></script>
     <script src="math.js"></script>
     <script src="index.js"></script>
+
+    <style>
+		canvas {
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
 </head>
 <body>
     <ul>
-       <li>dati della protezione civile
+       <li>dati della protezione civile (<a href="https://github.com/pcm-dpc/COVID-19">vedi qui</a>)
            <ul>
                <li>dati-nazionali:
                    Italia
@@ -26,8 +41,11 @@
             </ul>
         </li>
     </ul>
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div style="width:75%;">
+    <canvas id="canvas"></canvas>
+</div>
 <ul id="info">
 </ul>
+
 </body>
 </html>
