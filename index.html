@@ -49,6 +49,22 @@
                 </li>
             </ul>
         </li>
+        <li>dati raccolti dalla John Hopkins (<a href="https://github.com/CSSEGISandData/COVID-19">vedi qui</a>)
+            <ul>
+                <li>
+                    countries: 
+                    <select name="countries_Country/Region"></select>
+                    <select name="countries_column"></select>
+                    <button name="countries_add">plot</button>
+                </li>
+                <li>
+                    states:
+                    <select name="states_Province/State"></select>
+                    <select name="states_column"></select>
+                    <button name="states_add">plot</button>
+                </li>
+            </ul>
+        </li>
         <li>
             scala 
             <select name="chart_scale">
@@ -59,7 +75,7 @@
             <select name="time_shift">
                 <option value="off">off</option>
                 <option value="on">on</option>
-            </select>
+            </select> (lo sfasamento temporale viene applicato solamente alle serie che vengono caricate in seguito)
         </li>
     </ul>
 <div style="width:75%;">
