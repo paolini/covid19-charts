@@ -39,64 +39,22 @@ function table_get_column(table, column_name) {
     return table.rows.map(function(row) {return row[i]});
 }
 
+function string_to_date(x) {return new Date(x)}
+
+function string_to_int(x) {return parseInt(x)}
+
+function date_to_days(x) {return x.getTime()/(1000.0*60*60*24)}
+
 function table_get_column_date(table, column_name) {
-    return table_get_column(table, column_name).map(function(x){return new Date(x)});
+    return table_get_column(table, column_name).map(string_to_date);
 }
 
 function table_get_column_int(table, column_name) {
-    return table_get_column(table, column_name).map(parseInt);
+    return table_get_column(table, column_name).map(string_to_int);
 }
-
-var chart;
-
-var chart_cfg = {
-    title: {
-        text: "ITA Covid-19"
-    },
-    axisX: {
-        valueFormatString: "DD MMM"
-    },
-    axisY2: {
-        title: "persone",
-    },
-    toolTip: {
-        shared: true
-    },
-    legend: {
-        cursor: "pointer",
-        verticalAlign: "top",
-        horizontalAlign: "center",
-        dockInsidePlotArea: true,
-        itemclick: toggleDataSeries
-    },
-    data: []
-};
-
-function toggleDataSeries(e){
-    if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-        e.dataSeries.visible = false;
-    } else{
-        e.dataSeries.visible = true;
-    }
-    chart.render();
-}
-
-function add_data_series(name, data_x, data_y){
-    var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
-    chart.options.data.push({
-        type: "line",
-        axisYType: "secondary",
-        name: name,
-        showInLegend: true,
-        markerSize: 2,
-        dataPoints: points
-    });
-    chart.render();
-};
 
 $(function () {
-    chart = new CanvasJS.Chart("chartContainer", chart_cfg);
-    chart.render();
+    chart_init();
     load_data(function(){
         var $region = $("select[name='denominazione_regione']");
         $region.find('option').remove();
@@ -109,9 +67,11 @@ $(function () {
             var column = $column.children("option:selected").val();
             var table = table_filter(data['regioni'], 'denominazione_regione', region);
 
-            var data_x = table_get_column_date(table, "data");
-            var data_y = table_get_column_int(table, column);
+            var data_x = table_get_column(table, "data").map(string_to_date);
+            var data_y = table_get_column(table, column).map(string_to_int);
             add_data_series(column + " " + region, data_x, data_y);
+            lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
+            $("#info").append("<li>"+region+" "+column+": exponential R2="+lr.r2.toFixed(2)+" daily increase: "+((Math.exp(lr.m)-1)*100).toFixed(1)+"% (m="+lr.m+" q="+lr.q+")</li>")
             chart.render();
         });
     });
