@@ -1,4 +1,10 @@
-online: [https://paolini.github.io/covid19-charts/](browse covid-19 ITA charts)
+Explore covid-19 data in Italy regions
+
+data loaded from repository: https://github.com/pcm-dpc/COVID-19
+
+browse online: https://paolini.github.io/covid19-charts/
+
+# development
 
 To test on your local machine start an http server:
 
