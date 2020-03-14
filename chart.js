@@ -1,21 +1,8 @@
-var timeFormat = 'MM/DD/YYYY HH:mm';
-
-function newDate(days) {
-    return moment().add(days, 'd').toDate();
-}
-
-function newDateString(days) {
-    return moment().add(days, 'd').format(timeFormat);
-}
-
-var config = {
+var chart_config = {
     type: 'line',
-    data: {
-        datasets: []
-    },
     options: {
         title: {
-            text: 'Chart.js Time Scale'
+            text: 'ITA covid-19'
         },
         scales: {
             xAxes: [{
@@ -25,7 +12,7 @@ var config = {
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: 'Date'
+                    labelString: 'Data'
                 },
                 ticks: {
                         major: {
@@ -69,23 +56,25 @@ var config = {
             yAxes: [{
                 scaleLabel: {
                     display: true,
-                    labelString: 'value'
+                    labelString: 'numero'
                 }
             }]
         },
+        plugins: {
+            colorschemes: { // https://nagix.github.io/chartjs-plugin-colorschemes/
+              scheme: 'tableau.Tableau10'
+            }
+      
+        }
     }
 };
 
-
 var chart;
 
-function add_data_series(name, data_x, data_y){
+function chart_add_series(name, data_x, data_y){
     var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
-    // var color = Chart.helpers.color;
     chart.data.datasets.push({
         label: name,
-//        backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
-//        borderColor: window.chartColors.green,
         fill: false,
         data: points
     });
@@ -94,5 +83,5 @@ function add_data_series(name, data_x, data_y){
 
 function chart_init() {
     var ctx = document.getElementById('canvas').getContext('2d');
-    chart = new Chart(ctx, config);
+    chart = new Chart(ctx, chart_config);
 }

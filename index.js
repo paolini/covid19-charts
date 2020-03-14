@@ -95,7 +95,7 @@ $(function () {
 
             var data_x = table_get_column(table, "data").map(string_to_date);
             var data_y = table_get_column(table, column).map(string_to_int);
-            add_data_series(dash_to_space(column) + " italia", data_x, data_y);
+            chart_add_series(dash_to_space(column) + " italia", data_x, data_y);
             lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
             $("#info").append(
                 "<li>Italia "+dash_to_space(column)+": " 
@@ -129,7 +129,7 @@ $(function () {
 
             var data_x = table_get_column(table, "data").map(string_to_date);
             var data_y = table_get_column(table, column).map(string_to_int);
-            add_data_series(dash_to_space(column) + " " + region, data_x, data_y);
+            chart_add_series(dash_to_space(column) + " " + region, data_x, data_y);
             lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
             $("#info").append(
                 "<li>"+region+" "+dash_to_space(column)+": " 
