@@ -53,7 +53,18 @@ var datasets = [
         path: "/dati-province/dpc-covid19-ita-province.csv",
         fields: ['totale_casi'],
         filter_name_column: "denominazione_provincia",
-        filter_column: "codice_provincia"
+        filter_column: "codice_provincia",
+        table_adjust_hook: function(table) {
+            var j = table.headers.indexOf("codice_provincia");
+            var k = table.headers.indexOf("denominazione_provincia");
+            var h = table.headers.indexOf("denominazione_regione");
+            table.rows.forEach(function(row){
+                row[k] = utf8.decode(row[k]);
+                if (row[j]>900) {
+                    row[k] = row[h]+" "+row[k];
+                }
+            });
+        }
     }
 ];
 
@@ -62,12 +73,16 @@ $(function () {
 
     datasets.forEach(function(dataset){
         fetch_data(dataset.path).then(function(table){
+            if (dataset.table_adjust_hook) {
+                dataset.table_adjust_hook(table);
+            }
             var $column = $("select[name='" + dataset.name + "_column']");
             var $select = dataset.filter_column ? $("select[name='" + dataset.name + "_" + dataset.filter_column) : null;
             var $button = $("button[name='" + dataset.name + "_add']");
     
             if (dataset.filter_column) {
                 var pairs = table_get_column_distinct_pairs(table, dataset.filter_column, dataset.filter_name_column);
+                pairs.sort(function(a,b){return a[1].localeCompare(b[1])});
                 $select.find('option').remove();
                 pairs.forEach(function(pair){
                      $select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
