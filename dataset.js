@@ -29,7 +29,8 @@ class BaseDataset {
                 response.text().then(function(body) {
                     var rows = $.csv.toArrays(body);
                     var headers = rows[0];
-                    var rows = rows.slice(1);
+                    rows = rows.filter(function(row){return row.length>= headers.length});
+                    rows = rows.slice(1);
                     self.table = new Table(headers, rows);
                     
                     self.post_load_hook();
