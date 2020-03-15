@@ -11,12 +11,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
     <script src="Chart.min.js"></script>
     <script src="chartjs-plugin-colorschemes.min.js"></script>
-    <script src="utf8.js"></script>
+    <!--script src="utf8.js"></script-->
 
 
     <script src="chart.js"></script>
-    <script src="math.js"></script>
     <script src="table.js"></script>
+    <script src="series.js"></script>
     <script src="dataset.js"></script>
     <script src="index.js"></script>
 
@@ -31,10 +31,9 @@
 <body>
     <h1>covid 19 ITA charts</h1>
     <ul>
-       <li>dati della protezione civile (<a href="https://github.com/pcm-dpc/COVID-19">vedi qui</a>)
+       <li>Italian &quot;protezione civile&quot; (<a href="https://github.com/pcm-dpc/COVID-19">see here</a>)
            <ul>
                <li>dati-nazionali:
-                   Italia
                    <select name="italia_column"></select>
                    <button name="italia_add">plot</button>
                </li>
@@ -63,24 +62,27 @@
             </ul>
         </li-->
         <li>
-            scala 
+            scale
             <select name="chart_scale">
-                <option value="linear">lineare</option>
-                <option value="log">logaritmica</option>
+                <option value="linear">linear</option>
+                <option value="log">logaritmic</option>
             </select> 
-            sfalsamento temporale
+            -- time alignment
             <select name="time_shift">
                 <option value="off">off</option>
                 <option value="on">on</option>
             </select> (lo sfasamento temporale viene applicato solamente alle serie che vengono caricate in seguito)
         </li>
+        <li>
+            remove all plots <button name="chart_clear">clear</button>
+        </li>
     </ul>
 <div style="width:75%;">
     <canvas id="canvas"></canvas>
 </div>
-<ul id="info">
+<ul id="chart_info">
 </ul>
 
-<p>Codice su <a href="">github</a></p>
+<p>Code on <a href="">github</a></p>
 </body>
 </html>

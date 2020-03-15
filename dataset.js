@@ -14,11 +14,11 @@ class DpcDataset {
     }
 
     load() {
+        var self = this;
         const REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
 
-        console.log("start fetching dataset " + this.prefix);
+        console.log("start fetching dataset " + self.prefix);
 
-        var self = this;
         return new Promise(function(resolve,reject) {
             fetch(REPOSITORY_URL + self.options.path)
             .then(function(response) {
@@ -30,6 +30,7 @@ class DpcDataset {
                     if (self.options.table_adjust_hook) {
                         self.table = self.options.table_adjust_hook(self.table);
                     }
+                    console.log("finished fetching dataset " + self.prefix);
                     return resolve();
                 });
             })
@@ -79,26 +80,10 @@ class DpcDataset {
         var data_y = subtable.get_column(column).map(string_to_int);
 
         var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
-        var my_offset = ((lr.q/lr.m) + days_today);
 
-        var name = this.label(column, value_name);
-
-        if (first_series_offset === null) {
-            first_series_offset = my_offset;
-        } else if ($("select[name=time_shift]").children("option:selected").val() === "on") {
-            var offset =  my_offset - first_series_offset;
-            data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
-            if (offset > 0) {
-                name += " +" + offset.toFixed(1) + " giorni";
-            } else {
-                name += " -" + (-offset).toFixed(1) + " giorni";
-            }
-        }
-
-        chart_add_series(name, data_x, data_y);
-        chart.render();
-
-        display_regression(name, lr);
+        var label = this.label(column, value_name);
+        var series = new Series(data_x, data_y, label);
+        chart.add_series(series);
     }
     /*
         filters: object mapping column names to values

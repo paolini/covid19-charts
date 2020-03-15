@@ -3,9 +3,6 @@
 var common_fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
     "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
 
-var today = new Date();
-var days_today = date_to_days(today);
-
 function fetch_data(path) {
     const REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
     return new Promise(function(resolve,reject) {
@@ -54,23 +51,6 @@ function fetch_data_hopkins(path) {
     });
 }
 
-var months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-
-function display_regression(name, lr) {
-    var days_passed = ((lr.q/lr.m) + days_today);
-    var first_day = new Date((days_today-days_passed)*1000.0*60*60*24);
-    $("#info").append(
-        "<li> "+name+": " 
-        + "fit esponenziale: R2=<b>"+lr.r2.toFixed(2)+"</b>, "
-        + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
-        + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
-        + "inizio <b>" + days_passed.toFixed(1) + "</b> giorni fa: "
-        + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
-        + "<!-- m="+lr.m+" "
-        + "q="+lr.q+" --></li>"
-        );
-}
-
 var datasets = [
     new DpcDataset({
         name: "italia",
@@ -117,23 +97,22 @@ var datasets = [
     },*/
 ]
 
-var first_series_offset = null;
+var chart;
 
 $(function () {
-    chart_init();
+    chart = new ChartWrapper();
+
+    $("select[name='chart_scale']").change(function(){
+        var val = $(this).children("option:selected").val();
+        chart.set_logarithmic(val==='log');
+    });
 
     datasets.forEach(function(dataset){
         dataset.init_html();        
         
         dataset.load().then(function() {
             dataset.populate_html();            
-            console.log("finished fetching dataset " + dataset.prefix);
         });    
     });
 
-    $("select[name='chart_scale']").change(function(){
-        var val = $(this).children("option:selected").val();
-        chart.options.scales.yAxes[0].type = val==='log' ? 'logarithmic' : 'linear';
-        chart.update();
-    });
 });   

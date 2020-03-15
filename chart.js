@@ -70,19 +70,86 @@ var chart_config = {
     }
 };
 
-var chart;
+var months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
 
-function chart_add_series(name, data_x, data_y){
-    var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
-    chart.data.datasets.push({
-        label: name,
-        fill: false,
-        data: points
-    });
-    chart.update();
+
+
+class ChartWrapper {
+    constructor() {
+        var ctx = document.getElementById('canvas').getContext('2d');
+        this.chart = new Chart(ctx, chart_config); 
+        this.serieses = [];   
+        var self = this;
+        this.days_today = date_to_days(new Date());
+        this.time_shift = false;
+
+        this.$info = $("#chart_info");
+        this.$clear = $("button[name='chart_clear']");
+        this.$time_shift = $("select[name=time_shift]");
+        
+        this.$clear.click(function(){ 
+            self.clear(); 
+        });
+
+        this.$time_shift.change(function(){
+            self.time_shift = self.$time_shift.children("option:selected").val() === "on";
+        })
+    }
+
+    add_series(series) {
+        var label = series.label;
+        var data_x = series.data_x;
+        if (this.time_shift && this.serieses.length>0) {
+            var offset =  series.offset - this.serieses[0].offset;
+            data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
+            if (offset > 0) {
+                label += " +" + offset.toFixed(1) + " giorni";
+            } else {
+                label += " -" + (-offset).toFixed(1) + " giorni";
+            }
+        }
+
+        var points = data_x.map(function(x, i) {return {"x": x, "y": series.data_y[i]}});
+        this.chart.data.datasets.push({
+            label: label,
+            fill: false,
+            data: points
+        });
+        this.serieses.push(series);
+        this.chart.update();
+        this.display_regression(series);
+        if (this.serieses.length > 1) {
+            this.$time_shift.prop("disabled", true);
+        }
+    };
+
+    display_regression(series) {
+        var name = series.label;
+        var lr = series.lr;
+        var days_passed = series.offset + this.days_today;
+        var first_day = new Date((this.days_today-days_passed)*1000.0*60*60*24);
+        this.$info.append(
+            "<li> "+name+": " 
+            + "fit esponenziale: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
+            + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
+            + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
+            + "inizio <b>" + days_passed.toFixed(1) + "</b> giorni fa: "
+            + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
+            + "<!-- m="+lr.m+" "
+            + "q="+lr.q+" --></li>"
+            );
+    }
+    
+    clear() {
+        this.chart.data.datasets = [];
+        this.serieses = [];
+        this.chart.update();
+        this.$info.find("li").remove();
+        this.$time_shift.prop("disabled", false);
+    }
+
+    set_logarithmic(logarithmic) {
+        this.chart.options.scales.yAxes[0].type = logarithmic ? 'logarithmic' : 'linear';
+        this.chart.update();
+    }
 };
-
-function chart_init() {
-    var ctx = document.getElementById('canvas').getContext('2d');
-    chart = new Chart(ctx, chart_config);
-}
