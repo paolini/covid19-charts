@@ -118,7 +118,7 @@ class DpcNazionaleDataset extends DpcDataset {
     }
 
     series_label(column, value) {
-        return "Italia" + dash_to_space(column);
+        return "Italia " + dash_to_space(column);
     }
 }
 
