@@ -2,7 +2,9 @@ var datasets = [
     new DpcNazionaleDataset(),
     new DpcRegioniDataset(),
     new DpcProvinceDataset(),
-    new HopkinsConfirmedDataset()
+    new HopkinsConfirmedDataset(),
+    new HopkinsDeathsDataset(),
+    new HopkinsRecoveredDataset()
 ]
 
 var chart;
