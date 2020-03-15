@@ -154,8 +154,8 @@ class HopkinsDataset extends BaseDataset {
     constructor(options) {
         super(options);
         this.REPOSITORY_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/";
-        this.filter_column = options.filter_column;
-        this.subfilter_column = options.subfilter_column;
+        this.filter_column = options.filter_column || "Country/Region";
+        this.subfilter_column = options.subfilter_column || "Province/State";
         this.fields = options.fields;
         this.first_time_column = 4;
     }
@@ -259,12 +259,31 @@ class HopkinsDataset extends BaseDataset {
 class HopkinsConfirmedDataset extends HopkinsDataset {
     constructor() {
         super({
-            name: "countries",
+            name: "confirmed",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
-            fields: ['Confirmed'],
-            filter_column: "Country/Region",
-            subfilter_column: "Province/State"
+            fields: ['confirmed'],
         });
     }
-
 }
+
+class HopkinsDeathsDataset extends HopkinsDataset {
+    constructor() {
+        super({
+            name: "deaths",
+            path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv",
+            fields: ['deaths'],
+        });
+    }
+}
+
+class HopkinsRecoveredDataset extends HopkinsDataset {
+    constructor() {
+        super({
+            name: "recovered",
+            path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
+            fields: ['recovered'],
+        });
+    }
+}
+
+

@@ -1,7 +1,5 @@
 Explore covid-19 data in Italy regions
 
-data loaded from repository: https://github.com/pcm-dpc/COVID-19
-
 browse online: https://paolini.github.io/covid19-charts/
 
 # development
