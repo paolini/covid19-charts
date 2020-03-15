@@ -3,6 +3,8 @@
 <head>  
     <title>covid 19 ITA charts</title>
 
+    <link rel="stylesheet" href="index.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.js"></script>
 
@@ -29,7 +31,7 @@
 	</style>
 </head>
 <body>
-    <h1>covid 19 ITA charts</h1>
+    <h1>covid-19 charts</h1>
     <p>
         <b>warning:</b>
         this application is fetching data directly from the sources described.
@@ -83,10 +85,11 @@
             </ul>
         </li>
         <li>
-            scale
-            <select name="chart_scale">
+            plot type
+            <select name="chart_type">
                 <option value="linear">linear</option>
                 <option value="log">logaritmic</option>
+                <option value="rate">spreading rate</option>
             </select> 
             -- time alignment
             <select name="time_shift">

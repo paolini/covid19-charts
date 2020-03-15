@@ -29,7 +29,8 @@ class BaseDataset {
                 response.text().then(function(body) {
                     var rows = $.csv.toArrays(body);
                     var headers = rows[0];
-                    var rows = rows.slice(1);
+                    rows = rows.filter(function(row){return row.length>= headers.length});
+                    rows = rows.slice(1);
                     self.table = new Table(headers, rows);
                     
                     self.post_load_hook();
@@ -92,6 +93,7 @@ class DpcDataset extends BaseDataset {
         var column = this.$column.children("option:selected").val();
         var subtable = this.table;
         var value = null;
+        var value_name = null;
 
         if (this.filter_column) {
             value = this.$select.children("option:selected").val();
@@ -101,7 +103,7 @@ class DpcDataset extends BaseDataset {
 
         var data_x = subtable.get_column("data").map(string_to_date);
         var data_y = subtable.get_column(column).map(string_to_int);
-        var label = this.series_label(column, value);
+        var label = this.series_label(column, value_name);
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
     }
@@ -116,7 +118,7 @@ class DpcNazionaleDataset extends DpcDataset {
     }
 
     series_label(column, value) {
-        return "Italia" + dash_to_space(column);
+        return "Italia " + dash_to_space(column);
     }
 }
 
