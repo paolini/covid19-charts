@@ -25,7 +25,7 @@ function fetch_data(path) {
     });
 }
 
-function fetch_data_hopkins(path, province) {
+function fetch_data_hopkins(path) {
     const REPOSITORY_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/";
     return new Promise(function(resolve,reject) {
         fetch(REPOSITORY_URL + path)
@@ -39,27 +39,9 @@ function fetch_data_hopkins(path, province) {
                 var rows = rows.slice(1);
                 var full_rows = [];
                 rows.forEach(function(row){
-                    if (province && row[0]==="") {
-                        // this is not a province: discard
-                    } else {
-                        for (i=first_date_column;i<row.length;++i) {
-                            var found = full_rows.length;
-                            if (!province) {
-                                // need aggregation
-                                if (row[1] == "Canada") {
-                                    console.log("Canada");
-                                }
-                                for (found=0;found < full_rows.length;found++) {
-                                    if (full_rows[found][1]===row[1] && full_rows[found][first_date_column]===dates[i-first_date_column]) break;
-                                }
-                            }
-                            if (found >= full_rows.length) {
-                                row[0] = row[1]+" "+row[0];
-                                full_rows.push(row.slice(0,first_date_column).concat([dates[i-first_date_column], parseInt(row[i])]));
-                            } else {
-                                full_rows[found][first_date_column+1] += parseInt(row[i])
-                            }
-                        }
+                    for (i=first_date_column;i<row.length;++i) {
+                        var found = full_rows.length;
+                        full_rows.push(row.slice(0,first_date_column).concat([dates[i-first_date_column], parseInt(row[i])]));
                     }
                 });
                 var table = { 
@@ -70,14 +52,6 @@ function fetch_data_hopkins(path, province) {
             });
         })
     });
-}
-
-function fetch_data_hopkins_country(path) {
-    return fetch_data_hopkins(path, false);
-}
-
-function fetch_data_hopkins_province(path) {
-    return fetch_data_hopkins(path, true);
 }
 
 var months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
@@ -98,22 +72,21 @@ function display_regression(name, lr) {
 }
 
 var datasets = [
-    {
+    new DpcDataset({
         name: "italia",
-        fetch_hook: fetch_data,
         path: "dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv",
         fields: common_fields,
         label: function(column, value) {return "Italia " + dash_to_space(column);}
-    },
-    {
+    }),
+    new DpcDataset({
         name: "regioni",
         fetch_hook: fetch_data,
         path: "dati-regioni/dpc-covid19-ita-regioni.csv",
         fields: common_fields,
         filter_name_column: "denominazione_regione",
         filter_column: "codice_regione"
-    },
-    {
+    }),
+    new DpcDataset({
         name: "province",
         fetch_hook: fetch_data,
         path: "dati-province/dpc-covid19-ita-province.csv",
@@ -121,107 +94,40 @@ var datasets = [
         filter_name_column: "denominazione_provincia",
         filter_column: "codice_provincia",
         table_adjust_hook: function(table) {
-            var j = table.headers.indexOf("codice_provincia");
+            //    var j = table.headers.indexOf("codice_provincia");
             var k = table.headers.indexOf("denominazione_provincia");
             var h = table.headers.indexOf("denominazione_regione");
             table.rows.forEach(function(row){
-                if (row[j]>900) {
-                    row[k] = row[h]+" "+row[k];
-                }
+                row[k] = row[h]+": "+row[k];
             });
+            return table;
         }
-    },
+    })
+    /*,
     {
         name: "countries",
-        fetch_hook: fetch_data_hopkins_country,
+        request_load: true,
+        fetch_hook: fetch_data_hopkins,
         path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
         fields: ['Confirmed'],
         filter_name_column: "Country/Region",
-        filter_column: "Country/Region"
-    },
-    {
-        name: "states",
-        fetch_hook: fetch_data_hopkins_province,
-        path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
-        fields: ['Confirmed'],
-        filter_name_column: "Province/State",
-        filter_column: "Province/State"
-    }
-];
+        filter_column: "Country/Region",
+        subfilter_name_column: "Province/State",
+        subfilter_column: "Province/State"
+    },*/
+]
+
+var first_series_offset = null;
 
 $(function () {
     chart_init();
 
-    var first_series_offset = null;
-
     datasets.forEach(function(dataset){
-        var $button = $("button[name='" + dataset.name + "_add']");
-        $button.prop("disabled", true);
-        console.log("start fetching dataset " + dataset.name);
-        dataset.fetch_hook(dataset.path).then(function(table){
-            if (dataset.table_adjust_hook) {
-                dataset.table_adjust_hook(table);
-            }
-            var $column = $("select[name='" + dataset.name + "_column']");
-            var $select = dataset.filter_column ? $("select[name='" + dataset.name + "_" + dataset.filter_column) : null;
-    
-            if (dataset.filter_column) {
-                var pairs = table_get_column_distinct_pairs(table, dataset.filter_column, dataset.filter_name_column);
-                pairs.sort(function(a,b){return a[1].localeCompare(b[1])});
-                $select.find('option').remove();
-                pairs.forEach(function(pair){
-                     $select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
-                });
-            }
-            
-            $column.find('option').remove();
-            dataset.fields.forEach(function(field){
-                $column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
-            });
-    
-            console.log("finished fetching dataset " + dataset.name);
-
-            $button.prop("disabled", false);
-            $button.click(function(){
-                var column = $column.children("option:selected").val();
-                var subtable = table;
-                var value = null;
-                var value_name = null;
-                if (dataset.filter_column) {
-                    value = $select.children("option:selected").val();
-                    value_name = $select.children("option:selected").text();
-                    var subtable = table_filter(table, dataset.filter_column, value);
-                }
-    
-                var data_x = table_get_column(subtable, "data").map(string_to_date);
-                var data_y = table_get_column(subtable, column).map(string_to_int);
-
-                var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
-                var my_offset = ((lr.q/lr.m) + days_today);
-
-                var label = dataset.label || (function(column, value) {
-                    return value + " " + dash_to_space(column);
-                });
-                var name = label(column, value_name);
-
-    
-                if (first_series_offset === null) {
-                    first_series_offset = my_offset;
-                } else if ($("select[name=time_shift]").children("option:selected").val() === "on") {
-                    var offset =  my_offset - first_series_offset;
-                    data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
-                    if (offset > 0) {
-                        name += " +" + offset.toFixed(1) + " giorni";
-                    } else {
-                        name += " -" + (-offset).toFixed(1) + " giorni";
-                    }
-                }
-
-                chart_add_series(name, data_x, data_y);
-                chart.render();
-
-                display_regression(name, lr);
-            });
+        dataset.init_html();        
+        
+        dataset.load().then(function() {
+            dataset.populate_html();            
+            console.log("finished fetching dataset " + dataset.prefix);
         });    
     });
 
