@@ -1,35 +1,36 @@
 class DpcDataset {
     constructor(options) {
-        this.options = options;
-        const COMMON_FIELDS = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
+        this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
         "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
-        this.prefix = this.options.prefix || this.options.name;
-        this.fields = this.options.fields || COMMON_FIELDS;
-        this.filter_column = this.options.filter_column || null;
-        this.filter_name_column = this.options.filter_name_column || this.filter_column;
-        this.label = this.options.label || 
-            (function(column, value) {
-                return value + " " + dash_to_space(column);
-            });
+        this.prefix = options.prefix || options.name;
+        this.filter_column = options.filter_column || null;
+        this.filter_name_column = options.filter_name_column || this.filter_column;
+        this.REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
+        this.path = options.path;
+    }
+
+    post_load_hook() {}
+
+    series_label(column, value) {
+        return value + " " + dash_to_space(column);
     }
 
     load() {
         var self = this;
-        const REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
 
         console.log("start fetching dataset " + self.prefix);
 
         return new Promise(function(resolve,reject) {
-            fetch(REPOSITORY_URL + self.options.path)
+            fetch(self.REPOSITORY_URL + self.path)
             .then(function(response) {
                 response.text().then(function(body) {
                     var rows = $.csv.toArrays(body);
                     var headers = rows[0];
                     var rows = rows.slice(1);
                     self.table = new Table(headers, rows);
-                    if (self.options.table_adjust_hook) {
-                        self.table = self.options.table_adjust_hook(self.table);
-                    }
+                    
+                    self.post_load_hook();
+
                     console.log("finished fetching dataset " + self.prefix);
                     return resolve();
                 });
@@ -81,27 +82,56 @@ class DpcDataset {
 
         var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days));
 
-        var label = this.label(column, value_name);
+        var label = this.series_label(column, value_name);
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
     }
-    /*
-        filters: object mapping column names to values
-    */
-    get_series(column, filters) {
-        var rows = this.table.rows;
+}
 
-        Object.entries(filters).forEach(function(entry){
-            var i = this.table.headers.indexOf(entry[0]);
-            rows = rows.filter(function(row){row[i] === entry[1]});
+class DpcNazionaleDataset extends DpcDataset {
+    constructor() {
+        super({
+            name: "italia",
+            path: "dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv"
         });
-
-        var i = this.table.headers.indexOf("data");
-
-        var data_x = this.get_column("data").map(string_to_date);
-        var data_y = this.get_column(column).map(string_to_int);
-        var label = this.options.label(column, filters);
-        return new Series(data_x, data_y, label);
     }
+
+    series_label(column, value) {
+        return "Italia" + dash_to_space(column);
+    }
+}
+
+class DpcRegioniDataset extends DpcDataset {
+    constructor() {
+        super({
+            name: "regioni",
+            path: "dati-regioni/dpc-covid19-ita-regioni.csv",
+            filter_name_column: "denominazione_regione",
+            filter_column: "codice_regione"
+        });
+    }
+}
+
+class DpcProvinceDataset extends DpcDataset {
+    constructor() {
+        super({
+            name: "province",
+            path: "dati-province/dpc-covid19-ita-province.csv",
+            filter_name_column: "denominazione_provincia",
+            filter_column: "codice_provincia"
+        });
+        this.fields = ['totale_casi'];
+    }
+
+    post_load_hook() {
+        var k = this.table.headers.indexOf("denominazione_provincia");
+        var h = this.table.headers.indexOf("denominazione_regione");
+        this.table.rows.forEach(function(row){
+            row[k] = row[h]+": "+row[k];
+        });
+    }
+}
+
+class HopkinsDataset {
 
 }

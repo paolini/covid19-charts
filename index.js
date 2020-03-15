@@ -52,37 +52,9 @@ function fetch_data_hopkins(path) {
 }
 
 var datasets = [
-    new DpcDataset({
-        name: "italia",
-        path: "dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv",
-        fields: common_fields,
-        label: function(column, value) {return "Italia " + dash_to_space(column);}
-    }),
-    new DpcDataset({
-        name: "regioni",
-        fetch_hook: fetch_data,
-        path: "dati-regioni/dpc-covid19-ita-regioni.csv",
-        fields: common_fields,
-        filter_name_column: "denominazione_regione",
-        filter_column: "codice_regione"
-    }),
-    new DpcDataset({
-        name: "province",
-        fetch_hook: fetch_data,
-        path: "dati-province/dpc-covid19-ita-province.csv",
-        fields: ['totale_casi'],
-        filter_name_column: "denominazione_provincia",
-        filter_column: "codice_provincia",
-        table_adjust_hook: function(table) {
-            //    var j = table.headers.indexOf("codice_provincia");
-            var k = table.headers.indexOf("denominazione_provincia");
-            var h = table.headers.indexOf("denominazione_regione");
-            table.rows.forEach(function(row){
-                row[k] = row[h]+": "+row[k];
-            });
-            return table;
-        }
-    })
+    new DpcNazionaleDataset(),
+    new DpcRegioniDataset(),
+    new DpcProvinceDataset()
     /*,
     {
         name: "countries",
