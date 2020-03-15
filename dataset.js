@@ -204,16 +204,20 @@ class HopkinsDataset extends BaseDataset {
         });
 
         this.$select.find("option").remove();
-        Object.entries(obj).forEach(function(entry) {
-            self.$select.append("<option value='" + entry[0] + "'>" + entry[0] + "</option>");
+        var options = Object.getOwnPropertyNames(obj);
+        options.sort();
+        options.forEach(function(option) {
+            self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
 
         this.$select.change(function() {
             var value = self.$select.children("option:selected").val();
             self.$subselect.find("option").remove();
             self.$subselect.append("<option value=''>-- all states --</option>");
-            Object.entries(obj[value]).forEach(function(entry) {
-                self.$subselect.append("<option value='" + entry[0] + "'>" + entry[0] + "</option>");
+            var options = Object.getOwnPropertyNames(obj[value]);
+            options.sort();
+            options.forEach(function(option) {
+                self.$subselect.append("<option value='" + option + "'>" + option + "</option>");
             });
             self.$subselect.prop("disabled", false);
         });
