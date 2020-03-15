@@ -58,8 +58,25 @@ var chart_config = {
                     display: true,
                     labelString: 'count'
                 },
-                type: 'linear'
-            }]
+                ticks: {
+                    beginAtZero: true,
+                },
+                type: 'linear',
+                display: true,
+                id: "count"
+            },{
+                scaleLabel: {
+                    display: true,
+                    labelString: '%'
+                },
+                ticks: {
+                    beginAtZero: true,
+                },
+                type: 'linear',
+                display: false,
+                id: "rate"
+            }
+            ]
         },
         plugins: {
             colorschemes: { // https://nagix.github.io/chartjs-plugin-colorschemes/
@@ -76,24 +93,39 @@ var months = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "oc
 
 class ChartWrapper {
     constructor() {
+        var self = this;
         var ctx = document.getElementById('canvas').getContext('2d');
         this.chart = new Chart(ctx, chart_config); 
         this.serieses = [];   
-        var self = this;
         this.days_today = date_to_days(new Date());
         this.time_shift = false;
+        this.rate_plot = false;
+        this.no_update = false;
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
         this.$time_shift = $("select[name=time_shift]");
-        
+        this.$plot_type = $("select[name=chart_type]");
+    
         this.$clear.click(function(){ 
             self.clear(); 
         });
 
         this.$time_shift.change(function(){
-            self.time_shift = self.$time_shift.children("option:selected").val() === "on";
+            self.time_shift = (self.$time_shift.children("option:selected").val() === "on");
+            if (self.serieses.length>1) self.redraw();
         })
+
+        this.$plot_type.change(function() {
+            var val = self.$plot_type.children("option:selected").val();
+            self.chart.options.scales.yAxes[0].type = (val=="log") ? 'logarithmic' : 'linear';
+            self.rate_plot = (val=="rate");
+            self.redraw();
+        })
+    }
+
+    update() {
+        if (!this.no_update) this.chart.update();
     }
 
     add_series(series) {
@@ -102,25 +134,40 @@ class ChartWrapper {
         if (this.time_shift && this.serieses.length>0) {
             var offset =  series.offset - this.serieses[0].offset;
             data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
-            if (offset > 0) {
+            if (offset > 0) {this.rate_plot ? 1 : 0
                 label += " +" + offset.toFixed(1) + " giorni";
             } else {
                 label += " -" + (-offset).toFixed(1) + " giorni";
             }
         }
 
-        var points = data_x.map(function(x, i) {return {"x": x, "y": series.data_y[i]}});
+        var data_y = series.data_y;
+        if (this.rate_plot) {
+            data_x = data_x.slice(1);
+            var data_y = new Array(data_x.length);
+            for (var i=0; i < data_y.length;++i) {
+                if (series.data_y[i]>0) {
+                    data_y[i] = (series.data_y[i+1] / series.data_y[i] - 1.0) * 100.0; 
+                } else {
+                    data_y[i] = 0.0;
+                }
+            }
+        }
+
+        this.chart.options.scales.yAxes[0].display = !this.rate_plot;
+        this.chart.options.scales.yAxes[1].display = this.rate_plot;
+
+        var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
         this.chart.data.datasets.push({
             label: label,
             fill: false,
+            yAxisID: (this.rate_plot ? "rate" : "count"),
+            lineTension: 0,
             data: points
         });
         this.serieses.push(series);
-        this.chart.update();
+        this.update();
         this.display_regression(series);
-        if (this.serieses.length > 1) {
-            this.$time_shift.prop("disabled", true);
-        }
     };
 
     display_regression(series) {
@@ -143,13 +190,20 @@ class ChartWrapper {
     clear() {
         this.chart.data.datasets = [];
         this.serieses = [];
-        this.chart.update();
+        this.update();
         this.$info.find("li").remove();
-        this.$time_shift.prop("disabled", false);
     }
 
-    set_logarithmic(logarithmic) {
-        this.chart.options.scales.yAxes[0].type = logarithmic ? 'logarithmic' : 'linear';
-        this.chart.update();
+    redraw() {
+        var self = this;
+        var serieses = this.serieses; // backup
+        var no_update_backup = this.no_update;
+        this.no_update = true;
+        this.clear();
+        serieses.forEach(function (series){
+            self.add_series(series);
+        })
+        this.no_update = no_update_backup;
+        this.update();
     }
 };
