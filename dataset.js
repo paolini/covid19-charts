@@ -101,6 +101,7 @@ class DpcDataset extends BaseDataset {
 
         var data_x = subtable.get_column("data").map(string_to_date);
         var data_y = subtable.get_column(column).map(string_to_int);
+        var label = this.series_label(column, value);
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
     }
