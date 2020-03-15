@@ -92,6 +92,7 @@ class DpcDataset extends BaseDataset {
         var column = this.$column.children("option:selected").val();
         var subtable = this.table;
         var value = null;
+        var value_name = null;
 
         if (this.filter_column) {
             value = this.$select.children("option:selected").val();
@@ -101,7 +102,7 @@ class DpcDataset extends BaseDataset {
 
         var data_x = subtable.get_column("data").map(string_to_date);
         var data_y = subtable.get_column(column).map(string_to_int);
-        var label = this.series_label(column, value);
+        var label = this.series_label(column, value_name);
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
     }
