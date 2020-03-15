@@ -16,11 +16,7 @@ $(function () {
     });
 
     datasets.forEach(function(dataset){
-        dataset.init_html();        
-        
-        dataset.load().then(function() {
-            dataset.populate_html();            
-        });    
+        dataset.run();
     });
 
 });   

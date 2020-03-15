@@ -2,7 +2,7 @@ var chart_config = {
     type: 'line',
     options: {
         title: {
-            text: 'ITA covid-19'
+            text: 'covid-19'
         },
         scales: {
             xAxes: [{
@@ -56,7 +56,7 @@ var chart_config = {
             yAxes: [{
                 scaleLabel: {
                     display: true,
-                    labelString: 'numero'
+                    labelString: 'count'
                 },
                 type: 'linear'
             }]
@@ -70,7 +70,7 @@ var chart_config = {
     }
 };
 
-var months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+var months = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 
 

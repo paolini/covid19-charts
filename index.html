@@ -57,14 +57,13 @@
                 </li>
             </ul>
         </li>
-        <li>dati raccolti dalla John Hopkins (<a href="https://github.com/CSSEGISandData/COVID-19">vedi qui</a>)
+        <li>John Hopkins data (<a href="https://github.com/CSSEGISandData/COVID-19">see here</a>)
             <ul>
                 <li>
                     Confirmed: 
-                    <button name="countries_load">carica i dati</button>
-                    <select name="countries_Country/Region"></select>
-                    <select name="countries_Province/State"></select>
-                    <select name="countries_column"></select>
+                    <!--button name="countries_load">carica i dati</button-->
+                    <select name="countries_filter"></select>
+                    <select name="countries_subfilter"></select>
                     <button name="countries_add">plot</button>
                 </li>
             </ul>
@@ -79,7 +78,7 @@
             <select name="time_shift">
                 <option value="off">off</option>
                 <option value="on">on</option>
-            </select> (lo sfasamento temporale viene applicato solamente alle serie che vengono caricate in seguito)
+            </select> 
         </li>
         <li>
             remove all plots <button name="chart_clear">clear</button>
