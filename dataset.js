@@ -1,11 +1,6 @@
-class DpcDataset {
+class BaseDataset {
     constructor(options) {
-        this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
-        "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
         this.prefix = options.prefix || options.name;
-        this.filter_column = options.filter_column || null;
-        this.filter_name_column = options.filter_name_column || this.filter_column;
-        this.REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
         this.path = options.path;
     }
 
@@ -41,8 +36,6 @@ class DpcDataset {
     init_html() {
         this.$button = $("button[name='" + this.prefix + "_add']"); 
         this.$button.prop("disabled", true);
-        this.$column = $("select[name='" + this.prefix + "_column']");
-        this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column) : null;
     }
 
     populate_html() {
@@ -86,6 +79,28 @@ class DpcDataset {
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
     }
+}
+
+/*
+ * database della protezione civile
+ */
+
+class DpcDataset extends BaseDataset {
+    constructor(options) {
+        super(options);
+        this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
+        "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
+        this.filter_column = options.filter_column || null;
+        this.filter_name_column = options.filter_name_column || this.filter_column;
+        this.REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
+    }
+
+    init_html() {
+        super.init_html();
+        this.$column = $("select[name='" + this.prefix + "_column']");
+        this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column) : null;
+    }
+
 }
 
 class DpcNazionaleDataset extends DpcDataset {
@@ -132,6 +147,23 @@ class DpcProvinceDataset extends DpcDataset {
     }
 }
 
-class HopkinsDataset {
+class HopkinsDataset extends BaseDataset {
+    constructor(options) {
+        super(options);
+        this.REPOSITORY_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/";
+    }
+}
 
+class HopkinsConfirmedDataset extends HopkinsDataset {
+    constructor() {
+        super({
+            name: "countries",
+            path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
+            fields: ['Confirmed'],
+            filter_name_column: "Country/Region",
+            filter_column: "Country/Region",
+            subfilter_name_column: "Province/State",
+            subfilter_column: "Province/State"
+        });
+    }
 }
