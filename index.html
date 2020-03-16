@@ -92,11 +92,24 @@
                 <option value="rate">spreading rate</option>
             </select> 
             -- draw fitting exponential <input type="checkbox" name="draw_fit">
+            -- consider
+            <select name="n_points">
+                <option value="">all data points</option>
+                <option value="28">last 28 points</option>
+                <option value="21">last 21 points</option>
+                <option value="14">last 14 points</option>
+                <option value="10">last 10 points</option>
+                <option value="9">last 9 points</option>
+                <option value="8">last 8 points</option>
+                <option value="7">last 7 points</option>
+                <option value="6">last 6 points</option>
+                <option value="5">last 5 points</option>
+                <option value="4">last 4 points</option>
+                <option value="3">last 4 points</option>
+                <option value="2">last 4 points</option>
+            </select>
             -- time alignment
-            <select name="time_shift">
-                <option value="off">off</option>
-                <option value="on">on</option>
-            </select> 
+                <input type="checkbox" name="time_shift">
         </li>
         <li>
             remove all plots <button name="chart_clear">clear</button>

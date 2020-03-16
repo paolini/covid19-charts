@@ -80,7 +80,7 @@ var chart_config = {
         },
         plugins: {
             colorschemes: { // https://nagix.github.io/chartjs-plugin-colorschemes/
-              scheme: 'tableau.Tableau10'
+              scheme: 'tableau.Tableau10' // ignored: see Chart.add_series below
             }
       
         }
@@ -102,19 +102,21 @@ class ChartWrapper {
         this.rate_plot = false;
         this.no_update = false;
         this.draw_fit = false;
+        this.n_points = 0; // all
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
-        this.$time_shift = $("select[name=time_shift]");
+        this.$time_shift = $("input[name=time_shift]");
         this.$plot_type = $("select[name=chart_type]");
         this.$draw_fit = $("input[name=draw_fit");
+        this.$n_points = $("select[name='n_points']");
     
         this.$clear.click(function(){ 
             self.clear(); 
         });
 
         this.$time_shift.change(function(){
-            self.time_shift = (self.$time_shift.children("option:selected").val() === "on");
+            self.time_shift = self.$time_shift.is(":checked");
             if (self.serieses.length>1) self.redraw();
         })
         this.$time_shift.change();
@@ -131,6 +133,16 @@ class ChartWrapper {
             self.draw_fit = self.$draw_fit.is(":checked");
         })
         this.$draw_fit.change();
+
+        this.$n_points.change(function() {
+            var val = self.$n_points.children("option:selected").val();
+            if (val === "") {
+                self.n_points = 0;
+            } else {
+                self.n_points = parseInt(val);
+            }
+        });
+        this.$n_points.change();
     }
 
     update() {
@@ -138,12 +150,23 @@ class ChartWrapper {
     }
 
     add_series(series) {
+        if (this.n_points>0) {
+            series = new Series(
+                series.data_x.slice(-this.n_points),
+                series.data_y.slice(-this.n_points),
+                series.label)
+        }
+
+        series.compute_lr();
+
         var label = series.label;
         var data_x = series.data_x;
         var color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
 
+
         if (this.time_shift && this.serieses.length>0) {
-            var offset =  series.offset - this.serieses[0].offset;
+//            var offset =  series.offset - this.serieses[0].offset;
+            var offset = series.offset_relative_to_series(this.serieses[0]);
             data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
             if (offset > 0) {this.rate_plot ? 1 : 0
                 label += " +" + offset.toFixed(1) + " giorni";
@@ -175,7 +198,8 @@ class ChartWrapper {
             fill: false,
             yAxisID: (this.rate_plot ? "rate" : "count"),
             lineTension: 0,
-            borderColor: color
+            borderColor: color,
+            borderJoinStyle: "round"
         });
 
         if (!series.hasOwnProperty("draw_fit")) {
@@ -186,17 +210,21 @@ class ChartWrapper {
             var start = date_to_days(series.data_x[0]);
             var end = date_to_days(series.data_x[series.data_x.length-1]) + 5.0;
             var points = new Array(100);
+            var offset = 0;
+            if (this.time_shift && this.serieses.length>0) {
+                offset = series.offset - this.serieses[0].offset;
+            };
             for (var i=0;i<points.length;++i) {
                 var x = start + (end-start)*i/(points.length-1);
                 points[i] = {
-                    x: days_to_date(x),
+                    x: days_to_date(x + offset),
                     y: this.rate_plot ? 100.0*(Math.exp(series.lr.m)-1) : Math.exp(series.lr.m * x + series.lr.q)
                 }
             }
             this.chart.data.datasets.push({
                 data: points,
                 fill: false,
-                lavel: "fit",
+                label: "fit",
                 yAxisID: (this.rate_plot ? "rate" : "count"),
                 pointRadius: 0,
                 borderWidth: 1,
@@ -218,10 +246,10 @@ class ChartWrapper {
         var first_day = new Date((this.days_today-days_passed)*1000.0*60*60*24);
         this.$info.append(
             "<li> "+name+": " 
-            + "fit esponenziale: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
-            + "aumento giornaliero: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
-            + "raddoppio in: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
-            + "inizio <b>" + days_passed.toFixed(1) + "</b> giorni fa: "
+            + "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
+            + "daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
+            + "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
+            + "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
             + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
             + "<!-- m="+lr.m+" "
             + "q="+lr.q+" --></li>"

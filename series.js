@@ -3,8 +3,25 @@ class Series {
         this.label = label;
         this.data_x = data_x;
         this.data_y = data_y;
+    }
+
+    compute_lr() {
         this.lr = linearRegression(this.data_y.map(Math.log), this.data_x.map(date_to_days));
         this.offset = this.lr.q/this.lr.m;
+    }
+
+    offset_relative_to_series(series) {
+        var last = this.data_y.length-1;
+        var last2 = series.data_y.length-1;
+        if (series.data_y[last2] > this.data_y[last]) {
+            var i;
+            for (i=series.data_y.length-1;i>=0 && series.data_y[i] > this.data_y[last];i--) {}
+            return i-last;
+        } else {
+            var i;
+            for (i=last;i>=0 && series.data_y[last2] < this.data_y[i];i--) {}
+            return last-i;
+        }
     }
 }
 
