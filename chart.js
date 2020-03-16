@@ -187,10 +187,14 @@ class ChartWrapper {
             var start = date_to_days(series.data_x[0]);
             var end = date_to_days(series.data_x[series.data_x.length-1]) + 5.0;
             var points = new Array(100);
+            var offset = 0;
+            if (this.time_shift && this.serieses.length>0) {
+                offset = series.offset - this.serieses[0].offset;
+            };
             for (var i=0;i<points.length;++i) {
                 var x = start + (end-start)*i/(points.length-1);
                 points[i] = {
-                    x: days_to_date(x),
+                    x: days_to_date(x + offset),
                     y: this.rate_plot ? 100.0*(Math.exp(series.lr.m)-1) : Math.exp(series.lr.m * x + series.lr.q)
                 }
             }
