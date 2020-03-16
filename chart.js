@@ -80,7 +80,7 @@ var chart_config = {
         },
         plugins: {
             colorschemes: { // https://nagix.github.io/chartjs-plugin-colorschemes/
-              scheme: 'tableau.Tableau10'
+              scheme: 'tableau.Tableau10' // ignored: see Chart.add_series below
             }
       
         }
@@ -175,7 +175,8 @@ class ChartWrapper {
             fill: false,
             yAxisID: (this.rate_plot ? "rate" : "count"),
             lineTension: 0,
-            borderColor: color
+            borderColor: color,
+            borderJoinStyle: "round"
         });
 
         if (!series.hasOwnProperty("draw_fit")) {
@@ -196,7 +197,7 @@ class ChartWrapper {
             this.chart.data.datasets.push({
                 data: points,
                 fill: false,
-                lavel: "fit",
+                label: "fit",
                 yAxisID: (this.rate_plot ? "rate" : "count"),
                 pointRadius: 0,
                 borderWidth: 1,
