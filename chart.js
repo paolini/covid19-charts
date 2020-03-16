@@ -101,11 +101,13 @@ class ChartWrapper {
         this.time_shift = false;
         this.rate_plot = false;
         this.no_update = false;
+        this.draw_fit = false;
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
         this.$time_shift = $("select[name=time_shift]");
         this.$plot_type = $("select[name=chart_type]");
+        this.$draw_fit = $("input[name=draw_fit");
     
         this.$clear.click(function(){ 
             self.clear(); 
@@ -115,6 +117,7 @@ class ChartWrapper {
             self.time_shift = (self.$time_shift.children("option:selected").val() === "on");
             if (self.serieses.length>1) self.redraw();
         })
+        this.$time_shift.change();
 
         this.$plot_type.change(function() {
             var val = self.$plot_type.children("option:selected").val();
@@ -122,6 +125,12 @@ class ChartWrapper {
             self.rate_plot = (val=="rate");
             self.redraw();
         })
+        this.$plot_type.change();
+
+        this.$draw_fit.change(function(){
+            self.draw_fit = self.$draw_fit.is(":checked");
+        })
+        this.$draw_fit.change();
     }
 
     update() {
@@ -131,6 +140,8 @@ class ChartWrapper {
     add_series(series) {
         var label = series.label;
         var data_x = series.data_x;
+        var color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
+
         if (this.time_shift && this.serieses.length>0) {
             var offset =  series.offset - this.serieses[0].offset;
             data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
@@ -159,13 +170,43 @@ class ChartWrapper {
 
         var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
         this.chart.data.datasets.push({
+            data: points,
             label: label,
             fill: false,
             yAxisID: (this.rate_plot ? "rate" : "count"),
             lineTension: 0,
-            data: points
+            borderColor: color
         });
+
+        if (!series.hasOwnProperty("draw_fit")) {
+            series.draw_fit = this.draw_fit;
+        }
+
+        if (series.draw_fit && series.data_x.length>1) {
+            var start = date_to_days(series.data_x[0]);
+            var end = date_to_days(series.data_x[series.data_x.length-1]) + 5.0;
+            var points = new Array(100);
+            for (var i=0;i<points.length;++i) {
+                var x = start + (end-start)*i/(points.length-1);
+                points[i] = {
+                    x: days_to_date(x),
+                    y: this.rate_plot ? 100.0*(Math.exp(series.lr.m)-1) : Math.exp(series.lr.m * x + series.lr.q)
+                }
+            }
+            this.chart.data.datasets.push({
+                data: points,
+                fill: false,
+                lavel: "fit",
+                yAxisID: (this.rate_plot ? "rate" : "count"),
+                pointRadius: 0,
+                borderWidth: 1,
+                pointHoverRadius: 5,
+                borderColor: color
+            })
+        }
+
         this.serieses.push(series);
+
         this.update();
         this.display_regression(series);
     };
