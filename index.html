@@ -85,6 +85,10 @@
             </ul>
         </li>
         <li>
+            <button name="chart_clear">remove all plots</button>
+            <button name="chart_pop">remove last plot</button>
+        </li>
+        <li>
             plot type
             <select name="chart_type">
                 <option value="linear">linear</option>
@@ -111,9 +115,6 @@
             -- time alignment
                 <input type="checkbox" name="time_shift">
         </li>
-        <li>
-            remove all plots <button name="chart_clear">clear</button>
-        </li>
     </ul>
 <div style="width:75%;">
     <canvas id="canvas"></canvas>
@@ -128,13 +129,10 @@ From each series <i>y=y(t)</i> we consider as many data points in the past as sp
 We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
 This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
 The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
-The origin is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
+The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
 The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day.
-The <i>time alignment</i> checkbox translates each curve with respect to the first curve selected:
-if the first curve is larger, the given curve is translated in the past so that the last point 
-matches the first curve; 
-if the first curve is smaller then the given curve is translated in the future so that the last point 
-of the first curve matches the value of the given curve.
+The <i>time alignment</i> checkbox translates each curve in time so that the exponential fit passes 
+throught the last point of the first curve.
 </p>
 
 <p>Code on <a href="https://github.com/paolini/covid19-charts">github</a></p>

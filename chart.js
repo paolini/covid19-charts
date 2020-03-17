@@ -106,6 +106,7 @@ class ChartWrapper {
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
+        this.$pop = $("button[name='chart_pop']");
         this.$time_shift = $("input[name=time_shift]");
         this.$plot_type = $("select[name=chart_type]");
         this.$draw_fit = $("input[name=draw_fit");
@@ -114,6 +115,10 @@ class ChartWrapper {
         this.$clear.click(function(){ 
             self.clear(); 
         });
+
+        this.$pop.click(function() {
+            self.pop();
+        })
 
         this.$time_shift.change(function(){
             self.time_shift = self.$time_shift.is(":checked");
@@ -269,6 +274,12 @@ class ChartWrapper {
         this.serieses = [];
         this.update();
         this.$info.find("li").remove();
+    }
+
+    pop() {
+        this.chart.data.datasets.pop();
+        this.serieses.pop();
+        this.redraw();
     }
 
     redraw() {
