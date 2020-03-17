@@ -89,7 +89,7 @@
             <select name="chart_type">
                 <option value="linear">linear</option>
                 <option value="log">logaritmic</option>
-                <option value="rate">spreading rate</option>
+                <option value="rate">growth rate</option>
             </select> 
             -- draw fitting exponential <input type="checkbox" name="draw_fit">
             -- consider
@@ -120,6 +120,22 @@
 </div>
 <ul id="chart_info">
 </ul>
+
+<h2>explanation</h2>
+
+<p>
+From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user. 
+We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
+This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
+The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
+The origin is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
+The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day.
+The <i>time alignment</i> checkbox translates each curve with respect to the first curve selected:
+if the first curve is larger, the given curve is translated in the past so that the last point 
+matches the first curve; 
+if the first curve is smaller then the given curve is translated in the future so that the last point 
+of the first curve matches the value of the given curve.
+</p>
 
 <p>Code on <a href="https://github.com/paolini/covid19-charts">github</a></p>
 </body>

@@ -248,7 +248,7 @@ class ChartWrapper {
         this.$info.append(
             "<li> "+name+": " 
             + "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
-            + "daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
+            + "average daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
             + "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
             + "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
             + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
