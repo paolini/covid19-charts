@@ -5,12 +5,8 @@ class Series {
         this.data_y = data_y;
     }
 
-    compute_lr() {
-        this.lr = linearRegression(this.data_y.map(Math.log), this.data_x.map(date_to_days));
-        this.offset = this.lr.q/this.lr.m;
-    }
-
-    offset_relative_to_series(series) {
+    /*
+    offset_relative_to_series_old(series) {
         var last = this.data_y.length-1;
         var last2 = series.data_y.length-1;
         if (series.data_y[last2] > this.data_y[last]) {
@@ -41,6 +37,8 @@ class Series {
             return last-i;
         }
     }
+    */
+
 }
 
 // https://stackoverflow.com/questions/6195335/linear-regression-in-javascript

@@ -152,39 +152,41 @@ class ChartWrapper {
     }
 
     add_series(series) {
-        var color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
+        function last(arr) {return arr[arr.length-1]}
 
-        // save the original series then apply modifiers
-        this.serieses.push(series);
-        series = new Series(series.data_x, series.data_y, series.label);
+        // we are going to modify data
+        var data_x = series.data_x;
+        var data_y = series.data_y;
+        var label = series.label;
+
+        // consider only last points
+        if (this.n_points > 0) {
+            data_x = data_x.slice(-this.n_points);
+            data_y = data_y.slice(-this.n_points);
+        }
+
+        // compute linear regression
+        var lr = linearRegression(data_y.map(Math.log), data_x.map(date_to_days))
 
         // time shift
-        if (this.time_shift && this.serieses.length>1) {
-            var offset = series.offset_relative_to_series(this.serieses[0]);
-            series.data_x = series.data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
+        var offset = 0;
+        if (this.time_shift && this.serieses.length>0) {
+            var y0 = last(this.serieses[0].data_y);
+            // y = exp(m x + q)
+            var x = (Math.log(y0) - lr.q) / lr.m;
+            offset = date_to_days(last(data_x)) - x;
+            data_x = data_x.map(function(x){return days_to_date(date_to_days(x) + offset)});
             if (offset > 0) {
-                series.label += " +" + offset.toFixed(1) + " days";
-            } else {
-                series.label += " -" + (-offset).toFixed(1) + " days";
+                label += " +" + offset.toFixed(1) + " days";
+            } else if (offset < 0) {
+                label += " -" + (-offset).toFixed(1) + " days";
             }
         }
 
-        // consider only last points
-        if (this.n_points>0) {
-            series = new Series(
-                series.data_x.slice(-this.n_points),
-                series.data_y.slice(-this.n_points),
-                series.label)
-        }
-
-        series.compute_lr();
-        var data_x = series.data_x;
-        var data_y = series.data_y;
-
         // convert to growing rate
         if (this.rate_plot) {
-            var new_data_x = series.data_x.slice(1);
-            var new_data_y = new Array(data_x.length);
+            var new_data_x = data_x.slice(1);
+            var new_data_y = new Array(new_data_x.length);
             for (var i=0; i < new_data_y.length;++i) {
                 if (data_y[i]>0) {
                     new_data_y[i] = (data_y[i+1] / data_y[i] - 1.0) * 100.0; 
@@ -198,12 +200,13 @@ class ChartWrapper {
 
         this.chart.options.scales.yAxes[0].display = !this.rate_plot;
         this.chart.options.scales.yAxes[1].display = this.rate_plot;
-
+        
         // draw curve
+        var color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
         var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
         this.chart.data.datasets.push({
             data: points,
-            label: series.label,
+            label: label,
             fill: false,
             yAxisID: (this.rate_plot ? "rate" : "count"),
             lineTension: 0,
@@ -213,15 +216,15 @@ class ChartWrapper {
         });
 
         // draw fit curve
-        if (this.draw_fit && series.data_x.length>1) {
-            var start = date_to_days(data_x[0]);
-            var end = date_to_days(data_x[data_x.length-1]) + 5.0;
+        if (this.draw_fit && data_x.length>1) {
+            var start = date_to_days(data_x[0]) - offset;
+            var end = date_to_days(last(data_x)) - offset + 5.0;
             var points = new Array(100);
             for (var i=0;i<points.length;++i) {
                 var x = start + (end-start)*i/(points.length-1);
                 points[i] = {
-                    x: days_to_date(x),
-                    y: this.rate_plot ? 100.0*(Math.exp(series.lr.m)-1) : Math.exp(series.lr.m * x + series.lr.q)
+                    x: days_to_date(x + offset),
+                    y: this.rate_plot ? 100.0*(Math.exp(lr.m)-1) : Math.exp(lr.m * x + lr.q)
                 }
             }
             this.chart.data.datasets.push({
@@ -231,10 +234,14 @@ class ChartWrapper {
                 yAxisID: (this.rate_plot ? "rate" : "count"),
                 pointRadius: 0,
                 borderWidth: 1,
-                pointHoverRadius: 5,
+                pointHoverRadius: 0,
                 borderColor: color
             })
         }
+
+        // store the series for future redraw
+        series.lr = lr; // forse non serve...
+        this.serieses.push(series);
 
         this.update();
         this.display_regression(series);
@@ -243,7 +250,7 @@ class ChartWrapper {
     display_regression(series) {
         var name = series.label;
         var lr = series.lr;
-        var days_passed = series.offset + this.days_today;
+        var days_passed = lr.q/lr.m + this.days_today;
         var first_day = new Date((this.days_today-days_passed)*1000.0*60*60*24);
         this.$info.append(
             "<li> "+name+": " 
