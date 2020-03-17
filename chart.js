@@ -207,7 +207,7 @@ class ChartWrapper {
         this.chart.options.scales.yAxes[1].display = this.rate_plot;
         
         // draw curve
-        var color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
+        series.color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
         var points = data_x.map(function(x, i) {return {"x": x, "y": data_y[i]}});
         this.chart.data.datasets.push({
             data: points,
@@ -215,8 +215,8 @@ class ChartWrapper {
             fill: false,
             yAxisID: (this.rate_plot ? "rate" : "count"),
             lineTension: 0,
-            borderColor: color,
-            pointBorderColor: color,
+            borderColor: series.color,
+            pointBorderColor: series.color,
             borderJoinStyle: "round"
         });
 
@@ -240,7 +240,7 @@ class ChartWrapper {
                 pointRadius: 0,
                 borderWidth: 1,
                 pointHoverRadius: 0,
-                borderColor: color
+                borderColor: series.color
             })
         }
 
@@ -258,10 +258,10 @@ class ChartWrapper {
         var days_passed = lr.q/lr.m + this.days_today;
         var first_day = new Date((this.days_today-days_passed)*1000.0*60*60*24);
         this.$info.append(
-            "<li> "+name+": " 
+            "<li> <div class='box' style='background-color:" + series.color + "'></div> "+name+":</font> " 
             + "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
             + "average daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
-            + "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> giorni, "
+            + "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> days, "
             + "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
             + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
             + "<!-- m="+lr.m+" "

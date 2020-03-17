@@ -1,3 +1,10 @@
 button {
     background-color: #f90;
 }
+
+.box {
+    width: 2em;
+    height: 1em;
+    display: inline-block;
+    border-radius: 0.2em;
+}
