@@ -123,7 +123,8 @@ class DpcDataset extends BaseDataset {
     click() {
         var options = {
             column: this.$column.children("option:selected").val(),
-            value: this.$select.children("option:selected").val()
+            value: this.$select.children("option:selected").val(),
+            value_name: this.$select.children("option:selected").text()
         }
         this.add_series(options)
         return options
