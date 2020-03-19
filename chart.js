@@ -219,6 +219,16 @@ class ChartWrapper {
                     new_data_y[i] = 0.0;
                 }
             }
+            // smooth out 
+            for (var i=0; i < new_data_y.length; ++i) {
+                if (i==0 && i < new_data_y.length-1) {
+                    new_data_y[i] = (new_data_y[i] + new_data_y[i+1]) / 2.0;
+                } else if (i>0 && i < new_data_y.length-2) {
+                    new_data_y[i] = (new_data_y[i-1] + new_data_y[i] + new_data_y[i+1]) / 3.0;
+                } else if (i>0 && i == new_data_y.length-2) {
+                    new_data_y[i] = (new_data_y[i-1] + new_data_y[i]) / 2.0;
+                }
+            }
             data_x = new_data_x;
             data_y = new_data_y;
         }
