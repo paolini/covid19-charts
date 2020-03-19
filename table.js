@@ -42,7 +42,7 @@ class Table {
     
 };
 
-function string_to_date(x) {return new Date(x)}
+function string_to_date(x) {return moment(x).toDate()}
 
 function string_to_int(x) {return parseInt(x)}
 
