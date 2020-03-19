@@ -89,8 +89,6 @@ var chart_config = {
 
 var months = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
-
-
 class ChartWrapper {
     constructor() {
         var self = this;
@@ -114,10 +112,12 @@ class ChartWrapper {
     
         this.$clear.click(function(){ 
             self.clear(); 
+            replay.length = 0;
         });
 
         this.$pop.click(function() {
             self.pop();
+            replay.pop();
         })
 
         this.$time_shift.change(function(){
@@ -149,6 +149,26 @@ class ChartWrapper {
             }
             self.redraw();
         });
+        this.$n_points.change();
+    }
+
+    get_options() {
+        return {
+            time_shift: this.time_shift,
+            plot_type: this.$plot_type.children("option:selected").val(),
+            draw_fit: this.draw_fit,
+            n_points: this.n_points
+        }
+    }
+
+    set_options(options) {
+        this.$time_shift.prop('checked', options['time_shift']);
+        this.$time_shift.change();
+        this.$plot_type.val(options['plot_type']);
+        this.$plot_type.change();
+        this.$draw_fit.prop('checked', options['draw_fit']);
+        this.$draw_fit.change();
+        this.$n_points.val(options['n_points'] || "");
         this.$n_points.change();
     }
 

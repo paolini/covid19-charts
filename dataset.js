@@ -8,7 +8,7 @@ class BaseDataset {
         var self = this;
         this.init_html();
         
-        this.load().then(function() {
+        return this.load().then(function() {
             self.populate_html();            
         });
     }
@@ -45,6 +45,17 @@ class BaseDataset {
     init_html() {
         this.$button = $("button[name='" + this.prefix + "_add']"); 
         this.$button.prop("disabled", true);
+    }
+
+    add_series(options) {
+        replay.push({
+            dataset: this.prefix,
+            options: options
+        })
+    }
+
+    click() {
+        // to be overridden        
     }
 }
 
@@ -89,15 +100,15 @@ class DpcDataset extends BaseDataset {
         this.$button.click(function(){self.click()});
     }
 
-    click() {
-        var column = this.$column.children("option:selected").val();
+    add_series(options) {
+        var column = options['column'];
         var subtable = this.table;
         var value = null;
         var value_name = null;
 
         if (this.filter_column) {
-            value = this.$select.children("option:selected").val();
-            value_name = this.$select.children("option:selected").text();
+            value = options['value'];
+            value_name = options['value_name'];
             subtable = subtable.filter(this.filter_column, value);
         }
 
@@ -106,6 +117,16 @@ class DpcDataset extends BaseDataset {
         var label = this.series_label(column, value_name);
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
+        super.add_series(options)
+    }
+
+    click() {
+        var options = {
+            column: this.$column.children("option:selected").val(),
+            value: this.$select.children("option:selected").val()
+        }
+        this.add_series(options)
+        return options
     }
 }
 
@@ -169,26 +190,7 @@ class HopkinsDataset extends BaseDataset {
         this.$select = $("select[name='" + this.prefix + "_filter']");
         this.$subselect = $("select[name='" + this.prefix + "_subfilter']");
     }
-
-    run() {
-        var self = this;
-        this.init_html();
-
-        self.load().then(function() {
-            self.populate_html();
-        });
-
-        /*
-        this.$load.click(function() {
-            self.$load.prop("disabled", true);
-            self.load().then(function() {
-                self.populate_html();
-                self.$load.hide();
-            });
-        });
-        */
-    }
-
+    
     populate_html() {
         var self = this;
 
@@ -231,10 +233,10 @@ class HopkinsDataset extends BaseDataset {
         this.$button.click(function(){self.click()});
     }
 
-    click() {
+    add_series(options) {
         var self = this;
-        var value = this.$select.children("option:selected").val();
-        var subvalue = this.$subselect.children("option:selected").val();
+        var value = options['value'];
+        var subvalue = options['subvalue'];
         var subtable = this.table;
         var label = this.fields[0] + " " + value;
         
@@ -256,6 +258,16 @@ class HopkinsDataset extends BaseDataset {
 
         var series = new Series(data_x, data_y, label);
         chart.add_series(series);
+        super.add_series(options);
+    }
+
+    click() {
+        var options = {
+            value: this.$select.children("option:selected").val(),
+            subvalue: this.$subselect.children("option:selected").val()
+        }
+        this.add_series(options)
+        return options
     }
 }
 
