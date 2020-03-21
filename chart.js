@@ -101,6 +101,7 @@ class ChartWrapper {
         this.no_update = false;
         this.draw_fit = false;
         this.n_points = 0; // all
+        this.fit_future_days = null;
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
@@ -109,6 +110,10 @@ class ChartWrapper {
         this.$plot_type = $("select[name=chart_type]");
         this.$draw_fit = $("input[name=draw_fit");
         this.$n_points = $("select[name='n_points']");
+        this.$advanced_settings = $("input[name='advanced_settings']");
+        this.$axis_count_min = $("input[name='axis_count_min']");
+        this.$axis_count_max = $("input[name='axis_count_max']");
+        this.$fit_future_days = $("input[name='fit_future_days");
     
         this.$clear.click(function(){ 
             self.clear(); 
@@ -150,6 +155,35 @@ class ChartWrapper {
             self.redraw();
         });
         this.$n_points.change();
+
+        this.$advanced_settings.change(function() {
+            if (self.$advanced_settings.is(":checked")) {
+                $("#advanced_settings").show();
+            } else {
+                $("#advanced_settings").hide();
+            }
+        })
+        this.$advanced_settings.change();
+
+        this.$axis_count_min.change(function() {
+            var val = self.$axis_count_min.val();
+            self.chart.config.options.scales.yAxes[0].ticks.min = val ? parseInt(val) : undefined;
+            self.update();
+        });
+        this.$axis_count_min.change();
+
+        this.$axis_count_max.change(function() {
+            var val = self.$axis_count_max.val();
+            self.chart.config.options.scales.yAxes[0].ticks.max = val ? parseInt(val) : undefined;
+            self.update();
+        })
+        this.$axis_count_max.change();
+        
+        this.$fit_future_days.change(function() {
+            self.fit_future_days = parseFloat(self.$fit_future_days.val());
+            self.redraw();
+        })
+        this.$fit_future_days.change();
     }
 
     get_options() {
@@ -253,7 +287,7 @@ class ChartWrapper {
         // draw fit curve
         if (this.draw_fit && data_x.length>1) {
             var start = date_to_days(data_x[0]) - offset;
-            var end = date_to_days(last(data_x)) - offset + 5.0;
+            var end = date_to_days(last(data_x)) - offset + this.fit_future_days;
             var points = new Array(100);
             for (var i=0;i<points.length;++i) {
                 var x = start + (end-start)*i/(points.length-1);
