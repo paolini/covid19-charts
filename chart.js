@@ -195,7 +195,10 @@ class ChartWrapper {
             time_shift: this.time_shift,
             plot_type: this.$plot_type.children("option:selected").val(),
             draw_fit: this.draw_fit,
-            n_points: this.n_points
+            n_points: this.n_points,
+            axis_count_min: this.$axis_count_min.val(),
+            axis_count_max: this.$axis_count_max.val(),
+            fit_future_days: this.fit_future_days
         }
     }
 
@@ -208,6 +211,11 @@ class ChartWrapper {
         this.$draw_fit.change();
         this.$n_points.val(options['n_points'] || "");
         this.$n_points.change();
+        this.$axis_count_min.val(options['axis_count_min']);
+        this.$axis_count_min.change();
+        this.$axis_count_max.val(options['axis_count_max']);
+        this.$axis_count_max.change();
+        this.$fit_future_days.val(options['fit_future_days']);
     }
 
     update() {
