@@ -13,7 +13,7 @@
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-    <script src="Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script src="chartjs-plugin-colorschemes.min.js"></script>
     <!--script src="utf8.js"></script-->
 
@@ -121,7 +121,11 @@
             -- advanced settings <input name="advanced_settings" type="checkbox">
         </li>
         <li id="advanced_settings">
-                y-axis count min <input name="axis_count_min" size="5">
+                -- x-axis day min <input name="axis_days_min" size="5">
+                -- x-axis day max <input name="axis_days_max" size="5">
+                -- x-axis date min <input name="axis_date_min" size="5">
+                -- x-axis date max <input name="axis_date_max" size="5">
+                -- y-axis count min <input name="axis_count_min" size="5">
                 -- y-axis count max <input name="axis_count_max" size="5">
                 -- fit future days <input name="fit_future_days" value="5" size="5">
         </li>
@@ -135,7 +139,8 @@
 <h2>explanation</h2>
 
 <p>
-From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user. 
+From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user 
+up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field). 
 We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
 This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
 The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
