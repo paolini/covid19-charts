@@ -140,6 +140,10 @@ class ChartWrapper {
         this.$draw_fit = $("input[name=draw_fit");
         this.$n_points = $("select[name='n_points']");
         this.$advanced_settings = $("input[name='advanced_settings']");
+        this.$axis_date_min = $("input[name='axis_date_min']");
+        this.$axis_date_max = $("input[name='axis_date_max']");
+        this.$axis_days_min = $("input[name='axis_days_min']");
+        this.$axis_days_max = $("input[name='axis_days_max']");
         this.$axis_count_min = $("input[name='axis_count_min']");
         this.$axis_count_max = $("input[name='axis_count_max']");
         this.$fit_future_days = $("input[name='fit_future_days']");
@@ -207,6 +211,36 @@ class ChartWrapper {
         })
         this.$advanced_settings.change();
 
+        this.$axis_date_min.datepicker();
+        this.$axis_date_min.change(function() {
+            var val = self.$axis_date_min.val();
+            self.chart.config.options.scales.xAxes[0].ticks.min = val ? new Date(val) : undefined;
+            self.update();
+        });
+        this.$axis_date_min.change();
+
+        this.$axis_date_max.datepicker();
+        this.$axis_date_max.change(function() {
+            var val = self.$axis_date_max.val();
+            self.chart.config.options.scales.xAxes[0].ticks.max = val ? new Date(val) : undefined;
+            self.update();
+        })
+        this.$axis_date_max.change();
+        
+        this.$axis_days_min.change(function() {
+            var val = self.$axis_days_min.val();
+            self.chart.config.options.scales.xAxes[1].ticks.min = val ? parseInt(val) : undefined;
+            self.update();
+        });
+        this.$axis_days_min.change();
+
+        this.$axis_days_max.change(function() {
+            var val = self.$axis_days_max.val();
+            self.chart.config.options.scales.xAxes[1].ticks.max = val ? parseInt(val) : undefined;
+            self.update();
+        })
+        this.$axis_days_max.change();
+        
         this.$axis_count_min.change(function() {
             var val = self.$axis_count_min.val();
             self.chart.config.options.scales.yAxes[0].ticks.min = val ? parseInt(val) : undefined;
@@ -234,6 +268,11 @@ class ChartWrapper {
             plot_type: this.$plot_type.children("option:selected").val(),
             draw_fit: this.draw_fit,
             n_points: this.n_points,
+            up_to_date: this.$up_to_date.val(),
+            axis_days_min: this.$axis_days_min.val(),
+            axis_days_max: this.$axis_days_max.val(),
+            axis_date_min: this.$axis_date_min.val(),
+            axis_date_max: this.$axis_date_max.val(),
             axis_count_min: this.$axis_count_min.val(),
             axis_count_max: this.$axis_count_max.val(),
             fit_future_days: this.fit_future_days
@@ -249,6 +288,16 @@ class ChartWrapper {
         this.$draw_fit.change();
         this.$n_points.val(options['n_points'] || "");
         this.$n_points.change();
+        this.$up_to_date.val(options['up_to_date']);
+        this.$up_to_date.change();
+        this.$axis_days_min.val(options['axis_days_min']);
+        this.$axis_days_min.change();
+        this.$axis_days_max.val(options['axis_days_max']);
+        this.$axis_days_max.change();
+        this.$axis_date_min.val(options['axis_date_min']);
+        this.$axis_date_min.change();
+        this.$axis_date_max.val(options['axis_date_max']);
+        this.$axis_date_max.change();
         this.$axis_count_min.val(options['axis_count_min']);
         this.$axis_count_min.change();
         this.$axis_count_max.val(options['axis_count_max']);
@@ -292,10 +341,15 @@ class ChartWrapper {
             data_x = data_x.slice(-this.n_points);
             data_y = data_y.slice(-this.n_points);
         }
+        
+        if (data_x.length < 2) {
+            console.log("too few data points for series " + label);
+            return;
+        }
 
         // compute linear regression
         var lr = linearRegression(data_y.map(Math.log), data_x)
-
+        
         // time shift
         var offset = 0;
         if (this.time_shift) {
@@ -373,7 +427,7 @@ class ChartWrapper {
         });
 
         // draw fit curve
-        if (this.draw_fit && data_x.length>1) {
+        if (this.draw_fit && data_x.length>1 && isFinite(offset)) {
             var start = data_x[0];
             var end = last(data_x) + this.fit_future_days;
             var points = new Array(100);
