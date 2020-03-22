@@ -67,7 +67,13 @@ class DpcDataset extends BaseDataset {
     constructor(options) {
         super(options);
         this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
-        "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi"];
+            "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi",
+            // computed fields:
+            "ricoverati_con_sintomi / totale_casi", "terapia_intensiva / totale_casi", 
+            "totale_ospedalizzati / totale_casi", "isolamento_domiciliare / totale_casi", 
+            "totale_attualmente_positivi / totale_casi", "nuovi_attualmente_positivi / totale_casi",
+            "dimessi_guariti / totale_casi", "deceduti / totale_casi"
+        ];
         this.filter_column = options.filter_column || null;
         this.filter_name_column = options.filter_name_column || this.filter_column;
         this.REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
@@ -101,21 +107,31 @@ class DpcDataset extends BaseDataset {
     }
 
     add_series(options) {
-        var column = options['column'];
         var subtable = this.table;
         var value = null;
         var value_name = null;
-
+        
         if (this.filter_column) {
             value = options['value'];
             value_name = options['value_name'];
             subtable = subtable.filter(this.filter_column, value);
         }
-
+        
+        var column = options['column'];
+        var columns = column.split('/');
+        columns = columns.map(function(x) {return x.trim()});
         var data_x = subtable.get_column("data").map(string_to_date);
-        var data_y = subtable.get_column(column).map(string_to_int);
+        var data_y = subtable.get_column(columns[0]).map(string_to_int);
+        var y_axis = 'count';
+        if (columns.length === 2) {
+            var col = subtable.get_column(columns[1]).map(string_to_int);
+            data_y = data_y.map(function(x, i) {return 100.0 * x / col[i]});
+            y_axis = 'rate';
+        } 
+        
         var label = this.series_label(column, value_name);
         var series = new Series(data_x, data_y, label);
+        series.y_axis = y_axis;
         chart.add_series(series);
         super.add_series(options)
     }

@@ -306,6 +306,23 @@ class ChartWrapper {
     }
 
     update() {
+        var x_axes = [];
+        var y_axes = [];
+        this.chart.data.datasets.forEach(function(dataset) {
+            if (!x_axes.includes(dataset.xAxisID)) x_axes.push(dataset.xAxisID);
+            if (!y_axes.includes(dataset.yAxisID)) y_axes.push(dataset.yAxisID);
+        });
+        this.chart.options.scales.xAxes.forEach(function(axis) {
+            axis.display = x_axes.includes(axis.id);
+        });
+        this.chart.options.scales.yAxes.forEach(function(axis) {
+            axis.display = y_axes.includes(axis.id);
+        });
+        if (this.chart.data.datasets.length === 0) {
+            // draw something otherwise window remains completely empty
+            this.chart.options.scales.xAxes[0].display = true;
+            this.chart.options.scales.yAxes[0].display = true;
+        }
         if (!this.no_update) this.chart.update();
     }
 
@@ -393,12 +410,6 @@ class ChartWrapper {
             data_y = new_data_y;
         }
 
-        this.chart.options.scales.yAxes[0].display = !this.rate_plot;
-        this.chart.options.scales.yAxes[1].display = this.rate_plot;
-
-        this.chart.options.scales.xAxes[0].display = !this.time_shift;
-        this.chart.options.scales.xAxes[1].display = this.time_shift;
-        
         // draw curve
         series.color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
         var points;
@@ -414,7 +425,7 @@ class ChartWrapper {
             data: points,
             label: label,
             fill: false,
-            yAxisID: (this.rate_plot ? "rate" : "count"),
+            yAxisID: (this.rate_plot ? "rate" : series.y_axis),
             xAxisID: (this.time_shift ? "days" : "date"),
             lineTension: 0,
             borderColor: series.color,
