@@ -1,4 +1,4 @@
-Explore covid-19 data in Italy regions
+Explore covid-19 italian and world data.
 
 browse online: https://paolini.github.io/covid19-charts/
 
