@@ -4,8 +4,10 @@
     <title>covid-19 charts</title>
 
     <link rel="stylesheet" href="index.css">
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.js"></script>
 
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -113,14 +115,15 @@
                 <option value="3">last 3 points</option>
                 <option value="2">last 2 points</option>
             </select>
+            -- up to date <input name="up_to_date" size="5">
             -- time alignment
                 <input type="checkbox" name="time_shift">
             -- advanced settings <input name="advanced_settings" type="checkbox">
         </li>
         <li id="advanced_settings">
-                y-axis count min <input name="axis_count_min">
-                -- y-axis count max <input name="axis_count_max">
-                -- fit future days <input name="fit_future_days" value="5">
+                y-axis count min <input name="axis_count_min" size="5">
+                -- y-axis count max <input name="axis_count_max" size="5">
+                -- fit future days <input name="fit_future_days" value="5" size="5">
         </li>
     </ul>
 <div style="width:75%;">

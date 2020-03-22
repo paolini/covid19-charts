@@ -1,3 +1,7 @@
+$.datepicker.setDefaults({
+    dateFormat: "yy-mm-dd"
+});
+
 var datasets = [
     new DpcNazionaleDataset(),
     new DpcRegioniDataset(),

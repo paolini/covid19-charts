@@ -4,6 +4,26 @@ var chart_config = {
         title: {
             text: 'covid-19'
         },
+        tooltips: {
+            callbacks: {
+                _title: function(tooltipItems, data) {
+                    // in tooltipItems ci sono anche i fit
+                    var axis = data.datasets[tooltipItems[0].datasetIndex].xAxisID;
+                    return "axis";
+                },
+                label: function(tooltipItem, data) {
+                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                    var label = dataset.label || '';
+
+                    if (dataset.xAxisID === 'days') {
+                        label += " " + days_to_date(tooltipItem.xLabel - dataset.my_x_offset).toDateString();
+                    }
+                    label += ': ';
+                    label += tooltipItem.yLabel;
+                    return label;
+                }
+            }
+        },
         scales: {
             xAxes: [{
                 id: 'date',
@@ -13,7 +33,7 @@ var chart_config = {
                 },
                 scaleLabel: {
                     display: true,
-                    labelString: 'Data'
+                    labelString: 'date'
                 },
                 ticks: {
                         major: {
@@ -55,7 +75,11 @@ var chart_config = {
                     }
             },{
                 id: "days",
-                type: "linear"
+                type: "linear",
+                scaleLabel: {
+                    display: true,
+                    labelString: "days"
+                }
             }],
             yAxes: [{
                 id: "count",
@@ -106,6 +130,7 @@ class ChartWrapper {
         this.draw_fit = false;
         this.n_points = 0; // all
         this.fit_future_days = null;
+        this.up_to_date = null;
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
@@ -117,7 +142,8 @@ class ChartWrapper {
         this.$advanced_settings = $("input[name='advanced_settings']");
         this.$axis_count_min = $("input[name='axis_count_min']");
         this.$axis_count_max = $("input[name='axis_count_max']");
-        this.$fit_future_days = $("input[name='fit_future_days");
+        this.$fit_future_days = $("input[name='fit_future_days']");
+        this.$up_to_date = $("input[name='up_to_date']");
     
         this.$clear.click(function(){ 
             self.clear(); 
@@ -159,6 +185,18 @@ class ChartWrapper {
             self.redraw();
         });
         this.$n_points.change();
+
+        this.$up_to_date.datepicker();
+        this.$up_to_date.change(function() {
+            var val = self.$up_to_date.val();
+            if (val === "") {
+                self.up_to_date = null;
+            } else {
+                self.up_to_date = new Date(val + "T23:59");
+            }
+            self.redraw();
+        });
+        this.$up_to_date.change();
 
         this.$advanced_settings.change(function() {
             if (self.$advanced_settings.is(":checked")) {
@@ -223,14 +261,32 @@ class ChartWrapper {
     }
 
     add_series(series) {
-        function last(arr) {return arr[arr.length-1]}
+        var self = this;
 
+        function last(arr) {return arr[arr.length-1]}
+        
         // we are going to modify data
-        // data_x will be days from now on...
-        var data_x = series.data_x.map(date_to_days);
+        var data_x = series.data_x;
         var data_y = series.data_y;
         var label = series.label;
-
+        
+        // crop to up_to_date
+        if (this.up_to_date) {
+            var i = 0;
+            for (i=0; i<data_x.length && data_x[i]<this.up_to_date; ++i) {}
+            data_x = data_x.slice(0,i);
+            data_y = data_y.slice(0,i);
+        }
+        
+        // data_x will be days from now on...
+        data_x = data_x.map(date_to_days);
+        if (this.serieses.length === 0) {
+            this.reference_point = {
+                x: last(data_x), 
+                y: last(data_y)
+            }
+        }
+        
         // consider only last points
         if (this.n_points > 0) {
             data_x = data_x.slice(-this.n_points);
@@ -242,12 +298,11 @@ class ChartWrapper {
 
         // time shift
         var offset = 0;
-        var x0 = this.serieses.length>0 ? date_to_days(last(this.serieses[0].data_x)) : last(data_x);
         if (this.time_shift) {
             if (this.serieses.length>0) {
-                var series0 = this.serieses[0];
-                // var y0 = last(this.serieses[0].data_y);
-                var y0 = Math.exp(series0.lr.m * date_to_days(last(series0.data_x)) + series0.lr.q);
+                var lr0 = this.serieses[0].lr;
+                // var y0 = this.reference_point.y;
+                var y0 = Math.exp(lr0.m * this.reference_point.x + lr0.q);
                 // y = exp(m x + q)
                 var x = (Math.log(y0) - lr.q) / lr.m;
                 offset = last(data_x) - x;
@@ -294,7 +349,10 @@ class ChartWrapper {
         series.color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
         var points;
         if (this.time_shift) {
-            points = data_x.map(function(x, i) {return {"x": x + offset - x0, "y": data_y[i]}});            
+            points = data_x.map(function(x, i) {return {
+                x: x + offset - self.reference_point.x, 
+                y: data_y[i]
+            }});            
         } else {
             points = data_x.map(days_to_date).map(function(x, i) {return {"x": x, "y": data_y[i]}});
         }
@@ -307,7 +365,11 @@ class ChartWrapper {
             lineTension: 0,
             borderColor: series.color,
             pointBorderColor: series.color,
-            borderJoinStyle: "round"
+            pointBackgroundColor: series.color,
+            hoverBorderColor: series.color,
+            pointHoverBorderColor: series.color,
+            borderJoinStyle: "round",
+            my_x_offset: offset - this.reference_point.x
         });
 
         // draw fit curve
@@ -318,20 +380,25 @@ class ChartWrapper {
             for (var i=0;i<points.length;++i) {
                 var x = start + (end-start)*i/(points.length-1);
                 points[i] = {
-                    x: this.time_shift ? x + offset - x0 : days_to_date(x),
+                    x: this.time_shift ? x + offset - this.reference_point.x : days_to_date(x),
                     y: this.rate_plot ? 100.0*(Math.exp(lr.m)-1) : Math.exp(lr.m * x + lr.q)
                 }
             }
             this.chart.data.datasets.push({
                 data: points,
                 fill: false,
-                label: "fit",
+                label: 'fit',
                 yAxisID: (this.rate_plot ? "rate" : "count"),
                 xAxisID: (this.time_shift ? "days" : "date"),
                 pointRadius: 0,
                 borderWidth: 1,
-                pointHoverRadius: 0,
-                borderColor: series.color
+                pointHoverRadius: 3,
+                borderColor: series.color,
+                pointBorderColor: series.color,
+                pointBackgroundColor: series.color,
+                hoverBorderColor: series.color,
+                pointHoverBorderColor: series.color,
+                my_x_offset: offset - this.reference_point.x
             })
         }
 
