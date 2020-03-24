@@ -128,7 +128,7 @@ class ChartWrapper {
         this.chart = new Chart(ctx, chart_config); 
         this.serieses = [];   
         this.days_today = date_to_days(new Date());
-        this.time_shift = 'none';
+        this.time_shift = '';
         this.rate_plot = false;
         this.no_update = false;
         this.draw_fit = false;
@@ -301,7 +301,9 @@ class ChartWrapper {
         if (options['time_shift'] === true) {
             options['time_shift'] = 'lr_shift';
         } else if (options['time_shift'] === false) {
-            options['time_shift'] = 'none';
+            options['time_shift'] = '';
+        } else if (options['time_shift'] === 'none') {
+            options['time_shift'] = ''
         }
 
         this.$time_shift.val(options['time_shift']);
