@@ -36,11 +36,10 @@
     <h1>covid-19 charts</h1>
     <p>
         <b>warning:</b>
-        this application is fetching data directly from the sources described.
-        Hence data is always up to date. 
-        As a side-effect it is possible that the application will crash if the 
-        sources change the format of their data: in such cases please feel free 
-        to report the problem <a href="https://github.com/paolini/covid19-charts/issues">opening an issue</a>.
+        this application is fetching data from the sources described below (namely italian dpc for italian data, and Hopkins University for world data).
+        Only a very simplistic and objective analysis is performed: 
+        see the explanations given below before giving any significance to the data plotted.
+        You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.
     </p>
     <ul>
        <li>Italian &quot;protezione civile&quot; (<a href="https://github.com/pcm-dpc/COVID-19">see here</a>)
@@ -117,7 +116,11 @@
             </select>
             -- up to date <input name="up_to_date" size="5">
             -- time alignment
-                <input type="checkbox" name="time_shift">
+                <select name="time_shift">
+                    <option value="none">none</option>
+                    <option value="lr_shift">prediction shift</option>
+                    <option value="past_shift">history shift</option>
+                </select>
             -- advanced settings <input name="advanced_settings" type="checkbox">
         </li>
         <li id="advanced_settings">
@@ -147,10 +150,16 @@ The <i>average daily increase</i> is the average daily percentual increase: <i>e
 The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
 The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day,
 an average over three days is performed to smooth out the curve.
-The <i>time alignment</i> checkbox translates each curve in time so that the exponential fit passes 
-throught the last point of the first curve.
+The <i>time alignment</i> selection translates each curve in time with respect to the first curve 
+plotted.
+If &quot;prediction shift&quot; is selected, each curve is shifted by the number of days required to reach 
+the level of the first curve following the current exponential trend.
+If &quot;history shift&quot; is selected, each curve is shifted by the number of days in the past 
+when the first curve had the same value (when the first curve is larger than the current) or 
+in the future when it has the same value of the first curve (when the first curve is smaller than the current). 
 If you press the button <i>&quot;set url for this chart&quot;</i> the url of the page is changed 
 so that you can share the current chart.
+To perform your own analysis you can download the data in CSV format.
 </p>
 
 <p>Code on <a href="https://github.com/paolini/covid19-charts">github</a></p>

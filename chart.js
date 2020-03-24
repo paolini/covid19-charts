@@ -128,7 +128,7 @@ class ChartWrapper {
         this.chart = new Chart(ctx, chart_config); 
         this.serieses = [];   
         this.days_today = date_to_days(new Date());
-        this.time_shift = false;
+        this.time_shift = 'none';
         this.rate_plot = false;
         this.no_update = false;
         this.draw_fit = false;
@@ -140,7 +140,7 @@ class ChartWrapper {
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
         this.$pop = $("button[name='chart_pop']");
-        this.$time_shift = $("input[name=time_shift]");
+        this.$time_shift = $("select[name=time_shift]");
         this.$plot_type = $("select[name=chart_type]");
         this.$draw_fit = $("input[name=draw_fit");
         this.$n_points = $("select[name='n_points']");
@@ -166,7 +166,7 @@ class ChartWrapper {
         })
 
         this.$time_shift.change(function(){
-            self.time_shift = self.$time_shift.is(":checked");
+            self.time_shift = self.$time_shift.val();
             self.redraw();
         })
         this.$time_shift.change();
@@ -343,6 +343,40 @@ class ChartWrapper {
         if (!this.no_update) this.chart.update();
     }
 
+    history_offset(data_y) {
+        var last = data_y.length-1;
+        var ref_data_y = this.ref_data_y;
+        var last2 = ref_data_y.length-1;
+        if (ref_data_y[last2] > data_y[last]) {
+            var i;
+            for (i=last2;i>=0 && ref_data_y[i] > data_y[last];i--) {}
+            // log(y) = m x + q
+            // y0 = m i + q
+            // y1 = m (i+1) + q
+            // y1 - y0 = m
+            var y = Math.log(data_y[last]);
+            var y1 = Math.log(ref_data_y[i+1]);
+            var y0 = Math.log(ref_data_y[i]);
+            var m = y1 - y0;
+            // q = y0 - m i
+            var q = y0 - m * i;
+            // x = (log(y) - q) / m
+            i = (y - q) / m;
+            return i - last2;
+        } else {
+            var i;
+            for (i=last;i>=0 && ref_data_y[last2] < data_y[i];i--) {}
+            var y1 = Math.log(data_y[i+1]);
+            var y0 = Math.log(data_y[i]);
+            var y = Math.log(ref_data_y[last2])
+            var m = y1 - y0;
+            var q = y0 - m * i;
+            i = (y - q) / m;
+            return last-i;
+        }
+    }
+
+
     add_series(series) {
         var self = this;
 
@@ -358,7 +392,11 @@ class ChartWrapper {
             data_x = data_x.slice(0,i);
             data_y = data_y.slice(0,i);
         }
-        
+        if (this.serieses.length === 0) {
+            // this will be the reference series for time shifts
+            this.ref_data_y = data_y;
+        }
+    
         // data_x will be days from now on...
         data_x = data_x.map(date_to_days);
         if (this.serieses.length === 0) {
@@ -384,7 +422,7 @@ class ChartWrapper {
         
         // time shift
         var offset = 0;
-        if (this.time_shift) {
+        if (this.time_shift == 'lr_shift') {
             if (this.serieses.length>0) {
                 var lr0 = this.serieses[0].lr;
                 // var y0 = this.reference_point.y;
@@ -392,12 +430,16 @@ class ChartWrapper {
                 // y = exp(m x + q)
                 var x = (Math.log(y0) - lr.q) / lr.m;
                 offset = last(data_x) - x;
-                if (offset > 0) {
-                    label += " +" + offset.toFixed(1) + " days";
-                } else if (offset < 0) {
-                    label += " -" + (-offset).toFixed(1) + " days";
-                }
             }
+        } else if (this.time_shift === 'past_shift') {
+            if (this.serieses.length>0) {
+                offset = this.history_offset(data_y);
+            }
+        }
+        if (offset > 0) {
+            label += " +" + offset.toFixed(1) + " days";
+        } else if (offset < 0) {
+            label += " -" + (-offset).toFixed(1) + " days";
         }
 
         // convert to growing rate

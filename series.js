@@ -4,41 +4,6 @@ class Series {
         this.data_x = data_x;
         this.data_y = data_y;
     }
-
-    /*
-    offset_relative_to_series_old(series) {
-        var last = this.data_y.length-1;
-        var last2 = series.data_y.length-1;
-        if (series.data_y[last2] > this.data_y[last]) {
-            var i;
-            for (i=last2;i>=0 && series.data_y[i] > this.data_y[last];i--) {}
-            // log(y) = m x + q
-            // y0 = m i + q
-            // y1 = m (i+1) + q
-            // y1 - y0 = m
-            var y = Math.log(this.data_y[last]);
-            var y1 = Math.log(series.data_y[i+1]);
-            var y0 = Math.log(series.data_y[i]);
-            var m = y1 - y0;
-            // q = y0 - m i
-            var q = y0 - m * i;
-            // x = (log(y) - q) / m
-            i = (y - q) / m;
-            return i - last2;
-        } else {
-            var i;
-            for (i=last;i>=0 && series.data_y[last2] < this.data_y[i];i--) {}
-            var y1 = Math.log(this.data_y[i+1]);
-            var y0 = Math.log(this.data_y[i]);
-            var y = Math.log(series.data_y[last2])
-            var m = y1 - y0;
-            var q = y0 - m * i;
-            i = (y - q) / m;
-            return last-i;
-        }
-    }
-    */
-
 }
 
 // https://stackoverflow.com/questions/6195335/linear-regression-in-javascript
