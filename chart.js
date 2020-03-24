@@ -1,3 +1,7 @@
+function last(arr) {
+    return arr[arr.length-1]
+}
+
 var chart_config = {
     type: 'line',
     options: {
@@ -131,6 +135,7 @@ class ChartWrapper {
         this.n_points = 0; // all
         this.fit_future_days = null;
         this.up_to_date = null;
+        this.download_url = null;
 
         this.$info = $("#chart_info");
         this.$clear = $("button[name='chart_clear']");
@@ -148,6 +153,7 @@ class ChartWrapper {
         this.$axis_count_max = $("input[name='axis_count_max']");
         this.$fit_future_days = $("input[name='fit_future_days']");
         this.$up_to_date = $("input[name='up_to_date']");
+        this.$download = $("#download_button");
     
         this.$clear.click(function(){ 
             self.clear(); 
@@ -260,6 +266,17 @@ class ChartWrapper {
             self.redraw();
         })
         this.$fit_future_days.change();
+
+        this.$download.click(function() {
+            if (self.download_url) {
+                URL.revokeObjectURL(self.download_url);
+            }
+            var blob = self.prepare_csv();
+            self.download_url = URL.createObjectURL(blob);
+            self.$download.attr("href", self.download_url);
+            self.$download.attr("target", "_blank");
+            self.$download.attr("download", "covid19-charts.csv");
+        });
     }
 
     get_options() {
@@ -329,8 +346,6 @@ class ChartWrapper {
     add_series(series) {
         var self = this;
 
-        function last(arr) {return arr[arr.length-1]}
-        
         // we are going to modify data
         var data_x = series.data_x;
         var data_y = series.data_y;
@@ -516,5 +531,40 @@ class ChartWrapper {
         })
         this.no_update = no_update_backup;
         this.update();
+    }
+
+    prepare_csv() {
+        var start=null, end=null;
+        var rows = [];
+        var row = 'date,day'; // headers
+        this.serieses.forEach(function(series){
+            if (start === null || series.data_x[0]<start) start = series.data_x[0];
+            if (end === null || last(series.data_x)>end) end = last(series.data_x);
+            row += ',' + series.label;
+        });
+        row += '\n';
+        rows.push(row); // headers
+        if (start !== null) {
+            start = Math.ceil(date_to_days(start));
+            end = date_to_days(end) + 1;
+            var indices = new Array(this.serieses.length);
+            indices.fill(0);
+            for (var day = 0; start + day < end; day ++) {
+                row = days_to_date(start+day+0.5).toISOString().slice(0,10) + "," + day;
+                for (var j=0;j<indices.length;++j) {
+                    var date = days_to_date(start + day);
+                    var val = 0;
+                    while (this.serieses[j].data_x[indices[j]] < date) {
+                        val = this.serieses[j].data_y[indices[j]];
+                        indices[j]++;
+                    }
+                    row += "," + val.toString();
+                }
+                row += '\n';
+                rows.push(row);
+            }
+        }
+        var blob = new Blob(rows, { type: 'text/csv;charset=utf-8;' });
+        return blob;
     }
 };
