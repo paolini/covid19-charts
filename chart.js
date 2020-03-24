@@ -550,7 +550,7 @@ class ChartWrapper {
             var indices = new Array(this.serieses.length);
             indices.fill(0);
             for (var day = 0; start + day < end; day ++) {
-                row = days_to_date(start+day+0.5).toISOString().slice(0,10) + "," + day;
+                row = days_to_date(start+day-0.5).toISOString().slice(0,10) + "," + day;
                 for (var j=0;j<indices.length;++j) {
                     var date = days_to_date(start + day);
                     var val = 0;
