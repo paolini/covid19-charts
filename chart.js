@@ -297,7 +297,14 @@ class ChartWrapper {
     }
 
     set_options(options) {
-        this.$time_shift.prop('checked', options['time_shift']);
+        // converting
+        if (options['time_shift'] === true) {
+            options['time_shift'] = 'lr_shift';
+        } else if (options['time_shift'] === false) {
+            options['time_shift'] = 'none';
+        }
+
+        this.$time_shift.val(options['time_shift']);
         this.$time_shift.change();
         this.$plot_type.val(options['plot_type']);
         this.$plot_type.change();
