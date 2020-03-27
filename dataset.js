@@ -101,7 +101,10 @@ class DpcDataset extends BaseDataset {
             var pairs = this.table.get_column_distinct_pairs(this.filter_column, this.filter_name_column);
             pairs.sort(function(a,b){return a[1].localeCompare(b[1])});
             this.$select.find('option').remove();
-            pairs.forEach(function(pair){
+            pairs.forEach(function(pair) {
+                if (pair[0] === "04" && self.filter_name_column === "denominazione_regione") {
+                    pair[1] = "Trentino Alto Adige"; // fix upstream data
+                }
                 self.$select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
             });
         }
@@ -130,8 +133,23 @@ class DpcDataset extends BaseDataset {
         var column = options['column'];
         var columns = column.split('/');
         columns = columns.map(function(x) {return x.trim()});
-        var data_x = subtable.get_column("data").map(string_to_date);
-        var data_y = subtable.get_column(columns[0]).map(string_to_int);
+        var data_x = [];
+        var data_y = [];
+        var x_col = subtable.headers.indexOf("data");
+        var y_col = subtable.headers.indexOf(columns[0]);
+        subtable.rows.forEach(function(row) {
+            var l = data_x.length;
+            var x = string_to_date(row[x_col]);
+            var y = string_to_int(row[y_col]);
+            if (l>0 && data_x[l-1].getTime() === x.getTime()) {
+                data_y[l-1] += y;
+            } else {
+                data_x.push(x);
+                data_y.push(y);
+            }
+        });
+//        var data_x = subtable.get_column("data").map(string_to_date);
+//        var data_y = subtable.get_column(columns[0]).map(string_to_int);
         var y_axis = 'count';
         if (columns.length === 2) {
             if (columns[1] === "popolazione") {
