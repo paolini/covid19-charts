@@ -68,11 +68,21 @@ class DpcDataset extends BaseDataset {
         super(options);
         this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
             "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi",
+
             // computed fields:
             "ricoverati_con_sintomi / totale_casi", "terapia_intensiva / totale_casi", 
             "totale_ospedalizzati / totale_casi", "isolamento_domiciliare / totale_casi", 
             "totale_attualmente_positivi / totale_casi", "nuovi_attualmente_positivi / totale_casi",
-            "dimessi_guariti / totale_casi", "deceduti / totale_casi"
+            "dimessi_guariti / totale_casi", "deceduti / totale_casi",
+
+            "totale_casi / tamponi", "tamponi / popolazione",
+
+            "totale_casi / popolazione",
+            "ricoverati_con_sintomi / popolazione", "terapia_intensiva / popolazione", 
+            "totale_ospedalizzati / popolazione", "isolamento_domiciliare / popolazione", 
+            "totale_attualmente_positivi / popolazione", "nuovi_attualmente_positivi / popolazione",
+            "dimessi_guariti / popolazione", "deceduti / popolazione",
+            
         ];
         this.filter_column = options.filter_column || null;
         this.filter_name_column = options.filter_name_column || this.filter_column;
@@ -124,8 +134,16 @@ class DpcDataset extends BaseDataset {
         var data_y = subtable.get_column(columns[0]).map(string_to_int);
         var y_axis = 'count';
         if (columns.length === 2) {
-            var col = subtable.get_column(columns[1]).map(string_to_int);
-            data_y = data_y.map(function(x, i) {return 100.0 * x / col[i]});
+            if (columns[1] === "popolazione") {
+                var popolazione = country_population['Italy'];
+                if (value_name) {
+                    popolazione = popolazione_regioni[value_name];
+                }
+                data_y = data_y.map(function(x) {return 100.0 * x / popolazione;});
+            } else {
+                var col = subtable.get_column(columns[1]).map(string_to_int);
+                data_y = data_y.map(function(x, i) {return 100.0 * x / col[i]});
+            }
             y_axis = 'rate';
         } 
         
@@ -293,9 +311,9 @@ class HopkinsDataset extends BaseDataset {
             // divide by population
             var population = country_population[value];
             if (population && population > 0) {
-                data_y = data_y.map(function(x) {return x/population;});
+                data_y = data_y.map(function(x) {return  100.0 * x / population;});
+                label+= ' percent'; 
                 y_axis = 'rate';
-                label+= ' percent';
             }
         } 
 
