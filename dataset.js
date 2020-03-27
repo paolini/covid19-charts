@@ -324,7 +324,8 @@ class HopkinsDataset extends BaseDataset {
         });
 
         var y_axis = 'count';
-        var columns = options['column'].split("/").map(function(x) {return x.trim();});
+        var column = options['columns'] || 'count';
+        var columns = column.split("/").map(function(x) {return x.trim();});
         if (columns.length === 2 && subvalue === "") {
             // divide by population
             var population = country_population[value];
