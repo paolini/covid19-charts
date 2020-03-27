@@ -3,6 +3,7 @@ class Series {
         this.label = label;
         this.data_x = data_x;
         this.data_y = data_y;
+        this.y_axis = 'count';
     }
 }
 
