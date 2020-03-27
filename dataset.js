@@ -201,6 +201,7 @@ class HopkinsDataset extends BaseDataset {
         this.subfilter_column = options.subfilter_column || "Province/State";
         this.fields = options.fields;
         this.first_time_column = 4;
+        this.fields = ['count', 'count / population']
     }
 
     init_html() {
@@ -208,6 +209,7 @@ class HopkinsDataset extends BaseDataset {
         // this.$load = $("button[name='" + this.prefix + "_load']");
         this.$select = $("select[name='" + this.prefix + "_filter']");
         this.$subselect = $("select[name='" + this.prefix + "_subfilter']");
+        this.$column = $("select[name='" + this.prefix + "_column']");
     }
     
     populate_html() {
@@ -245,8 +247,18 @@ class HopkinsDataset extends BaseDataset {
             });
             self.$subselect.prop("disabled", false);
         });
-
         this.$select.change();
+
+        this.$subselect.change(function() {
+            var value = self.$subselect.children("option:selected").val();
+            self.$column.prop('disabled', value !== "");
+        });
+        this.$subselect.change();
+
+        this.$column.find("option").remove();
+        this.fields.forEach(function(option) {
+            self.$column.append("<option value='" + option + "'>" + option + "</option>");
+        });
 
         this.$button.prop("disabled", false);
         this.$button.click(function(){self.click()});
@@ -275,7 +287,20 @@ class HopkinsDataset extends BaseDataset {
             }
         });
 
+        var y_axis = 'count';
+        var columns = options['column'].split("/").map(function(x) {return x.trim();});
+        if (columns.length === 2 && subvalue === "") {
+            // divide by population
+            var population = country_population[value];
+            if (population && population > 0) {
+                data_y = data_y.map(function(x) {return x/population;});
+                y_axis = 'rate';
+                label+= ' percent';
+            }
+        } 
+
         var series = new Series(data_x, data_y, label);
+        series.y_axis = y_axis;
         chart.add_series(series);
         super.add_series(options);
     }
@@ -283,7 +308,8 @@ class HopkinsDataset extends BaseDataset {
     click() {
         var options = {
             value: this.$select.children("option:selected").val(),
-            subvalue: this.$subselect.children("option:selected").val()
+            subvalue: this.$subselect.children("option:selected").val(),
+            column: this.$column.children("option:selected").val()
         }
         this.add_series(options)
         return options
