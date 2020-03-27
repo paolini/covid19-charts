@@ -463,17 +463,23 @@ class ChartWrapper {
                 }
             }
             // smooth out 
+            var smooth_data_y = new Array(new_data_y.length);
             for (var i=0; i < new_data_y.length; ++i) {
-                if (i==0 && i < new_data_y.length-1) {
-                    new_data_y[i] = (new_data_y[i] + new_data_y[i+1]) / 2.0;
-                } else if (i>0 && i < new_data_y.length-2) {
-                    new_data_y[i] = (new_data_y[i-1] + new_data_y[i] + new_data_y[i+1]) / 3.0;
-                } else if (i>0 && i == new_data_y.length-2) {
-                    new_data_y[i] = (new_data_y[i-1] + new_data_y[i]) / 2.0;
+                var val = new_data_y[i];
+                if (i>0) {
+                    val += new_data_y[i-1];
+                } else {
+                    val += new_data_y[i];
                 }
+                if (i<new_data_y.length-1) {
+                    val += new_data_y[i+1];
+                } else {
+                    val += new_data_y[i];
+                }
+                smooth_data_y[i] = val / 3.0;
             }
             data_x = new_data_x;
-            data_y = new_data_y;
+            data_y = smooth_data_y;
         }
 
         // draw curve
