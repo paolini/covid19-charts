@@ -237,7 +237,7 @@ class HopkinsDataset extends BaseDataset {
         this.subfilter_column = options.subfilter_column || "Province/State";
         this.fields = options.fields;
         this.first_time_column = 4;
-        this.fields = ['count', 'count / population']
+        this.fields = options.fields || ['count', 'count / population'];
     }
 
     init_html() {
@@ -324,7 +324,7 @@ class HopkinsDataset extends BaseDataset {
         });
 
         var y_axis = 'count';
-        var column = options['columns'] || 'count';
+        var column = options['column'] || 'count';
         var columns = column.split("/").map(function(x) {return x.trim();});
         if (columns.length === 2 && subvalue === "") {
             // divide by population
@@ -358,7 +358,7 @@ class HopkinsConfirmedDataset extends HopkinsDataset {
         super({
             name: "confirmed",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
-            fields: ['confirmed'],
+            fields: ['confirmed', 'confirmed / population'],
         });
     }
 }
@@ -368,7 +368,7 @@ class HopkinsDeathsDataset extends HopkinsDataset {
         super({
             name: "deaths",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
-            fields: ['deaths'],
+            fields: ['deaths', 'deaths / population'],
         });
     }
 }
@@ -379,7 +379,7 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
             name: "recovered",
             // path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
-            fields: ['recovered'],
+            fields: ['recovered', 'recovered / population'],
         });
     }
 }
