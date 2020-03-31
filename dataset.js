@@ -66,22 +66,50 @@ class BaseDataset {
 class DpcDataset extends BaseDataset {
     constructor(options) {
         super(options);
-        this.fields = ["ricoverati_con_sintomi", "terapia_intensiva", "totale_ospedalizzati", "isolamento_domiciliare", 
-            "totale_attualmente_positivi", "nuovi_attualmente_positivi", "dimessi_guariti", "deceduti", "totale_casi", "tamponi",
+        this.fields = [
+            "ricoverati_con_sintomi", 
+            "terapia_intensiva", 
+            "totale_ospedalizzati", 
+            "isolamento_domiciliare", 
+            "totale_attualmente_positivi", 
+            "nuovi_attualmente_positivi", 
+            "dimessi_guariti", 
+            "deceduti", 
+            "totale_casi", 
+            "tamponi",
 
             // computed fields:
-            "ricoverati_con_sintomi / totale_casi", "terapia_intensiva / totale_casi", 
-            "totale_ospedalizzati / totale_casi", "isolamento_domiciliare / totale_casi", 
-            "totale_attualmente_positivi / totale_casi", "nuovi_attualmente_positivi / totale_casi",
-            "dimessi_guariti / totale_casi", "deceduti / totale_casi",
+            "incremento deceduti",
+            "incremento riceverati_con_sintomi",
+            "incremento terapia_intensiva",
+            "incremento totale_ospedalizzati",
+            "incremento isolamento_domiciliare",
+            "incremento totale_attualmente_positivi",
+            "incremento dimessi_guariti",
+            "incremento totale_casi",
+            "incremento tamponi",
+            
+            "ricoverati_con_sintomi / totale_casi", 
+            "terapia_intensiva / totale_casi", 
+            "totale_ospedalizzati / totale_casi", 
+            "isolamento_domiciliare / totale_casi", 
+            "totale_attualmente_positivi / totale_casi", 
+            "nuovi_attualmente_positivi / totale_casi",
+            "dimessi_guariti / totale_casi", 
+            "deceduti / totale_casi",
 
-            "totale_casi / tamponi", "tamponi / popolazione",
+            "totale_casi / tamponi", 
+            "tamponi / popolazione",
 
             "totale_casi / popolazione",
-            "ricoverati_con_sintomi / popolazione", "terapia_intensiva / popolazione", 
-            "totale_ospedalizzati / popolazione", "isolamento_domiciliare / popolazione", 
-            "totale_attualmente_positivi / popolazione", "nuovi_attualmente_positivi / popolazione",
-            "dimessi_guariti / popolazione", "deceduti / popolazione",
+            "ricoverati_con_sintomi / popolazione", 
+            "terapia_intensiva / popolazione", 
+            "totale_ospedalizzati / popolazione", 
+            "isolamento_domiciliare / popolazione", 
+            "totale_attualmente_positivi / popolazione", 
+            "nuovi_attualmente_positivi / popolazione",
+            "dimessi_guariti / popolazione", 
+            "deceduti / popolazione",
             
         ];
         this.filter_column = options.filter_column || null;
@@ -120,23 +148,66 @@ class DpcDataset extends BaseDataset {
     }
 
     add_series(options) {
+        var column = options['column'];
+        const increment_prefix = 'incremento ';
+        var series = this.get_series_extended(column, options);
+        series.label = this.series_label(series.label, options['value_name']);
+        chart.add_series(series);
+        super.add_series(options);
+    }
+
+    get_series_extended(column, options) {
+        var series;
+        const increment_prefix = "incremento ";
+        var columns = column.split('/').map(function(x){return x.trim();});
+        if (columns.length === 2) {
+            series = this.get_series_extended(columns[0], options);
+            if (columns[1] === "popolazione") {
+                series.data_y = series.data_y.map(function(x) {return 100.0 * x / series.population;});
+                series.label += " / popolazione";
+            } else {
+                var s = this.get_series_extended(columns[1], options);
+                series.data_y = series.data_y.map(function(x, i) {return 100.0 * x / s.data_y[i]});
+                series.label += " / " + columns[1];
+            }
+            series.y_axis = 'rate';
+        } else if (column.startsWith(increment_prefix)) {
+            column = column.slice(increment_prefix.length);
+            series = this.get_series_extended(column, options); 
+            var new_data_y = new Array(series.data_y.length);
+            var last = 0;
+            for (var i=0; i < new_data_y.length; ++i) {
+                new_data_y[i] = series.data_y[i] - last;
+                last = series.data_y[i];
+            }
+            series.data_y = new_data_y;
+            series.label = "incremento " + series.label;
+        } else {
+            series = this.get_series(column, options);
+        }
+        return series;
+    }
+
+    get_series(column, options) {
         var subtable = this.table;
         var value = null;
         var value_name = null;
+        var population;
         
         if (this.filter_column) {
             value = options['value'];
             value_name = options['value_name'];
             subtable = subtable.filter(this.filter_column, value);
+            population = popolazione_regioni[value_name];
+        } else {
+            population = country_population['Italy'];
         }
         
-        var column = options['column'];
-        var columns = column.split('/');
-        columns = columns.map(function(x) {return x.trim()});
         var data_x = [];
         var data_y = [];
+
         var x_col = subtable.headers.indexOf("data");
-        var y_col = subtable.headers.indexOf(columns[0]);
+        var y_col = subtable.headers.indexOf(column);
         subtable.rows.forEach(function(row) {
             var l = data_x.length;
             var x = string_to_date(row[x_col]);
@@ -148,28 +219,14 @@ class DpcDataset extends BaseDataset {
                 data_y.push(y);
             }
         });
-//        var data_x = subtable.get_column("data").map(string_to_date);
-//        var data_y = subtable.get_column(columns[0]).map(string_to_int);
+
         var y_axis = 'count';
-        if (columns.length === 2) {
-            if (columns[1] === "popolazione") {
-                var popolazione = country_population['Italy'];
-                if (value_name) {
-                    popolazione = popolazione_regioni[value_name];
-                }
-                data_y = data_y.map(function(x) {return 100.0 * x / popolazione;});
-            } else {
-                var col = subtable.get_column(columns[1]).map(string_to_int);
-                data_y = data_y.map(function(x, i) {return 100.0 * x / col[i]});
-            }
-            y_axis = 'rate';
-        } 
         
-        var label = this.series_label(column, value_name);
+        var label = column;
         var series = new Series(data_x, data_y, label);
+        series.population = population;
         series.y_axis = y_axis;
-        chart.add_series(series);
-        super.add_series(options)
+        return series;
     }
 
     click() {
@@ -217,7 +274,7 @@ class DpcProvinceDataset extends DpcDataset {
             filter_name_column: "denominazione_provincia",
             filter_column: "codice_provincia"
         });
-        this.fields = ['totale_casi'];
+        this.fields = ['totale_casi', 'incremento totale_casi'];
     }
 
     post_load_hook() {
