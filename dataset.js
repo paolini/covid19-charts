@@ -294,12 +294,11 @@ class HopkinsDataset extends BaseDataset {
         this.subfilter_column = options.subfilter_column || "Province/State";
         this.fields = options.fields;
         this.first_time_column = 4;
-        this.fields = options.fields || ['count', 'count / population'];
+        this.fields = options.fields;
     }
 
     init_html() {
         super.init_html();
-        // this.$load = $("button[name='" + this.prefix + "_load']");
         this.$select = $("select[name='" + this.prefix + "_filter']");
         this.$subselect = $("select[name='" + this.prefix + "_subfilter']");
         this.$column = $("select[name='" + this.prefix + "_column']");
@@ -358,14 +357,54 @@ class HopkinsDataset extends BaseDataset {
     }
 
     add_series(options) {
+        var column = options['column'] || 'count';
+        var series = this.get_series_extended(column, options);
+        chart.add_series(series);
+        super.add_series(options);
+    }
+
+    get_series_extended(column, options) {
+        var series;
+        const increment_postfix = " increment";
+        var columns = column.split('/').map(function(x) {return x.trim();});
+        if (columns.length === 2) {
+            series = this.get_series_extended(columns[0], options);
+            // columns[1] should be "population"
+            if (series.population > 0) {
+                series.data_y = series.data_y.map(function(x) {return  100.0 * x / series.population;});
+                series.label += ' percent'; 
+                series.y_axis = 'rate';
+            }
+        } else if (column.endsWith(increment_postfix)) {
+            column = column.slice(0, -increment_postfix.length);
+            series = this.get_series_extended(column, options);
+            var new_data_y = new Array(series.data_y.length);
+            var last = 0;
+            for (var i=0; i < new_data_y.length; ++i) {
+                new_data_y[i] = series.data_y[i] - last;
+                last = series.data_y[i];
+            }
+            series.data_y = new_data_y;
+            series.label += increment_postfix;
+        } else {
+            series = this.get_series(column, options);
+        }
+        return series;
+    }
+
+    get_series(column, options) {
         var self = this;
         var value = options['value'];
         var subvalue = options['subvalue'];
         var subtable = this.table;
-        var label = this.fields[0] + " " + value;
+        var label = column + " " + value;
+        var population = 0;
         
         subtable = subtable.filter(this.filter_column, value);
-        if (subvalue !== "") {
+        if (subvalue === "") {
+            population = country_population[value];
+        } else {
+            population = 0; // population of regions is unknown
             subtable = subtable.filter(this.subfilter_column, subvalue);
             label += " " + subvalue;
         }
@@ -380,23 +419,10 @@ class HopkinsDataset extends BaseDataset {
             }
         });
 
-        var y_axis = 'count';
-        var column = options['column'] || 'count';
-        var columns = column.split("/").map(function(x) {return x.trim();});
-        if (columns.length === 2 && subvalue === "") {
-            // divide by population
-            var population = country_population[value];
-            if (population && population > 0) {
-                data_y = data_y.map(function(x) {return  100.0 * x / population;});
-                label+= ' percent'; 
-                y_axis = 'rate';
-            }
-        } 
-
         var series = new Series(data_x, data_y, label);
-        series.y_axis = y_axis;
-        chart.add_series(series);
-        super.add_series(options);
+        series.y_axis = 'count';
+        series.population = population;
+        return series;
     }
 
     click() {
@@ -415,7 +441,7 @@ class HopkinsConfirmedDataset extends HopkinsDataset {
         super({
             name: "confirmed",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
-            fields: ['confirmed', 'confirmed / population'],
+            fields: ['confirmed', 'confirmed / population', 'confirmed increment'],
         });
     }
 }
@@ -425,7 +451,7 @@ class HopkinsDeathsDataset extends HopkinsDataset {
         super({
             name: "deaths",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
-            fields: ['deaths', 'deaths / population'],
+            fields: ['deaths', 'deaths / population', 'deaths increment'],
         });
     }
 }
@@ -436,7 +462,7 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
             name: "recovered",
             // path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
-            fields: ['recovered', 'recovered / population'],
+            fields: ['recovered', 'recovered / population', 'recovered increment'],
         });
     }
 }
