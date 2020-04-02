@@ -1,23 +1,24 @@
   // original code by: izmegabe@gmail.com
   // extracted from: https://github.com/gabgoh/epcalc
+  // adapted by: E.P.
   
-  function range(n){
-    return Array(n).fill().map((_, i) => i);
-  }
+function range(n){
+    return Array(n).fill().map(function(_, i) {return i});
+}
 
-  function formatNumber(num) {
+function formatNumber(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-  }
+ }
 
-  var sum = function(arr, bools){
+var sum = function(arr, bools){
     var x = 0
     for (var i = 0; i < arr.length; i++) {
       x = x + arr[i]*(bools[i] ? 1 : 0)
     }
     return x
-  }
+}
 
-  var Integrators = {
+var Integrators = {
     Euler    : [[1]],
     Midpoint : [[.5,.5],[0, 1]],
     Heun     : [[1, 1],[.5,.5]],
@@ -29,10 +30,10 @@
     RK38     : [[1/3,1/3],[2/3,-1/3,1],[1,1,-1,1],[1/8,3/8,3/8,1/8]]
   };
 
-  // f is a func of time t and state y
-  // y is the initial state, t is the time, h is the timestep
-  // updated y is returned.
-  var integrate=(m,f,y,t,h)=>{
+// f is a func of time t and state y
+// y is the initial state, t is the time, h is the timestep
+// updated y is returned.
+function integrate(m,f,y,t,h){
     for (var k=[],ki=0; ki<m.length; ki++) {
       var _y=y.slice(), dt=ki?((m[ki-1][0])*h):0;
       for (var l=0; l<_y.length; l++) for (var j=1; j<=ki; j++) _y[l]=_y[l]+h*(m[ki-1][j])*(k[ki-1][l]);
@@ -40,51 +41,53 @@
     }
     for (var r=y.slice(),l=0; l<_y.length; l++) for (var j=0; j<k.length; j++) r[l]=r[l]+h*(k[j][l])*(m[ki-1][j]);
     return r;
-  }
+}
 
+var params = {
+    Time_to_death     : 32,
+    N                 : 7e6,
+    I0                : 1,
+    R0                : 2.2,
+    D_incbation       : 5.2,
+    D_infectious      : 2.9,
+    D_recovery_mild   : (14 - 2.9),
+    D_recovery_severe : (31.5 - 2.9),
+    D_hospital_lag    : 5,
+//    D_death           : Time_to_death - D_infectious ,
+    CFR               : 0.02,
+    InterventionTime  : 100,
+    OMInterventionAmt : 2/3,
+//    InterventionAmt   : 1 - OMInterventionAmt,
+    Time              : 220,
+    Xmax              : 110000,
+    dt                : 2,
+    P_SEVERE          : 0.2,
+    duration          : 7*12*1e10
+  };
 
-  $: Time_to_death     = 32
-  $: logN              = Math.log(7e6)
-  $: N                 = Math.exp(logN)
-  $: I0                = 1
-  $: R0                = 2.2
-  $: D_incbation       = 5.2       
-  $: D_infectious      = 2.9 
-  $: D_recovery_mild   = (14 - 2.9)  
-  $: D_recovery_severe = (31.5 - 2.9)
-  $: D_hospital_lag    = 5
-  $: D_death           = Time_to_death - D_infectious 
-  $: CFR               = 0.02  
-  $: InterventionTime  = 100  
-  $: OMInterventionAmt = 2/3
-  $: InterventionAmt   = 1 - OMInterventionAmt
-  $: Time              = 220
-  $: Xmax              = 110000
-  $: dt                = 2
-  $: P_SEVERE          = 0.2
-  $: duration          = 7*12*1e10
-
-  $: state = location.protocol + '//' + location.host + location.pathname + "?" + queryString.stringify({"Time_to_death":Time_to_death,
-               "logN":logN,
-               "I0":I0,
-               "R0":R0,
-               "D_incbation":D_incbation,
-               "D_infectious":D_infectious,
-               "D_recovery_mild":D_recovery_mild,
-               "D_recovery_severe":D_recovery_severe,
-               "CFR":CFR,
-               "InterventionTime":InterventionTime,
-               "InterventionAmt":InterventionAmt,
-               "D_hospital_lag":D_hospital_lag,
-               "P_SEVERE": P_SEVERE})
 
 // dt, N, I0, R0, D_incbation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration
 
-  function get_solution(dt, N, I0, R0, D_incbation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration) {
+function get_solution(params) {
+    const params_dt = params.dt;
+    const N = params.N;
+    const I0 = params.I0;
+    const R0 = params.R0;
+    const D_incbation = params.D_incbation;
+    const D_infectious = params.D_infectious;
+    const D_recovery_mild = params.D_recovery_mild;
+    const D_hospital_lag = params.D_hospital_lag;
+    const D_recovery_severe = params.D_recovery_severe;
+    const D_death = params.Time_to_death - params.D_infectious;
+    const P_SEVERE = params.P_SEVERE;
+    const CFR = params.CFR;
+    const InterventionTime = params.InterventionTime;
+    const InterventionAmt = 1 - params.OMInterventionAmt;
+    const duration = params.duration;
 
     var interpolation_steps = 40
     var steps = 110*interpolation_steps
-    var dt = dt/interpolation_steps
+    var dt = params_dt/interpolation_steps
     var sample_step = interpolation_steps
 
     var method = Integrators["RK4"]
@@ -139,7 +142,7 @@
     var Iters = []
     while (steps--) { 
       if ((steps+1) % (sample_step) == 0) {
-            //    Dead   Hospital          Recovered        Infectious   Exposed
+        //    Dead   Hospital          Recovered        Infectious   Exposed
         P.push([ N*v[9], N*(v[5]+v[6]),  N*(v[7] + v[8]), N*v[2],    N*v[1] ])
         Iters.push(v)
         TI.push(N*(1-v[0]))
@@ -157,18 +160,4 @@
             "dIters": f}
   }
 
-  function max(P, checked) {
-    return P.reduce((max, b) => Math.max(max, sum(b, checked) ), sum(P[0], checked) )
-  }
-
-  $: Sol            = get_solution(dt, N, I0, R0, D_incbation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration)
-  $: P              = Sol["P"].slice(0,100)
-  $: timestep       = dt
-  $: tmax           = dt*100
-  $: deaths         = Sol["deaths"]
-  $: total          = Sol["total"]
-  $: total_infected = Sol["total_infected"].slice(0,100)
-  $: Iters          = Sol["Iters"]
-  $: dIters         = Sol["dIters"]
-  $: Pmax           = max(P, checked)
-  $: lock           = false
+var  Sol  = get_solution(params);
