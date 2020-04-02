@@ -80,7 +80,7 @@ class DpcDataset extends BaseDataset {
 
             // computed fields:
             "incremento deceduti",
-            "incremento riceverati_con_sintomi",
+            "incremento ricoverati_con_sintomi",
             "incremento terapia_intensiva",
             "incremento totale_ospedalizzati",
             "incremento isolamento_domiciliare",
