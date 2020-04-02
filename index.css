@@ -58,22 +58,25 @@ body{
 }
 */
 .data{
-    display: grid;
-    grid-template-columns: 50% 50%;
+    /* display: grid; */
+    /* grid-template-columns: 50% 50%; */
 }
 .box {
-    margin: 16px 0;
+   /* margin: 16px 0; */
 }
 .box h1{
     font-size: 34px;
     font-weight: 500;
     margin: 0;
 }
+h3{
+    margin: 0;
+}
 .box h4{
     color: #555;
     margin: 0;
     font-weight: 400;
-    margin-bottom: 16px;
+/*    margin-bottom: 16px; */
 }
 .box a{
     color: #212121;
@@ -94,8 +97,8 @@ body{
     display: block;
 }
 .box li select{
-    width: 100%;
-    display: block;
+    /* width: 100%; */
+    /* display: block; */
     margin: 8px 0;
 }
 .box li button, a#download_button{

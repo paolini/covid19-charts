@@ -37,70 +37,68 @@
     <body>
         <div class="header">
             <h1 id="title">CoVID-19 Charts</h1>
-            <h4 id="author">Created by <a href="https://github.com/paolini">paolini</a></h4>
         </div>
         <div class="main">
             <div class="warning">
-                <h1>Warning</h1>
+                <h1>Disclaimer</h1>
                 <p>This application is fetching data from the sources described below (namely italian dpc for italian data, and Hopkins University for world data).
                     Only a very simplistic and objective analysis is performed: 
                     see the explanations given below before giving any significance to the data plotted.
                     You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.</p>
             </div>
             <div class="data">
-                <div class="box">
-                    <h1>Italian &quot;protezione civile&quot; data</h1>
-                    <h4>You can find the data <a href="https://github.com/pcm-dpc/COVID-19">here</a></h4>
-                    <ul>
-                        <li>Dati Nazionali:
-                            <select name="italia_column"></select>
-                            <button name="italia_add"><i class="fas fa-chart-line"></i> Plot</button>
-                        </li>
-                         <li>Dati Regioni:
-                             <select name="regioni_codice_regione"></select>
-                             <select name="regioni_column"></select>
-                             <button name="regioni_add"><i class="fas fa-chart-line"></i> Plot</button>
-                         </li>
-                         <li>Dati Province:
-                             <select name="province_codice_provincia"></select>
-                             <select name="province_column"></select>
-                             <button name="province_add"><i class="fas fa-chart-line"></i> Plot</button>
-                         </li>
-                    </ul>
+                <h3>Data source:
+                    <select name="data_source">
+                        <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
+                        <option value="hopkins">World data by John Hopkins Univ.</option>
+                    </select></h3>
+                <div id="dpc_box" class="box data_source">            
+                <h4>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></h4>
+                <h3>Data set:
+                    <select class="dataset_select">
+                    <option value="dpc nazione">Dati Nazionali</option>
+                    <option value="dpc regioni">Dati Regioni</option>
+                    <option value="dpc province">Dati Province</option>
+                    </select></h3>
+                <h3>Series:
+                <select name="italia_column" class="dpc nazione dataset_option"></select>
+                <button name="italia_add" class="dpc nazione dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+                <select name="regioni_codice_regione" class="dpc regioni dataset_option"></select>
+                <select name="regioni_column" class="dpc regioni dataset_option"></select>
+                <button name="regioni_add" class="dpc regioni dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+                <select name="province_codice_provincia" class="dpc province dataset_option"></select>
+                <select name="province_column" class="dpc province dataset_option"></select>
+                <button name="province_add" class="dpc province dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+                </h3>   
                 </div>
-                <div class="box">
-                    <h1>John Hopkins data</h1>
-                    <h4>You can find the data <a href="https://github.com/CSSEGISandData/COVID-19">here</a></h4>
-                    <ul>
-                        <li>
-                            Confirmed: 
-                            <!--button name="confirmed_load">carica i dati</button-->
-                            <select name="confirmed_filter"></select>
-                            <select name="confirmed_subfilter"></select>
-                            <select name="confirmed_column"></select>
-                            <button name="confirmed_add"><i class="fas fa-chart-line"></i> Plot</button>
-                        </li>
-                        <li>
-                            Deaths: 
-                            <!--button name="deaths_load">carica i dati</button-->
-                            <select name="deaths_filter"></select>
-                            <select name="deaths_subfilter"></select>
-                            <select name="deaths_column"></select>
-                            <button name="deaths_add"><i class="fas fa-chart-line"></i> Plot</button>
-                        </li>
-                        <li>
-                            Recovered: 
-                            <!--button name="recovered_load">carica i dati</button-->
-                            <select name="recovered_filter"></select>
-                            <select name="recovered_subfilter"></select>
-                            <select name="recovered_column"></select>
-                            <button name="recovered_add"><i class="fas fa-chart-line"></i> Plot</button>
-                        </li>
-                    </ul>
+                <div id="hopkins_box" class="box data_source">
+                    <h4>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></h4>
+                    <h3>Data set:
+                        <select class="dataset_select">
+                        <option value="hopkins confirmed">Confirmed</option>
+                        <option value="hopkins deaths">Deaths</option>
+                        <option value="hopkins recovered">Recovered</option>
+                        </select></h3>
+                    <h3>Series:
+                    <select name="confirmed_filter" class="hopkins confirmed dataset_option"></select>
+                    <select name="confirmed_subfilter" class="hopkins confirmed dataset_option"></select>
+                    <select name="confirmed_column" class="hopkins confirmed dataset_option"></select>
+                    <button name="confirmed_add" class="hopkins confirmed dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+
+                    <select name="deaths_filter" class="hopkins deaths dataset_option"></select>
+                    <select name="deaths_subfilter" class="hopkins deaths dataset_option"></select>
+                    <select name="deaths_column" class="hopkins deaths dataset_option"></select>
+                    <button name="deaths_add" class="hopkins deaths dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+
+                    <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
+                    <select name="recovered_subfilter" class="hopkins recovered dataset_option"></select>
+                    <select name="recovered_column" class="hopkins recovered dataset_option"></select>
+                    <button name="recovered_add" class="hopkins recovered dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
+                    </h3>
                 </div>
             </div>
             <div class="box">
-                <h1 style="margin-bottom: 16px;">Options</h1>
+                <!--h3 style="margin-bottom: 16px;">Options</h3-->
                 <li>
                     <button name="chart_clear"><i class="fas fa-trash-alt"></i> Remove all plots</button>
                     <button name="chart_pop"><i class="fas fa-minus"></i> Remove last plot</button>
@@ -132,21 +130,21 @@
                     </select>
                     -- up to date <input name="up_to_date" size="5">
                     -- time alignment
-                        <select name="time_shift">
-                            <option value="">none</option>
-                            <option value="lr_shift">prediction shift</option>
-                            <option value="past_shift">history shift</option>
-                        </select>
+                    <select name="time_shift">
+                        <option value="">none</option>
+                        <option value="lr_shift">prediction shift</option>
+                        <option value="past_shift">history shift</option>
+                    </select>
                     -- advanced settings <input name="advanced_settings" type="checkbox">
                 </li>
                 <li id="advanced_settings">
-                        -- x-axis day min <input name="axis_days_min" size="5">
-                        -- x-axis day max <input name="axis_days_max" size="5">
-                        -- x-axis date min <input name="axis_date_min" size="5">
-                        -- x-axis date max <input name="axis_date_max" size="5">
-                        -- y-axis count min <input name="axis_count_min" size="5">
-                        -- y-axis count max <input name="axis_count_max" size="5">
-                        -- fit future days <input name="fit_future_days" value="5" size="5">
+                    -- x-axis day min <input name="axis_days_min" size="5">
+                    -- x-axis day max <input name="axis_days_max" size="5">
+                    -- x-axis date min <input name="axis_date_min" size="5">
+                    -- x-axis date max <input name="axis_date_max" size="5">
+                    -- y-axis count min <input name="axis_count_min" size="5">
+                    -- y-axis count max <input name="axis_count_max" size="5">
+                    -- fit future days <input name="fit_future_days" value="5" size="5">
                 </li>
             </div>
             <div style="width:100%;">

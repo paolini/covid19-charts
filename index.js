@@ -50,4 +50,16 @@ $(function () {
         $("button[name='create_url']").click(set_location_hash);
     });
 
+    $("select[name='data_source']").change(function(){
+        var val = $(this).val();
+        $(".data_source").hide();
+        $("#" + val + "_box").show();
+    }).change();
+
+    $(".dataset_select").change(function(){
+        var vals = $(this).val().split(" ");
+        $("." + vals[0]).hide();
+        $("." + vals[0] + "." + vals[1]).show();
+    }).change();
+
 });   
