@@ -552,13 +552,21 @@ class ChartWrapper {
         var lr = series.lr;
         var days_passed = lr.q/lr.m + this.days_today;
         var first_day = new Date((this.days_today-days_passed)*1000.0*60*60*24);
+        var msg = "";
+        msg += "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, ";
+        msg += "average daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, ";
+        if (lr.m>0) {
+            msg += "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> days, ";
+            msg += "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
+            + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"; 
+        } else {
+            msg += "halving time: <b>"+ (Math.log(2.0)/(-lr.m)).toFixed(1) +"</b> days, ";
+            msg += "back to origin in <b>" + (-days_passed).toFixed(1) + "</b> days: "
+            + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"; 
+        }
         this.$info.append(
             "<li> <div class='box' style='background-color:" + series.color + "'></div> "+name+":</font> " 
-            + "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, "
-            + "average daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, "
-            + "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> days, "
-            + "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
-            + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"
+            + msg
             + "<!-- m="+lr.m+" "
             + "q="+lr.q+" --></li>"
             );
