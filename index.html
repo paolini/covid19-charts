@@ -1,171 +1,184 @@
 <!DOCTYPE HTML>
 <html>
-<head>  
-    <title>covid-19 charts</title>
+    <head>  
+        <title>covid-19 charts</title>
 
-    <link rel="stylesheet" href="index.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.js"></script>
+        <link rel="stylesheet" href="index.css">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.8/jquery.csv.js"></script>
 
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-    <script src="chartjs-plugin-colorschemes.min.js"></script>
-    <!--script src="utf8.js"></script-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script src="chartjs-plugin-colorschemes.min.js"></script>
+        <!--script src="utf8.js"></script-->
 
 
-    <script src="chart.js"></script>
-    <script src="table.js"></script>
-    <script src="series.js"></script>
-    <script src="dataset.js"></script>
-    <script src="index.js"></script>
-    <script src="population.js"></script>
+        <script src="chart.js"></script>
+        <script src="table.js"></script>
+        <script src="series.js"></script>
+        <script src="dataset.js"></script>
+        <script src="index.js"></script>
+        <script src="population.js"></script>
 
-    <style>
-		canvas {
-			-moz-user-select: none;
-			-webkit-user-select: none;
-			-ms-user-select: none;
-		}
-	</style>
-</head>
-<body>
-    <h1>covid-19 charts</h1>
-    <p>
-        <b>warning:</b>
-        this application is fetching data from the sources described below (namely italian dpc for italian data, and Hopkins University for world data).
-        Only a very simplistic and objective analysis is performed: 
-        see the explanations given below before giving any significance to the data plotted.
-        You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.
-    </p>
-    <ul>
-       <li>Italian &quot;protezione civile&quot; (<a href="https://github.com/pcm-dpc/COVID-19">see here</a>)
-           <ul>
-               <li>dati-nazionali:
-                   <select name="italia_column"></select>
-                   <button name="italia_add">plot</button>
-               </li>
-                <li>dati-regioni:
-                    <select name="regioni_codice_regione"></select>
-                    <select name="regioni_column"></select>
-                    <button name="regioni_add">plot</button>
+        <style>
+            canvas {
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                -ms-user-select: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1 id="title">CoVID-19 Charts</h1>
+            <h4 id="author">Created by <a href="https://github.com/paolini">paolini</a></h4>
+        </div>
+        <div class="main">
+            <div class="warning">
+                <h1>Warning</h1>
+                <p>This application is fetching data from the sources described below (namely italian dpc for italian data, and Hopkins University for world data).
+                    Only a very simplistic and objective analysis is performed: 
+                    see the explanations given below before giving any significance to the data plotted.
+                    You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.</p>
+            </div>
+            <div class="data">
+                <div class="box">
+                    <h1>Italian &quot;protezione civile&quot; data</h1>
+                    <h4>You can find the data <a href="https://github.com/pcm-dpc/COVID-19">here</a></h4>
+                    <ul>
+                        <li>Dati Nazionali:
+                            <select name="italia_column"></select>
+                            <button name="italia_add"><i class="fas fa-chart-line"></i> Plot</button>
+                        </li>
+                         <li>Dati Regioni:
+                             <select name="regioni_codice_regione"></select>
+                             <select name="regioni_column"></select>
+                             <button name="regioni_add"><i class="fas fa-chart-line"></i> Plot</button>
+                         </li>
+                         <li>Dati Province:
+                             <select name="province_codice_provincia"></select>
+                             <select name="province_column"></select>
+                             <button name="province_add"><i class="fas fa-chart-line"></i> Plot</button>
+                         </li>
+                    </ul>
+                </div>
+                <div class="box">
+                    <h1>John Hopkins data</h1>
+                    <h4>You can find the data <a href="https://github.com/CSSEGISandData/COVID-19">here</a></h4>
+                    <ul>
+                        <li>
+                            Confirmed: 
+                            <!--button name="confirmed_load">carica i dati</button-->
+                            <select name="confirmed_filter"></select>
+                            <select name="confirmed_subfilter"></select>
+                            <select name="confirmed_column"></select>
+                            <button name="confirmed_add"><i class="fas fa-chart-line"></i> Plot</button>
+                        </li>
+                        <li>
+                            Deaths: 
+                            <!--button name="deaths_load">carica i dati</button-->
+                            <select name="deaths_filter"></select>
+                            <select name="deaths_subfilter"></select>
+                            <select name="deaths_column"></select>
+                            <button name="deaths_add"><i class="fas fa-chart-line"></i> Plot</button>
+                        </li>
+                        <li>
+                            Recovered: 
+                            <!--button name="recovered_load">carica i dati</button-->
+                            <select name="recovered_filter"></select>
+                            <select name="recovered_subfilter"></select>
+                            <select name="recovered_column"></select>
+                            <button name="recovered_add"><i class="fas fa-chart-line"></i> Plot</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="box">
+                <h1 style="margin-bottom: 16px;">Options</h1>
+                <li>
+                    <button name="chart_clear"><i class="fas fa-trash-alt"></i> Remove all plots</button>
+                    <button name="chart_pop"><i class="fas fa-minus"></i> Remove last plot</button>
+                    <button name="create_url"><i class="fas fa-link"></i> Set url to link this chart</button>
                 </li>
-                <li>dati-province:
-                    <select name="province_codice_provincia"></select>
-                    <select name="province_column"></select>
-                    <button name="province_add">plot</button>
+                <li>
+                    plot type
+                    <select name="chart_type">
+                        <option value="linear">linear</option>
+                        <option value="log">logaritmic</option>
+                        <option value="rate">growth rate</option>
+                    </select> 
+                    -- draw fitting exponential <input type="checkbox" name="draw_fit">
+                    -- consider
+                    <select name="n_points">
+                        <option value="">all data points</option>
+                        <option value="28">last 28 points</option>
+                        <option value="21">last 21 points</option>
+                        <option value="14">last 14 points</option>
+                        <option value="10">last 10 points</option>
+                        <option value="9">last 9 points</option>
+                        <option value="8">last 8 points</option>
+                        <option value="7">last 7 points</option>
+                        <option value="6">last 6 points</option>
+                        <option value="5">last 5 points</option>
+                        <option value="4">last 4 points</option>
+                        <option value="3">last 3 points</option>
+                        <option value="2">last 2 points</option>
+                    </select>
+                    -- up to date <input name="up_to_date" size="5">
+                    -- time alignment
+                        <select name="time_shift">
+                            <option value="">none</option>
+                            <option value="lr_shift">prediction shift</option>
+                            <option value="past_shift">history shift</option>
+                        </select>
+                    -- advanced settings <input name="advanced_settings" type="checkbox">
                 </li>
+                <li id="advanced_settings">
+                        -- x-axis day min <input name="axis_days_min" size="5">
+                        -- x-axis day max <input name="axis_days_max" size="5">
+                        -- x-axis date min <input name="axis_date_min" size="5">
+                        -- x-axis date max <input name="axis_date_max" size="5">
+                        -- y-axis count min <input name="axis_count_min" size="5">
+                        -- y-axis count max <input name="axis_count_max" size="5">
+                        -- fit future days <input name="fit_future_days" value="5" size="5">
+                </li>
+            </div>
+            <div style="width:100%;">
+                <canvas id="canvas"></canvas>
+            </div>
+            <ul id="chart_info">
             </ul>
-        </li>
-        <li>John Hopkins data (<a href="https://github.com/CSSEGISandData/COVID-19">see here</a>)
-            <ul>
-                <li>
-                    Confirmed: 
-                    <!--button name="confirmed_load">carica i dati</button-->
-                    <select name="confirmed_filter"></select>
-                    <select name="confirmed_subfilter"></select>
-                    <select name="confirmed_column"></select>
-                    <button name="confirmed_add">plot</button>
-                </li>
-                <li>
-                    Deaths: 
-                    <!--button name="deaths_load">carica i dati</button-->
-                    <select name="deaths_filter"></select>
-                    <select name="deaths_subfilter"></select>
-                    <select name="deaths_column"></select>
-                    <button name="deaths_add">plot</button>
-                </li>
-                <li>
-                    Recovered: 
-                    <!--button name="recovered_load">carica i dati</button-->
-                    <select name="recovered_filter"></select>
-                    <select name="recovered_subfilter"></select>
-                    <select name="recovered_column"></select>
-                    <button name="recovered_add">plot</button>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <button name="chart_clear">remove all plots</button>
-            <button name="chart_pop">remove last plot</button>
-            <button name="create_url">set url to link this chart</button>
-        </li>
-        <li>
-            plot type
-            <select name="chart_type">
-                <option value="linear">linear</option>
-                <option value="log">logaritmic</option>
-                <option value="rate">growth rate</option>
-            </select> 
-            -- draw fitting exponential <input type="checkbox" name="draw_fit">
-            -- consider
-            <select name="n_points">
-                <option value="">all data points</option>
-                <option value="28">last 28 points</option>
-                <option value="21">last 21 points</option>
-                <option value="14">last 14 points</option>
-                <option value="10">last 10 points</option>
-                <option value="9">last 9 points</option>
-                <option value="8">last 8 points</option>
-                <option value="7">last 7 points</option>
-                <option value="6">last 6 points</option>
-                <option value="5">last 5 points</option>
-                <option value="4">last 4 points</option>
-                <option value="3">last 3 points</option>
-                <option value="2">last 2 points</option>
-            </select>
-            -- up to date <input name="up_to_date" size="5">
-            -- time alignment
-                <select name="time_shift">
-                    <option value="">none</option>
-                    <option value="lr_shift">prediction shift</option>
-                    <option value="past_shift">history shift</option>
-                </select>
-            -- advanced settings <input name="advanced_settings" type="checkbox">
-        </li>
-        <li id="advanced_settings">
-                -- x-axis day min <input name="axis_days_min" size="5">
-                -- x-axis day max <input name="axis_days_max" size="5">
-                -- x-axis date min <input name="axis_date_min" size="5">
-                -- x-axis date max <input name="axis_date_max" size="5">
-                -- y-axis count min <input name="axis_count_min" size="5">
-                -- y-axis count max <input name="axis_count_max" size="5">
-                -- fit future days <input name="fit_future_days" value="5" size="5">
-        </li>
-    </ul>
-<div style="width:75%;">
-    <canvas id="canvas"></canvas>
-</div>
-<ul id="chart_info">
-</ul>
-<a id="download_button" href="#">download data as a CSV file</a>
-<h2>explanation</h2>
-
-<p>
-From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user 
-up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field). 
-We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
-This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
-The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
-The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
-The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day,
-an average over three days is performed to smooth out the curve.
-The <i>time alignment</i> selection translates each curve in time with respect to the first curve 
-plotted.
-If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach 
-the level of the first curve following the current exponential trend.
-If <i>history shift</i> is selected, each curve is shifted by the number of days in the past 
-when the first curve had the same value (when the first curve is larger than the current) or 
-in the future when it has the same value of the first curve (when the first curve is smaller than the current). 
-If you press the button <i>set url for this chart</i> the url of the page is changed 
-so that you can save or share a link to the current chart.
-To perform your own analysis you can download the data in CSV format.
-</p>
-
-<p>Code on <a href="https://github.com/paolini/covid19-charts">github</a></p>
-</body>
+            <a id="download_button" href="#"><i class="fas fa-download"></i> Download data as a CSV file</a>
+            <div class="warning">
+                <h1>Explanation</h1>
+                <p>
+                    From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user 
+                    up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field). 
+                    We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
+                    This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
+                    The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
+                    The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
+                    The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day,
+                    an average over three days is performed to smooth out the curve.
+                    The <i>time alignment</i> selection translates each curve in time with respect to the first curve 
+                    plotted.
+                    If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach 
+                    the level of the first curve following the current exponential trend.
+                    If <i>history shift</i> is selected, each curve is shifted by the number of days in the past 
+                    when the first curve had the same value (when the first curve is larger than the current) or 
+                    in the future when it has the same value of the first curve (when the first curve is smaller than the current). 
+                    If you press the button <i>set url for this chart</i> the url of the page is changed 
+                    so that you can save or share a link to the current chart.
+                    To perform your own analysis you can download the data in CSV format.
+                </p>
+            </div>
+            <div class="footer"><p>Code on <a href="https://github.com/paolini/covid19-charts"><i class="fab fa-github"></i></a></p></div>
+        </div>
+    </body>
 </html>
