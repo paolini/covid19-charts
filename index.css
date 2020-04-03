@@ -121,3 +121,11 @@ a#download_button{
     margin-bottom: 32px;
     display: inline-block;
 }
+
+
+.label {
+    width: 2em;
+    height: 1em;
+    display: inline-block;
+    border-radius: 0.2em;
+}

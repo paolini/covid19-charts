@@ -565,7 +565,7 @@ class ChartWrapper {
             + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"; 
         }
         this.$info.append(
-            "<li> <div class='box' style='background-color:" + series.color + "'></div> "+name+":</font> " 
+            "<li> <div class='label' style='background-color:" + series.color + "'></div> "+name+":</font> " 
             + msg
             + "<!-- m="+lr.m+" "
             + "q="+lr.q+" --></li>"
