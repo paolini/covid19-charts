@@ -41,6 +41,9 @@ function get_location_hash() {
             deaths: "hopkins_deaths",
             recovered: "hopkins_recovered",            
         }[item.dataset];
+        if (item.options.column === "nuovi_attualmente_positivi") {
+            item.options.column = "nuovi_positivi";
+        }
         datasets[key].add_series(item.options);
     })
 }
