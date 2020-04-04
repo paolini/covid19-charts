@@ -176,6 +176,8 @@ class ChartWrapper {
             self.chart.options.scales.yAxes[0].type = (val=="log") ? 'logarithmic' : 'linear';
             if (val == "rate" || val == "rate_smooth") {
                 self.rate_plot = val;
+            } else {
+                self.rate_plot = false;
             }
             self.redraw();
         })
