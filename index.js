@@ -33,12 +33,15 @@ function get_location_hash() {
     var options = JSON.parse(json);
     chart.set_options(options['chart'])
     options['datasets'].forEach(function(item) {
-        for(var i=0;i<datasets.length;i++) {
-            if (datasets[i].prefix === item.dataset) {
-                datasets[i].add_series(item.options);
-                break;
-            }
-        } 
+        var key = {
+            italia: "dpc_nazione",
+            regioni: "dpc_regioni",
+            province: "dpc_province",
+            confirmed: "hopkins_confirmed",
+            deaths: "hopkins_deaths",
+            recovered: "hopkins_recovered",            
+        }[item.dataset];
+        datasets[key].add_series(item.options);
     })
 }
 
@@ -74,4 +77,4 @@ $(function () {
         datasets[data_set[data_source]].click();
     });
 
-});   
+});
