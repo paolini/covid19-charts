@@ -43,11 +43,22 @@ class BaseDataset {
     }
 
     init_html() {
-        this.$button = $("button[name='" + this.prefix + "_add']"); 
-        this.$button.prop("disabled", true);
+        this.$filter = $("select[name='filter']");
+    }
+
+    get_options() {
+        var options = {};
+        options.filter = parseInt(this.$filter.val());
+        return options;
     }
 
     add_series(options) {
+        var series = this.get_series(options);
+        if (options.filter) {
+            series.data_y = filter(series.data_y, binomial_coeff(options.filter));
+            series.label += " (smooth " + options.filter +")";
+        }
+        chart.add_series(series);
         replay.push({
             dataset: this.prefix,
             options: options
@@ -55,7 +66,8 @@ class BaseDataset {
     }
 
     click() {
-        // to be overridden        
+        var options = this.get_options();
+        this.add_series(options);
     }
 }
 
@@ -141,19 +153,24 @@ class DpcDataset extends BaseDataset {
         this.fields.forEach(function(field){
             self.$column.append("<option value='" + field + "'>" + dash_to_space(field) + "</option>");
         });
-
-        this.$button.prop("disabled", false);
-
-        this.$button.click(function(){self.click()});
     }
 
-    add_series(options) {
+    get_options() {
+        var options = super.get_options();
+        options.column = this.$column.children("option:selected").val();
+        if (this.filter_column) {
+            options.value = this.$select.children("option:selected").val();
+            options.value_name = this.$select.children("option:selected").text()
+        }
+        return options;
+    }
+
+    get_series(options) {
         var column = options['column'];
         const increment_prefix = 'incremento ';
         var series = this.get_series_extended(column, options);
         series.label = this.series_label(series.label, options['value_name']);
-        chart.add_series(series);
-        super.add_series(options);
+        return series;
     }
 
     get_series_extended(column, options) {
@@ -183,12 +200,12 @@ class DpcDataset extends BaseDataset {
             series.data_y = new_data_y;
             series.label = "incremento " + series.label;
         } else {
-            series = this.get_series(column, options);
+            series = this.get_series_basic(column, options);
         }
         return series;
     }
 
-    get_series(column, options) {
+    get_series_basic(column, options) {
         var subtable = this.table;
         var value = null;
         var value_name = null;
@@ -227,18 +244,6 @@ class DpcDataset extends BaseDataset {
         series.population = population;
         series.y_axis = y_axis;
         return series;
-    }
-
-    click() {
-        var options = {
-            column: this.$column.children("option:selected").val()
-        };
-        if (this.filter_column) {
-            options['value'] = this.$select.children("option:selected").val();
-            options['value_name'] = this.$select.children("option:selected").text()
-        }
-        this.add_series(options)
-        return options
     }
 }
 
@@ -351,16 +356,12 @@ class HopkinsDataset extends BaseDataset {
         this.fields.forEach(function(option) {
             self.$column.append("<option value='" + option + "'>" + option + "</option>");
         });
-
-        this.$button.prop("disabled", false);
-        this.$button.click(function(){self.click()});
     }
 
-    add_series(options) {
+    get_series(options) {
         var column = options['column'] || 'count';
         var series = this.get_series_extended(column, options);
-        chart.add_series(series);
-        super.add_series(options);
+        return series;
     }
 
     get_series_extended(column, options) {
@@ -387,12 +388,12 @@ class HopkinsDataset extends BaseDataset {
             series.data_y = new_data_y;
             series.label += increment_postfix;
         } else {
-            series = this.get_series(column, options);
+            series = this.get_series_basic(column, options);
         }
         return series;
     }
 
-    get_series(column, options) {
+    get_series_basic(column, options) {
         var self = this;
         var value = options['value'];
         var subvalue = options['subvalue'];
@@ -425,14 +426,12 @@ class HopkinsDataset extends BaseDataset {
         return series;
     }
 
-    click() {
-        var options = {
-            value: this.$select.children("option:selected").val(),
-            subvalue: this.$subselect.children("option:selected").val(),
-            column: this.$column.children("option:selected").val()
-        }
-        this.add_series(options)
-        return options
+    get_options() {
+        var options = super.get_options();
+        options.value = this.$select.children("option:selected").val();
+        options.subvalue = this.$subselect.children("option:selected").val();
+        options.column = this.$column.children("option:selected").val();
+        return options;
     }
 }
 

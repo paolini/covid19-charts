@@ -56,46 +56,51 @@
                 <h4>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></h4>
                 <h3>Data set:
                     <select class="dataset_select">
-                    <option value="dpc nazione">Dati Nazionali</option>
-                    <option value="dpc regioni">Dati Regioni</option>
-                    <option value="dpc province">Dati Province</option>
+                    <option value="dpc_nazione">Dati Nazionali</option>
+                    <option value="dpc_regioni">Dati Regioni</option>
+                    <option value="dpc_province">Dati Province</option>
                     </select></h3>
                 <h3>Series:
                 <select name="italia_column" class="dpc nazione dataset_option"></select>
-                <button name="italia_add" class="dpc nazione dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
                 <select name="regioni_codice_regione" class="dpc regioni dataset_option"></select>
                 <select name="regioni_column" class="dpc regioni dataset_option"></select>
-                <button name="regioni_add" class="dpc regioni dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
                 <select name="province_codice_provincia" class="dpc province dataset_option"></select>
                 <select name="province_column" class="dpc province dataset_option"></select>
-                <button name="province_add" class="dpc province dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
                 </h3>   
                 </div>
                 <div id="hopkins_box" class="box data_source">
                     <h4>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></h4>
                     <h3>Data set:
                         <select class="dataset_select">
-                        <option value="hopkins confirmed">Confirmed</option>
-                        <option value="hopkins deaths">Deaths</option>
-                        <option value="hopkins recovered">Recovered</option>
+                        <option value="hopkins_confirmed">Confirmed</option>
+                        <option value="hopkins_deaths">Deaths</option>
+                        <option value="hopkins_recovered">Recovered</option>
                         </select></h3>
                     <h3>Series:
                     <select name="confirmed_filter" class="hopkins confirmed dataset_option"></select>
                     <select name="confirmed_subfilter" class="hopkins confirmed dataset_option"></select>
                     <select name="confirmed_column" class="hopkins confirmed dataset_option"></select>
-                    <button name="confirmed_add" class="hopkins confirmed dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
 
                     <select name="deaths_filter" class="hopkins deaths dataset_option"></select>
                     <select name="deaths_subfilter" class="hopkins deaths dataset_option"></select>
                     <select name="deaths_column" class="hopkins deaths dataset_option"></select>
-                    <button name="deaths_add" class="hopkins deaths dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
 
                     <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
                     <select name="recovered_subfilter" class="hopkins recovered dataset_option"></select>
                     <select name="recovered_column" class="hopkins recovered dataset_option"></select>
-                    <button name="recovered_add" class="hopkins recovered dataset_option"><i class="fas fa-chart-line"></i> Plot</button>
                     </h3>
                 </div>
+                <h3>Filter:
+                    <select name="filter">
+                        <option value="0">no filter</option>
+                        <option value="3">binomial 3</option>
+                        <option value="5">binomial 5</option>
+                        <option value="7">binomial 7</option>
+                    </select>
+                </h3>
+                <h3>
+                    Press button: <button name="plot"><i class="fas fa-chart-line"></i> Plot</button>
+                </h3>
             </div>
             <div class="box">
                 <!--h3 style="margin-bottom: 16px;">Options</h3-->
@@ -110,6 +115,7 @@
                         <option value="linear">linear</option>
                         <option value="log">logaritmic</option>
                         <option value="rate">growth rate</option>
+                        <option value="rate_smooth">growth rate smooth</option>
                     </select> 
                     -- draw fitting exponential <input type="checkbox" name="draw_fit">
                     -- consider
@@ -162,8 +168,8 @@
                     This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
                     The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
                     The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
-                    The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day,
-                    an average over three days is performed to smooth out the curve.
+                    The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day.
+                    The <i>growth rate smooth</i> smooth also adds a smoothing filter.
                     The <i>time alignment</i> selection translates each curve in time with respect to the first curve 
                     plotted.
                     If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach 

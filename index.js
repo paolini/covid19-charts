@@ -2,14 +2,14 @@ $.datepicker.setDefaults({
     dateFormat: "yy-mm-dd"
 });
 
-var datasets = [
-    new DpcNazionaleDataset(),
-    new DpcRegioniDataset(),
-    new DpcProvinceDataset(),
-    new HopkinsConfirmedDataset(),
-    new HopkinsDeathsDataset(),
-    new HopkinsRecoveredDataset()
-]
+var datasets = {
+    'dpc_nazione': new DpcNazionaleDataset(),
+    'dpc_regioni': new DpcRegioniDataset(),
+    'dpc_province': new DpcProvinceDataset(),
+    'hopkins_confirmed': new HopkinsConfirmedDataset(),
+    'hopkins_deaths': new HopkinsDeathsDataset(),
+    'hopkins_recoverd': new HopkinsRecoveredDataset()
+}
 
 var chart;
 var replay = [];
@@ -45,21 +45,33 @@ function get_location_hash() {
 $(function () {
     chart = new ChartWrapper();
 
-    Promise.all(datasets.map(function(dataset){ return dataset.run()})).then(function() {
-        get_location_hash();
-        $("button[name='create_url']").click(set_location_hash);
-    });
+    Promise.all(Object.entries(datasets).map(function(pair){ return pair[1].run()}))
+        .then(function() {
+            get_location_hash();
+            $("button[name='create_url']").click(set_location_hash);
+        });
 
-    $("select[name='data_source']").change(function(){
+    var $data_source = $("select[name='data_source']");
+    var data_source;
+    var data_set = {};
+
+    $data_source.change(function(){
         var val = $(this).val();
         $(".data_source").hide();
         $("#" + val + "_box").show();
+        data_source = val;
     }).change();
 
     $(".dataset_select").change(function(){
-        var vals = $(this).val().split(" ");
+        var val = $(this).val();
+        var vals = val.split("_");
         $("." + vals[0]).hide();
         $("." + vals[0] + "." + vals[1]).show();
+        data_set[vals[0]] = val;
     }).change();
+
+    $("button[name='plot']").click(function(){
+        datasets[data_set[data_source]].click();
+    });
 
 });   
