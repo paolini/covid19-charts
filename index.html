@@ -46,68 +46,72 @@
                     see the explanations given below before giving any significance to the data plotted.
                     You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.</p>
             </div>
-            <div class="data">
-                <h3>Data source:
+            <ul class="data">
+                <li>Data source:
                     <select name="data_source">
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
                         <option value="hopkins">World data by John Hopkins Univ.</option>
-                    </select></h3>
-                <div id="dpc_box" class="box data_source">            
-                <h4>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></h4>
-                <h3>Data set:
-                    <select class="dataset_select">
-                    <option value="dpc_nazione">Dati Nazionali</option>
-                    <option value="dpc_regioni">Dati Regioni</option>
-                    <option value="dpc_province">Dati Province</option>
-                    </select></h3>
-                <h3>Series:
-                <select name="italia_column" class="dpc nazione dataset_option"></select>
-                <select name="regioni_codice_regione" class="dpc regioni dataset_option"></select>
-                <select name="regioni_column" class="dpc regioni dataset_option"></select>
-                <select name="province_codice_provincia" class="dpc province dataset_option"></select>
-                <select name="province_column" class="dpc province dataset_option"></select>
-                </h3>   
-                </div>
-                <div id="hopkins_box" class="box data_source">
-                    <h4>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></h4>
-                    <h3>Data set:
-                        <select class="dataset_select">
-                        <option value="hopkins_confirmed">Confirmed</option>
-                        <option value="hopkins_deaths">Deaths</option>
-                        <option value="hopkins_recovered">Recovered</option>
-                        </select></h3>
-                    <h3>Series:
-                    <select name="confirmed_filter" class="hopkins confirmed dataset_option"></select>
-                    <select name="confirmed_subfilter" class="hopkins confirmed dataset_option"></select>
-                    <select name="confirmed_column" class="hopkins confirmed dataset_option"></select>
+                    </select>
+                    <ul id="dpc_box" class="data_source">
+                        <li>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></li>
+                        <li>Data set:
+                            <select class="dataset_select">
+                                <option value="dpc_nazione">Dati Nazionali</option>
+                                <option value="dpc_regioni">Dati Regioni</option>
+                                <option value="dpc_province">Dati Province</option>
+                            </select>
+                        </li>
+                        <li>Series:
+                            <select name="italia_column" class="dpc nazione dataset_option"></select>
+                            <select name="regioni_codice_regione" class="dpc regioni dataset_option"></select>
+                            <select name="regioni_column" class="dpc regioni dataset_option"></select>
+                            <select name="province_codice_provincia" class="dpc province dataset_option"></select>
+                            <select name="province_column" class="dpc province dataset_option"></select>
+                        </li>   
+                    </ul>
+                    <ul id="hopkins_box" class="data_source">
+                        <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>
+                        <li>Data set:
+                            <select class="dataset_select">
+                                <option value="hopkins_confirmed">Confirmed</option>
+                                <option value="hopkins_deaths">Deaths</option>
+                                <option value="hopkins_recovered">Recovered</option>
+                            </select>
+                        </li>
+                        <li>Series:
+                            <select name="confirmed_filter" class="hopkins confirmed dataset_option"></select>
+                            <select name="confirmed_subfilter" class="hopkins confirmed dataset_option"></select>
+                            <select name="confirmed_column" class="hopkins confirmed dataset_option"></select>
 
-                    <select name="deaths_filter" class="hopkins deaths dataset_option"></select>
-                    <select name="deaths_subfilter" class="hopkins deaths dataset_option"></select>
-                    <select name="deaths_column" class="hopkins deaths dataset_option"></select>
+                            <select name="deaths_filter" class="hopkins deaths dataset_option"></select>
+                            <select name="deaths_subfilter" class="hopkins deaths dataset_option"></select>
+                            <select name="deaths_column" class="hopkins deaths dataset_option"></select>
 
-                    <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
-                    <select name="recovered_subfilter" class="hopkins recovered dataset_option"></select>
-                    <select name="recovered_column" class="hopkins recovered dataset_option"></select>
-                    </h3>
-                </div>
-                <h3>Filter:
+                            <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
+                            <select name="recovered_subfilter" class="hopkins recovered dataset_option"></select>
+                            <select name="recovered_column" class="hopkins recovered dataset_option"></select>
+                        </li>
+                    </ul>
+                </li>
+                <li>Filter:
                     <select name="filter">
                         <option value="0">no filter</option>
                         <option value="3">binomial 3</option>
                         <option value="5">binomial 5</option>
                         <option value="7">binomial 7</option>
                     </select>
-                </h3>
-                <h3>
+                </li>
+                <li>
                     Press button: <button name="plot"><i class="fas fa-chart-line"></i> Plot</button>
-                </h3>
-            </div>
+                </li>
+            </ul>
             <div class="box">
                 <!--h3 style="margin-bottom: 16px;">Options</h3-->
                 <li>
                     <button name="chart_clear"><i class="fas fa-trash-alt"></i> Remove all plots</button>
                     <button name="chart_pop"><i class="fas fa-minus"></i> Remove last plot</button>
                     <button name="create_url"><i class="fas fa-link"></i> Set url to link this chart</button>
+                    <a id="download_button" href="#"><i class="fas fa-download"></i> Download data as a CSV file</a>
                 </li>
                 <li>
                     plot type
@@ -158,7 +162,6 @@
             </div>
             <ul id="chart_info">
             </ul>
-            <a id="download_button" href="#"><i class="fas fa-download"></i> Download data as a CSV file</a>
             <div class="warning">
                 <h1>Explanation</h1>
                 <p>
