@@ -41,7 +41,11 @@ var chart_config = {
                 },
                 ticks: {
                         major: {
-                            enabled: true,
+                            enabled: false, 
+                            // major ticks are disabled because there is a bug in Chart.js happening 
+                            // when multiple months are spanned.
+                            // the bug is fixed in https://github.com/chartjs/Chart.js/pull/6853
+                            // but, however, is not currently deployed in the last stable version (2.9.7)
                             fontStyle: 'bold'
                         },
                         source: 'data',

@@ -50,8 +50,10 @@
             <ul class="data">
                 <li>Data source:
                     <select name="data_source">
+                        <!-- option value=""><i>** select data source **</i></option -->
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
                         <option value="hopkins">World data by John Hopkins Univ.</option>
+                        <option value="epcalc">epidemic calculator by gabgoh</option>
                     </select>
                     <ul id="dpc_box" class="data_source">
                         <li>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></li>
@@ -91,6 +93,25 @@
                             <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
                             <select name="recovered_subfilter" class="hopkins recovered dataset_option"></select>
                             <select name="recovered_column" class="hopkins recovered dataset_option"></select>
+                        </li>
+                    </ul>
+                    <ul id="epcalc_box" class="data_source">
+                        <li>code implemented by <a href="https://github.com/gabgoh/epcalc">gagboh</a></li>
+                        <li>Calculator parameters: 
+                            <span id="epcalc_params">
+                            </span>
+                        </li>
+                        <li>Series:
+                            <select name="epcalc_column">
+                                <option value="S">S</option>
+                                <option value="E">E</option>
+                                <option value="I">I</option>
+                                <option value="R">R</option>
+                                <option value="hospital">hospital</option>
+                                <option value="severe">severe</option>
+                                <option value="recovered">recovered</option>
+                                <option value="deceased">deceased</option>
+                            </select>
                         </li>
                     </ul>
                 </li>

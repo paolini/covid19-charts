@@ -8,7 +8,8 @@ var datasets = {
     'dpc_province': new DpcProvinceDataset(),
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
-    'hopkins_recoverd': new HopkinsRecoveredDataset()
+    'hopkins_recoverd': new HopkinsRecoveredDataset(),
+    'epcalc': new EpcalcDataset()
 }
 
 var chart;
@@ -51,7 +52,7 @@ function get_location_hash() {
 $(function () {
     chart = new ChartWrapper();
 
-    Promise.all(Object.entries(datasets).map(function(pair){ return pair[1].run()}))
+    Promise.all(Object.entries(datasets).map(function(pair){ return pair[1].setup()}))
         .then(function() {
             get_location_hash();
             $("button[name='create_url']").click(set_location_hash);
@@ -59,7 +60,7 @@ $(function () {
 
     var $data_source = $("select[name='data_source']");
     var data_source;
-    var data_set = {};
+    var data_set = {'epcalc': 'epcalc'};
 
     $data_source.change(function(){
         var val = $(this).val();

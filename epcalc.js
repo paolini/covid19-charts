@@ -43,37 +43,14 @@ function integrate(m,f,y,t,h){
     return r;
 }
 
-var params = {
-    Time_to_death     : 32,
-    N                 : 7e6,
-    I0                : 1,
-    R0                : 2.2,
-    D_incbation       : 5.2,
-    D_infectious      : 2.9,
-    D_recovery_mild   : (14 - 2.9),
-    D_recovery_severe : (31.5 - 2.9),
-    D_hospital_lag    : 5,
-//    D_death           : Time_to_death - D_infectious ,
-    CFR               : 0.02,
-    InterventionTime  : 100,
-    OMInterventionAmt : 2/3,
-//    InterventionAmt   : 1 - OMInterventionAmt,
-    Time              : 220,
-    Xmax              : 110000,
-    dt                : 2,
-    P_SEVERE          : 0.2,
-    duration          : 7*12*1e10
-  };
-
-
-// dt, N, I0, R0, D_incbation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration
+// dt, N, I0, R0, D_incubation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration
 
 function get_solution(params) {
     const params_dt = params.dt;
     const N = params.N;
     const I0 = params.I0;
     const R0 = params.R0;
-    const D_incbation = params.D_incbation;
+    const D_incubation = params.D_incubation;
     const D_infectious = params.D_infectious;
     const D_recovery_mild = params.D_recovery_mild;
     const D_hospital_lag = params.D_hospital_lag;
@@ -101,7 +78,7 @@ function get_solution(params) {
       } else {
         var beta = R0/(D_infectious)
       }
-      var a     = 1/D_incbation
+      var a     = 1/D_incubation
       var gamma = 1/D_infectious
       
       var S        = x[0] // Susectable
@@ -152,12 +129,5 @@ function get_solution(params) {
       v =integrate(method,f,v,t,dt); 
       t+=dt
     }
-    return {"P": P, 
-            "deaths": N*v[6], 
-            "total": 1-v[0],
-            "total_infected": TI,
-            "Iters":Iters,
-            "dIters": f}
+    return Iters;
   }
-
-var  Sol  = get_solution(params);

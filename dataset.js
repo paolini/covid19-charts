@@ -4,7 +4,7 @@ class BaseDataset {
         this.path = options.path;
     }
 
-    run() {
+    setup() {
         var self = this;
         this.init_html();
         
@@ -466,4 +466,174 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
     }
 }
 
+class EpcalcDataset {
+    constructor(options) {
+        this.prefix = 'epcalc';
+        this.options = {};
+        this.require_setup = true;
+        this.params = {
+            Time_to_death: {
+              order: 1, 
+              type: "int",
+              value: 32
+            },
+            N: { 
+              order: 2, 
+              type: "int",
+              value: 7e6
+            },
+            I0: { 
+              order: 3, 
+              type: "int",
+              value: 1
+            },
+            R0: { 
+              order: 4, 
+              type: "float",
+              value: 2.2 
+            },
+            D_incubation: { 
+              order: 5, 
+              type: "float",
+              value: 5.2 
+            },
+            D_infectious: { 
+              order: 6, 
+              type: "float",
+              value: 2.9 
+            },
+            D_recovery_mild: { 
+              order: 7, 
+              type: "float",
+              value: (14 - 2.9) 
+            },
+            D_recovery_severe: { 
+              order: 8, 
+              type: "float",
+              value: (31.5 - 2.9) 
+            },
+            D_hospital_lag: { 
+              order: 9, 
+              type: "float",
+              value: 5 
+            },
+            CFR: { 
+              order: 10, 
+              type: "float",
+              value: 0.02 
+            },
+            InterventionTime: { 
+              order: 11, 
+              type: "float",
+              value: 100 
+            },
+            OMInterventionAmt: { 
+              order: 12, 
+              type: "float",
+              value: 2/3 
+            },
+            Time: { 
+              order: 13, 
+              type: "float",
+              value: 220 
+            },
+            Xmax: { 
+              order: 14, 
+              type: "float",
+              value: 110000 
+            },
+            dt: { 
+              order: 15, 
+              type: "float",
+              value: 2 
+            },
+            P_SEVERE: { 
+              order: 16, 
+              type: "float",
+              value: 0.2 
+            },
+            duration: { 
+              order: 17, 
+              type: "int",
+              value: 7*12*1e10 
+            },
+            origin: {
+                order: 18,
+                type: "date",
+                value: "2020-01-01"
+            }
+        };
+    }
+  
+    setup() {
+        var self = this;
+        this.require_setup = false;
+        var $parent = $("#epcalc_params");
+        $parent.empty();
+        var first = true;
+        Object.entries(this.params)
+            .sort(function(x,y){return x[1].order < y[1].order;})
+            .forEach(function(pair) {
+                var field = pair[0];
+                var opt = pair[1];
+                if (!first) {
+                    $parent.append(" --- ");          
+                }
+                $parent.append(field + ':&nbsp;<input name="epcalc_' + field + '" value="' + opt.value + '">');      
+                first = false;
+            });
+        var $column=$("select[name='epcalc_column']");
+        $column.change(function(){
+            self.column = $column.val();
+        }).change();
+    }
+  
+    click() {
+      var self = this;
+      var changed = false;
+      Object.entries(this.params).forEach(function(pair) {
+        var field = pair[0];
+        var field_opt = pair[1];
+        var parser = {
+          "int": parseInt,
+          "float": parseFloat,
+          "date": function(x) {return x}
+        }[field_opt.type];
+        var val = parser($("input[name='epcalc_" + field + "']").val());
+        if (self.options[field] && self.options[field] === val) {
+        } else {
+          self.options[field] = val;
+          changed = true;
+        }
+      });
+      if (changed) {
+        this.sol = get_solution(this.options);
+      }
+      var r;
+      var N = this.options.N;
+      var f = {
+        'S': function(x){return N*x[0]},
+        'E': function(x){return N*x[1]},
+        'I': function(x){return N*(x[2] + x[3] + x[4] + x[5] + x[6])},
+        'R': function(x){return N*(x[7]+x[8]+x[9])},
+        'hospital': function(x){return N*(x[5] + x[6])},
+        'recovered': function(x){return N*(x[7] + x[8])},
+        'deceased': function(x){return N*x[9]}
+      }[this.column];
+      var data_y = this.sol.map(f);
+      var data_x = new Array(data_y.length);
+      var origin_days = date_to_days(string_to_date(this.options.origin)); 
+      for(var i=0;i<data_x.length;++i) {
+          data_x[i] = days_to_date(origin_days + i * this.options.dt);
+      }
+      var series = new Series(data_x, data_y, 'epcalc ' + this.column);
+      series.y_axis = 'count';
+      series.population = this.options.N;
 
+      chart.add_series(series);
+      replay.push({
+          dataset: this.prefix,
+          options: this.options
+      })
+    }
+  }
