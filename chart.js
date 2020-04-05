@@ -174,7 +174,11 @@ class ChartWrapper {
         this.$plot_type.change(function() {
             var val = self.$plot_type.children("option:selected").val();
             self.chart.options.scales.yAxes[0].type = (val=="log") ? 'logarithmic' : 'linear';
-            self.rate_plot = (val=="rate");
+            if (val == "rate" || val == "rate_smooth") {
+                self.rate_plot = val;
+            } else {
+                self.rate_plot = false;
+            }
             self.redraw();
         })
         this.$plot_type.change();
@@ -462,24 +466,12 @@ class ChartWrapper {
                     new_data_y[i] = 0.0;
                 }
             }
-            // smooth out 
-            var smooth_data_y = new Array(new_data_y.length);
-            for (var i=0; i < new_data_y.length; ++i) {
-                var val = new_data_y[i];
-                if (i>0) {
-                    val += new_data_y[i-1];
-                } else {
-                    val += new_data_y[i];
-                }
-                if (i<new_data_y.length-1) {
-                    val += new_data_y[i+1];
-                } else {
-                    val += new_data_y[i];
-                }
-                smooth_data_y[i] = val / 3.0;
-            }
             data_x = new_data_x;
-            data_y = smooth_data_y;
+            data_y = new_data_y;
+            // smooth out 
+            if (this.rate_plot == "rate_smooth") {
+                data_y = filter(data_y, binomial_coeff(5));
+            }
         }
 
         // draw curve
@@ -565,7 +557,7 @@ class ChartWrapper {
             + "<b>" + first_day.getDate() + " " + months[first_day.getMonth()]+ " " + first_day.getFullYear() + "</b>"; 
         }
         this.$info.append(
-            "<li> <div class='box' style='background-color:" + series.color + "'></div> "+name+":</font> " 
+            "<li> <div class='label' style='background-color:" + series.color + "'></div> "+name+":</font> " 
             + msg
             + "<!-- m="+lr.m+" "
             + "q="+lr.q+" --></li>"

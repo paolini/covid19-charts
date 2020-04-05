@@ -36,3 +36,36 @@ function linearRegression(data_y, data_x){
         r2: Math.pow((n*xy - x*y)/Math.sqrt((n*xx-x*x)*(n*yy-y*y)),2)
     }
 }
+
+function binomial_coeff(n) {
+    var coeff = [1];
+    for (n--;n>0;n--) {
+        var last = 0;
+        var i;
+        for (i=0;i<coeff.length;++i) {
+            var v = coeff[i] + last;
+            last = coeff[i];
+            coeff[i] = v;
+        }
+        coeff.push(1);
+    }
+    return coeff;
+}
+
+function filter(data, coeff) {
+    var center = Math.floor(coeff.length/2);
+    var out = new Array(data.length);
+    for (var i=0; i<data.length; ++i) {
+        var s = 0;
+        var n = 0;
+        for (var j=0;j<coeff.length;j++) {
+            var k = i + j - center;
+            if (k>=0 && k<data.length) {
+                s += data[k] * coeff[j];
+                n += coeff[j];
+            }
+        }
+        out[i] = s / n;
+    }
+    return out;
+}

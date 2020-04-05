@@ -1,8 +1,129 @@
-button {
-    background-color: #f90;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
+*{
+    font-family: "Roboto", Arial, Helvetica, sans-serif;
 }
 
+body{
+    margin: 0;
+}
+.header{
+    padding: 64px 100px 0;
+    margin-bottom: 32px;
+}
+#title{
+    font-size: 48px;
+    text-align: left;
+    margin: 0;
+    color: #212121;
+    font-weight: 500;
+}
+#author{
+    color: #979797;
+    margin: 0;
+}
+#author a{
+    color: #212121;
+    text-decoration: none;
+}
+.main{
+    padding: 0 100px;
+}
+.warning{
+    padding: 16px;
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    margin-bottom: 16px;
+}
+.warning h1{
+    position: absolute;
+    top: -32px;
+    left: 12px;
+    font-size: 24px;
+    background: white;
+    padding: 0 4px;
+    font-weight: 400;
+}
+.warning p{
+    margin: 0;
+}
+.warning a{
+    color: #212121;
+    font-weight: 700;
+}
+/* button {
+    background-color: #f90;
+}
+*/
+.data{
+    /* display: grid; */
+    /* grid-template-columns: 50% 50%; */
+}
 .box {
+   /* margin: 16px 0; */
+}
+.box h1{
+    font-size: 34px;
+    font-weight: 500;
+    margin: 0;
+}
+h3{
+    margin: 0;
+}
+.box h4{
+    color: #555;
+    margin: 0;
+    font-weight: 400;
+/*    margin-bottom: 16px; */
+}
+.box a{
+    color: #212121;
+/*    font-weight: 700; */
+}
+.box ul{
+    list-style-type: none;
+    display: block;
+    margin: 0;
+    padding: 0 8px;
+}
+.box li{
+    list-style-type: none;
+}
+.box ul li{
+    max-width: 600px;
+    width: 100%;
+    display: block;
+}
+.box li select{
+    /* width: 100%; */
+    /* display: block; */
+    margin: 8px 0;
+}
+.box li button, a#download_button{
+    margin: 0 0 8px 0;
+    background: 0;
+    border: 0;
+    padding: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 2px;
+    color: #212121;
+    transition: .2s ease-in-out;
+}
+.box li button:active, .box li button:hover, a#download_button:hover{
+    color: #212121;
+    background: rgba(33, 33, 33, 0.2);
+}
+a#download_button{
+    text-decoration: none;
+    margin-bottom: 32px;
+    display: inline-block;
+}
+
+
+.label {
     width: 2em;
     height: 1em;
     display: inline-block;
