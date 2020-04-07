@@ -469,7 +469,7 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
 class EpcalcDataset {
     constructor(options) {
         this.prefix = 'epcalc';
-        this.options = {};
+        this.last_options = {};
         this.require_setup = true;
         this.params = [
             {
@@ -557,10 +557,6 @@ class EpcalcDataset {
                 label: "days before hospitalization",
                 type: "float",
                 value: 5 
-            }, {
-                field: 'dt',  
-                type: "float",
-                value: 1
             }
         ];
     }
@@ -579,15 +575,64 @@ class EpcalcDataset {
                 $parent.append((opt.label || field) + ':&nbsp;<input name="epcalc_' + field + '" value="' + opt.value + '">');      
                 first = false;
             });
-        var $column=$("select[name='epcalc_column']");
-        $column.change(function(){
-            self.column = $column.val();
-        }).change();
+        this.$column=$("select[name='epcalc_column']");
     }
+
+    add_series(options) {
+        var changed = false;
+        var self = this;
+        var params = {} // integrator parameters to be constructed from options
+        Object.entries(options).forEach(function(pair) {
+            var key = pair[0];
+            var value = pair[1];
+            if (key !== 'column' && !(self.last_options[key] && self.last_options[key]==value)) {
+                changed = true;
+            } 
+            params[key] = value;
+        });
+        self.last_options = options; // for caching
+
+        params.dt = 1;
+
+        var origin_days = date_to_days(string_to_date(options.date0));
+        params.day_1 = date_to_days(string_to_date(options.date1)) - origin_days;
+        params.day_2 = date_to_days(string_to_date(options.date2)) - origin_days;
+        params.day_end = date_to_days(string_to_date(options.date3)) - origin_days;
+        
+        if (changed) {
+          this.sol = get_solution(params);
+        }
   
+        var N = params.N;
+  
+        var f = {
+          'S': function(x){return N*x[0]},
+          'E': function(x){return N*x[1]},
+          'I': function(x){return N*(x[2] + x[3] + x[4] + x[5] + x[6])},
+          'R': function(x){return N*(x[7]+x[8]+x[9])},
+          'hospital': function(x){return N*(x[5] + x[6])},
+          'recovered': function(x){return N*(x[7] + x[8])},
+          'deceased': function(x){return N*x[9]}
+        }[options.column];
+  
+        var data_y = this.sol.map(f);
+        var data_x = new Array(data_y.length);
+        for(var i=0;i<data_x.length;++i) {
+            data_x[i] = days_to_date(origin_days + i * params.dt);
+        }
+        var series = new Series(data_x, data_y, 'epcalc ' + options.column);
+        series.y_axis = 'count';
+        series.population = N;
+  
+        chart.add_series(series);
+        replay.push({
+            dataset: this.prefix,
+            options: options
+        })
+    }  
+      
     click() {
-      var self = this;
-      var changed = false;
+      var options = {};
       this.params.forEach(function(field_opt) {
         var field = field_opt.field;
         var parser = {
@@ -596,47 +641,10 @@ class EpcalcDataset {
           "date": function(x) {return x}
         }[field_opt.type];
         var val = parser($("input[name='epcalc_" + field + "']").val());
-        if (self.options[field] && self.options[field] === val) {
-        } else {
-          self.options[field] = val;
-          changed = true;
-        }
+        options[field] = val;
       });
+      options.column = this.$column.val();
 
-      var origin_days = date_to_days(string_to_date(this.options.date0));
-      this.options.day_1 = date_to_days(string_to_date(this.options.date1)) - origin_days;
-      this.options.day_2 = date_to_days(string_to_date(this.options.date2)) - origin_days;
-      this.options.day_end = date_to_days(string_to_date(this.options.date3)) - origin_days;
-      
-      if (changed) {
-        this.sol = get_solution(this.options);
-      }
-
-      var N = this.options.N;
-
-      var f = {
-        'S': function(x){return N*x[0]},
-        'E': function(x){return N*x[1]},
-        'I': function(x){return N*(x[2] + x[3] + x[4] + x[5] + x[6])},
-        'R': function(x){return N*(x[7]+x[8]+x[9])},
-        'hospital': function(x){return N*(x[5] + x[6])},
-        'recovered': function(x){return N*(x[7] + x[8])},
-        'deceased': function(x){return N*x[9]}
-      }[this.column];
-
-      var data_y = this.sol.map(f);
-      var data_x = new Array(data_y.length);
-      for(var i=0;i<data_x.length;++i) {
-          data_x[i] = days_to_date(origin_days + i * this.options.dt);
-      }
-      var series = new Series(data_x, data_y, 'epcalc ' + this.column);
-      series.y_axis = 'count';
-      series.population = this.options.N;
-
-      chart.add_series(series);
-      replay.push({
-          dataset: this.prefix,
-          options: this.options
-      })
+      this.add_series(options);
     }
   }

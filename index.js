@@ -40,7 +40,8 @@ function get_location_hash() {
             province: "dpc_province",
             confirmed: "hopkins_confirmed",
             deaths: "hopkins_deaths",
-            recovered: "hopkins_recovered",            
+            recovered: "hopkins_recovered",    
+            epcalc: "epcalc"        
         }[item.dataset];
         if (item.options.column === "nuovi_attualmente_positivi") {
             item.options.column = "nuovi_positivi";
