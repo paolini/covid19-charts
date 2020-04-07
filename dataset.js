@@ -476,7 +476,7 @@ class EpcalcDataset {
                 field: 'N',
                 label: 'population',  
                 type: "int",
-                value: 7e6
+                value: 60e6
             }, {
                 field: 'I0',
                 lable: 'infected at start date',
@@ -501,7 +501,7 @@ class EpcalcDataset {
                 field: 'R1', 
                 label: 'R1 (R at date 1)', 
                 type: "float",
-                value: 1.47 
+                value: 0.73 
             }, {
                 field: 'date2', 
                 label: "date 2",
