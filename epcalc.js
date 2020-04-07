@@ -43,13 +43,12 @@ function integrate(m,f,y,t,h){
     return r;
 }
 
-// dt, N, I0, R0, D_incubation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt, duration
+// dt, N, I0, R0, D_incubation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt
 
 function get_solution(params) {
-    const params_dt = params.dt;
-    const N = params.N;
+    const params_dt = params.dt; // days between output samples
+    const N = params.N; // population
     const I0 = params.I0;
-    const R0 = params.R0;
     const D_incubation = params.D_incubation;
     const D_infectious = params.D_infectious;
     const D_recovery_mild = params.D_recovery_mild;
@@ -58,26 +57,12 @@ function get_solution(params) {
     const D_death = params.Time_to_death - params.D_infectious;
     const P_SEVERE = params.P_SEVERE;
     const CFR = params.CFR;
-    const InterventionTime = params.InterventionTime;
-    const InterventionAmt = 1 - params.OMInterventionAmt;
-    const duration = params.duration;
-
-    var interpolation_steps = 40
-    var steps = 110*interpolation_steps
-    var dt = params_dt/interpolation_steps
-    var sample_step = interpolation_steps
+    
+    var current_R;
 
     var method = Integrators["RK4"]
     function f(t, x){
-
       // SEIR ODE
-      if (t > InterventionTime && t < InterventionTime + duration){
-        var beta = (InterventionAmt)*R0/(D_infectious)
-      } else if (t > InterventionTime + duration) {
-        var beta = 0.5*R0/(D_infectious)        
-      } else {
-        var beta = R0/(D_infectious)
-      }
       var a     = 1/D_incubation
       var gamma = 1/D_infectious
       
@@ -96,6 +81,8 @@ function get_solution(params) {
       var p_fatal  = CFR
       var p_mild   = 1 - P_SEVERE - CFR
 
+      var beta = current_R / D_infectious;
+
       var dS        = -beta*I*S
       var dE        =  beta*I*S - a*E
       var dI        =  a*E - gamma*I
@@ -111,22 +98,30 @@ function get_solution(params) {
       return [dS, dE, dI, dMild, dSevere, dSevere_H, dFatal, dR_Mild, dR_Severe, dR_Fatal]
     }
 
+    var interpolation_steps = 40
+    var steps = 110*interpolation_steps
+    var dt = params_dt/interpolation_steps
+
     var v = [1 - I0/N, 0, I0/N, 0, 0, 0, 0, 0, 0, 0]
     var t = 0
 
-    var P  = []
-    var TI = []
     var Iters = []
-    while (steps--) { 
-      if ((steps+1) % (sample_step) == 0) {
-        //    Dead   Hospital          Recovered        Infectious   Exposed
-        P.push([ N*v[9], N*(v[5]+v[6]),  N*(v[7] + v[8]), N*v[2],    N*v[1] ])
-        Iters.push(v)
-        TI.push(N*(1-v[0]))
-        // console.log((v[0] + v[1] + v[2] + v[3] + v[4] + v[5] + v[6] + v[7] + v[8] + v[9]))
-        // console.log(v[0] , v[1] , v[2] , v[3] , v[4] , v[5] , v[6] , v[7] , v[8] , v[9])
+    for (var step=0; ; ++step) { 
+
+      if (t < params.day_1) {
+        current_R = params.R0;
+      } else if (t < params.day_2) {
+        current_R = params.R1;
+      } else if (t < params.day_end) {
+        current_R = params.R2;
+      } else {
+        break;
       }
-      v =integrate(method,f,v,t,dt); 
+
+      if ((step % interpolation_steps) === 0) {
+        Iters.push(v)
+      }
+      v = integrate(method,f,v,t,dt); 
       t+=dt
     }
     return Iters;

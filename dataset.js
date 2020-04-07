@@ -471,98 +471,98 @@ class EpcalcDataset {
         this.prefix = 'epcalc';
         this.options = {};
         this.require_setup = true;
-        this.params = {
-            Time_to_death: {
-              order: 1, 
-              type: "int",
-              value: 32
-            },
-            N: { 
-              order: 2, 
-              type: "int",
-              value: 7e6
-            },
-            I0: { 
-              order: 3, 
-              type: "int",
-              value: 1
-            },
-            R0: { 
-              order: 4, 
-              type: "float",
-              value: 2.2 
-            },
-            D_incubation: { 
-              order: 5, 
-              type: "float",
-              value: 5.2 
-            },
-            D_infectious: { 
-              order: 6, 
-              type: "float",
-              value: 2.9 
-            },
-            D_recovery_mild: { 
-              order: 7, 
-              type: "float",
-              value: (14 - 2.9) 
-            },
-            D_recovery_severe: { 
-              order: 8, 
-              type: "float",
-              value: (31.5 - 2.9) 
-            },
-            D_hospital_lag: { 
-              order: 9, 
-              type: "float",
-              value: 5 
-            },
-            CFR: { 
-              order: 10, 
-              type: "float",
-              value: 0.02 
-            },
-            InterventionTime: { 
-              order: 11, 
-              type: "float",
-              value: 100 
-            },
-            OMInterventionAmt: { 
-              order: 12, 
-              type: "float",
-              value: 2/3 
-            },
-            Time: { 
-              order: 13, 
-              type: "float",
-              value: 220 
-            },
-            Xmax: { 
-              order: 14, 
-              type: "float",
-              value: 110000 
-            },
-            dt: { 
-              order: 15, 
-              type: "float",
-              value: 2 
-            },
-            P_SEVERE: { 
-              order: 16, 
-              type: "float",
-              value: 0.2 
-            },
-            duration: { 
-              order: 17, 
-              type: "int",
-              value: 7*12*1e10 
-            },
-            origin: {
-                order: 18,
+        this.params = [
+            {
+                field: 'N',
+                label: 'population',  
+                type: "int",
+                value: 7e6
+            }, {
+                field: 'I0',
+                lable: 'infected at start date',
+                type: "int",
+                value: 1
+            }, {
+                field: 'date0', 
+                label: "start date",
                 type: "date",
-                value: "2020-01-01"
+                value: "2020-02-01"
+            }, {
+                field: 'R0',  
+                label: 'R0 (R at start date)',
+                type: "float",
+                value: 2.2
+            }, {
+                field: 'date1', 
+                label: "date 1",
+                type: "date",
+                value: "2020-03-01"
+            }, {
+                field: 'R1', 
+                label: 'R1 (R at date 1)', 
+                type: "float",
+                value: 1.47 
+            }, {
+                field: 'date2', 
+                label: "date 2",
+                type: "date",
+                value: "2020-04-01"
+            }, {
+                field: 'R2',  
+                label: "R2 (R at date 2)",
+                type: "float",
+                value: 1.1 
+            },{ 
+                field: 'date3', 
+                label: "end date",
+                type: "date",
+                value: "2020-05-01"
+            }, {
+                field: 'D_incubation',  
+                label: "incubation days",
+                type: "float",
+                value: 5.2 
+            }, {
+                field: 'D_infectious',  
+                label: "n. days patient is infective",
+                type: "float",
+                value: 2.9 
+            }, {
+                field: 'CFR', 
+                label: "case fatality rate", 
+                type: "float",
+                value: 0.02 
+            }, {
+                field: 'Time_to_death', 
+                label: "days from end of incubation to death",
+                type: "int",
+                value: 32 
+            }, {
+                field: 'D_recovery_severe',  
+                label: "days of hospital stay for severe cases",
+                type: "float",
+                value: (31.5 - 2.9) 
+            }, {   
+                field: 'D_recovery_mild',  
+                label: 'recovery days for mild cases',
+                type: "float",
+                value: (14 - 2.9) 
+            }, {
+                field: 'P_SEVERE',  
+                label: 'hospitalization rate',
+                type: "float",
+                value: 0.2 
+            },  {
+                field: 'D_hospital_lag',  
+                label: "days before hospitalization",
+                type: "float",
+                value: 5 
+            }, {
+                field: 'dt',  
+                type: "float",
+                value: 1
             }
-        };
+        ];
     }
   
     setup() {
@@ -571,15 +571,12 @@ class EpcalcDataset {
         var $parent = $("#epcalc_params");
         $parent.empty();
         var first = true;
-        Object.entries(this.params)
-            .sort(function(x,y){return x[1].order < y[1].order;})
-            .forEach(function(pair) {
-                var field = pair[0];
-                var opt = pair[1];
+        this.params.forEach(function(opt) {
+                var field = opt.field;
                 if (!first) {
                     $parent.append(" --- ");          
                 }
-                $parent.append(field + ':&nbsp;<input name="epcalc_' + field + '" value="' + opt.value + '">');      
+                $parent.append((opt.label || field) + ':&nbsp;<input name="epcalc_' + field + '" value="' + opt.value + '">');      
                 first = false;
             });
         var $column=$("select[name='epcalc_column']");
@@ -591,9 +588,8 @@ class EpcalcDataset {
     click() {
       var self = this;
       var changed = false;
-      Object.entries(this.params).forEach(function(pair) {
-        var field = pair[0];
-        var field_opt = pair[1];
+      this.params.forEach(function(field_opt) {
+        var field = field_opt.field;
         var parser = {
           "int": parseInt,
           "float": parseFloat,
@@ -606,11 +602,18 @@ class EpcalcDataset {
           changed = true;
         }
       });
+
+      var origin_days = date_to_days(string_to_date(this.options.date0));
+      this.options.day_1 = date_to_days(string_to_date(this.options.date1)) - origin_days;
+      this.options.day_2 = date_to_days(string_to_date(this.options.date2)) - origin_days;
+      this.options.day_end = date_to_days(string_to_date(this.options.date3)) - origin_days;
+      
       if (changed) {
         this.sol = get_solution(this.options);
       }
-      var r;
+
       var N = this.options.N;
+
       var f = {
         'S': function(x){return N*x[0]},
         'E': function(x){return N*x[1]},
@@ -620,9 +623,9 @@ class EpcalcDataset {
         'recovered': function(x){return N*(x[7] + x[8])},
         'deceased': function(x){return N*x[9]}
       }[this.column];
+
       var data_y = this.sol.map(f);
       var data_x = new Array(data_y.length);
-      var origin_days = date_to_days(string_to_date(this.options.origin)); 
       for(var i=0;i<data_x.length;++i) {
           data_x[i] = days_to_date(origin_days + i * this.options.dt);
       }
