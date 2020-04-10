@@ -41,8 +41,8 @@ var chart_config = {
                 },
                 ticks: {
                         major: {
-                            enabled: false, 
-                            // major ticks are disabled because there is a bug in Chart.js happening 
+                            enabled: true, 
+                            // there is a bug in Chart.js happening 
                             // when multiple months are spanned.
                             // the bug is fixed in https://github.com/chartjs/Chart.js/pull/6853
                             // but, however, is not currently deployed in the last stable version (2.9.7)
@@ -53,6 +53,13 @@ var chart_config = {
                         autoSkipPadding: 75,
                         maxRotation: 0,
                         sampleSize: 100
+                    },
+                    afterBuildTicks_new: function(scale, ticks) {
+                        if (! ticks) return;
+                        for (i = 1, ilen = ticks.length; i < ilen; i++) {
+                            ticks[i].major = true;
+                        }
+                        return ticks;
                     },
                     afterBuildTicks: function(scale, ticks) {
                         var majorUnit = scale._majorUnit;
