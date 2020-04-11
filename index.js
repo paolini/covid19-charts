@@ -10,7 +10,7 @@ var datasets = {
     'hopkins_deaths': new HopkinsDeathsDataset(),
     'hopkins_recoverd': new HopkinsRecoveredDataset(),
     'epcalc': new EpcalcDataset(),
-    'events': new EventsDataset()
+    'lockdown': new LockdownDataset()
 }
 
 var chart;
@@ -43,7 +43,7 @@ function get_location_hash() {
             deaths: "hopkins_deaths",
             recovered: "hopkins_recovered",    
             epcalc: "epcalc",
-            events: "events"
+            lockdown: "lockdown"
         }[item.dataset];
         if (item.options.column === "nuovi_attualmente_positivi") {
             item.options.column = "nuovi_positivi";
@@ -63,7 +63,7 @@ $(function () {
 
     var data_set = {
         'epcalc': 'epcalc',
-        'events': 'events'
+        'lockdown': 'lockdown'
     };
 
     $(".dataset_select").change(function(){

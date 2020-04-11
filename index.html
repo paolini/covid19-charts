@@ -24,6 +24,10 @@
         <script src="table.js"></script>
         <script src="series.js"></script>
         <script src="dataset.js"></script>
+        <script src="dataset_hopkins.js"></script>
+        <script src="dataset_dpc.js"></script>
+        <script src="dataset_lockdown.js"></script>
+        <script src="dataset_epcalc.js"></script>
         <script src="epcalc.js"></script>
         <script src="index.js"></script>
         <script src="population.js"></script>
@@ -54,7 +58,7 @@
                         <!-- option value=""><i>** select data source **</i></option -->
                         <option value="hopkins">World data by John Hopkins Univ.</option>
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
-                        <option value="events">aura vision lockdown events</option>
+                        <option value="lockdown">aura vision lockdown dates</option>
                         <option value="epcalc">epidemic calculator</option>                        
                     </select>
                     <ul id="dpc_box" class="data_source">
@@ -97,10 +101,10 @@
                             <select name="recovered_column" class="hopkins recovered dataset_option"></select>
                         </li>
                     </ul>
-                    <ul id="events_box" class="data_source">
+                    <ul id="lockdown_box" class="data_source">
                         <li>data has been extracted from here <a href="https://auravision.ai/covid19-lockdown-tracker/">aura vision lockdown tracker</a></li>
                         <li>Series:
-                            <select name="events_filter" class="events"></select>
+                            <select name="lockdown_filter" class="lockdown"></select>
                         </li>
                     </ul>
                     <ul id="epcalc_box" class="data_source">
