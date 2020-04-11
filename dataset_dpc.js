@@ -59,7 +59,7 @@ class DpcDataset extends BaseDataset {
     init_html() {
         super.init_html();
         this.$column = $("select[name='" + this.prefix + "_column']");
-        this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "]") : null;
+        this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "']") : null;
     }    
     
     populate_html() {
