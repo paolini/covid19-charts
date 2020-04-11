@@ -125,7 +125,10 @@ var chart_config = {
             colorschemes: { // https://nagix.github.io/chartjs-plugin-colorschemes/
               scheme: 'tableau.Tableau10' // ignored: see Chart.add_series below
             }
-      
+        },
+        annotation: { //https://github.com/chartjs/chartjs-plugin-annotation
+            drawTime: 'afterDraw', // overrides annotation.drawTime if set
+            annotations: []
         }
     }
 };
@@ -436,118 +439,140 @@ class ChartWrapper {
             data_y = data_y.slice(-this.n_points);
         }
         
-        if (data_x.length < 2) {
-            console.log("too few data points for series " + label);
-            return;
-        }
-
-        // compute linear regression
-        var lr = linearRegression(data_y.map(Math.log), data_x)
-        
-        // time shift
-        var offset = 0;
-        if (this.time_shift == 'lr_shift') {
-            if (this.serieses.length>0) {
-                var lr0 = this.serieses[0].lr;
-                // var y0 = this.reference_point.y;
-                var y0 = Math.exp(lr0.m * this.reference_point.x + lr0.q);
-                // y = exp(m x + q)
-                var x = (Math.log(y0) - lr.q) / lr.m;
-                offset = last(data_x) - x;
-            }
-        } else if (this.time_shift === 'past_shift') {
-            if (this.serieses.length>0) {
-                offset = this.history_offset(data_y);
-            }
-        }
-        if (offset > 0) {
-            label += " +" + offset.toFixed(1) + " days";
-        } else if (offset < 0) {
-            label += " -" + (-offset).toFixed(1) + " days";
-        }
-
-        // convert to growing rate
-        if (this.rate_plot) {
-            var new_data_x = data_x.slice(1);
-            var new_data_y = new Array(new_data_x.length);
-            for (var i=0; i < new_data_y.length;++i) {
-                if (data_y[i]>0) {
-                    new_data_y[i] = (data_y[i+1] / data_y[i] - 1.0) * 100.0; 
-                } else {
-                    new_data_y[i] = 0.0;
-                }
-            }
-            data_x = new_data_x;
-            data_y = new_data_y;
-            // smooth out 
-            if (this.rate_plot == "rate_smooth") {
-                data_y = filter(data_y, binomial_coeff(5));
-            }
-        }
-
-        // draw curve
-        series.color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
-        var points;
-        if (this.time_shift) {
-            points = data_x.map(function(x, i) {return {
-                x: x + offset - self.reference_point.x, 
-                y: data_y[i]
-            }});            
+        if (series.y_axis === 'events') {
+            for (var i=0; i<data_x.length;++i) {
+                this.chart.options.annotation.annotations.push({
+                    type: 'line',
+                    mode: 'vertical',
+                    scaleID: 'date',
+                    value: days_to_date(data_x[i]),
+                    label: {                    
+                        content: data_y[i],
+                        enabled: true,
+                        rotation: 90,
+                        yAdjust: (i%10)*25
+                    },
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    position: 'right'
+                })
+            } 
         } else {
-            points = data_x.map(days_to_date).map(function(x, i) {return {"x": x, "y": data_y[i]}});
-        }
-        this.chart.data.datasets.push({
-            data: points,
-            label: label,
-            fill: false,
-            yAxisID: (this.rate_plot ? "rate" : series.y_axis),
-            xAxisID: (this.time_shift ? "days" : "date"),
-            lineTension: 0,
-            borderColor: series.color,
-            pointBorderColor: series.color,
-            pointBackgroundColor: series.color,
-            hoverBorderColor: series.color,
-            pointHoverBorderColor: series.color,
-            borderJoinStyle: "round",
-            my_x_offset: offset - this.reference_point.x
-        });
-
-        // draw fit curve
-        if (this.draw_fit && data_x.length>1 && isFinite(offset)) {
-            var start = data_x[0];
-            var end = last(data_x) + this.fit_future_days;
-            var points = new Array(100);
-            for (var i=0;i<points.length;++i) {
-                var x = start + (end-start)*i/(points.length-1);
-                points[i] = {
-                    x: this.time_shift ? x + offset - this.reference_point.x : days_to_date(x),
-                    y: this.rate_plot ? 100.0*(Math.exp(lr.m)-1) : Math.exp(lr.m * x + lr.q)
+            
+            if (data_x.length < 2) {
+                console.log("too few data points for series " + label);
+                return;
+            }
+    
+            // compute linear regression
+            var lr = linearRegression(data_y.map(Math.log), data_x)
+            
+            // time shift
+            var offset = 0;
+            if (this.time_shift == 'lr_shift') {
+                if (this.serieses.length>0) {
+                    var lr0 = this.serieses[0].lr;
+                    // var y0 = this.reference_point.y;
+                    var y0 = Math.exp(lr0.m * this.reference_point.x + lr0.q);
+                    // y = exp(m x + q)
+                    var x = (Math.log(y0) - lr.q) / lr.m;
+                    offset = last(data_x) - x;
                 }
+            } else if (this.time_shift === 'past_shift') {
+                if (this.serieses.length>0) {
+                    offset = this.history_offset(data_y);
+                }
+            }
+            if (offset > 0) {
+                label += " +" + offset.toFixed(1) + " days";
+            } else if (offset < 0) {
+                label += " -" + (-offset).toFixed(1) + " days";
+            }
+
+            // convert to growing rate
+            if (this.rate_plot) {
+                var new_data_x = data_x.slice(1);
+                var new_data_y = new Array(new_data_x.length);
+                for (var i=0; i < new_data_y.length;++i) {
+                    if (data_y[i]>0) {
+                        new_data_y[i] = (data_y[i+1] / data_y[i] - 1.0) * 100.0; 
+                    } else {
+                        new_data_y[i] = 0.0;
+                    }
+                }
+                data_x = new_data_x;
+                data_y = new_data_y;
+                // smooth out 
+                if (this.rate_plot == "rate_smooth") {
+                    data_y = filter(data_y, binomial_coeff(5));
+                }
+            }
+
+            // draw curve
+            series.color = Chart.colorschemes.tableau.Tableau10[this.serieses.length % 10];
+            var points;
+            if (this.time_shift) {
+                points = data_x.map(function(x, i) {return {
+                    x: x + offset - self.reference_point.x, 
+                    y: data_y[i]
+                }});            
+            } else {
+                points = data_x.map(days_to_date).map(function(x, i) {return {"x": x, "y": data_y[i]}});
             }
             this.chart.data.datasets.push({
                 data: points,
+                label: label,
                 fill: false,
-                label: 'fit',
-                yAxisID: (this.rate_plot ? "rate" : "count"),
+                yAxisID: (this.rate_plot ? "rate" : series.y_axis),
                 xAxisID: (this.time_shift ? "days" : "date"),
-                pointRadius: 0,
-                borderWidth: 1,
-                pointHoverRadius: 3,
+                lineTension: 0,
                 borderColor: series.color,
                 pointBorderColor: series.color,
                 pointBackgroundColor: series.color,
                 hoverBorderColor: series.color,
                 pointHoverBorderColor: series.color,
+                borderJoinStyle: "round",
                 my_x_offset: offset - this.reference_point.x
-            })
-        }
+            });
 
+            // draw fit curve
+            if (this.draw_fit && data_x.length>1 && isFinite(offset)) {
+                var start = data_x[0];
+                var end = last(data_x) + this.fit_future_days;
+                var points = new Array(100);
+                for (var i=0;i<points.length;++i) {
+                    var x = start + (end-start)*i/(points.length-1);
+                    points[i] = {
+                        x: this.time_shift ? x + offset - this.reference_point.x : days_to_date(x),
+                        y: this.rate_plot ? 100.0*(Math.exp(lr.m)-1) : Math.exp(lr.m * x + lr.q)
+                    }
+                }
+                this.chart.data.datasets.push({
+                    data: points,
+                    fill: false,
+                    label: 'fit',
+                    yAxisID: (this.rate_plot ? "rate" : "count"),
+                    xAxisID: (this.time_shift ? "days" : "date"),
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    pointHoverRadius: 3,
+                    borderColor: series.color,
+                    pointBorderColor: series.color,
+                    pointBackgroundColor: series.color,
+                    hoverBorderColor: series.color,
+                    pointHoverBorderColor: series.color,
+                    my_x_offset: offset - this.reference_point.x
+                })
+            }
+
+            series.lr = lr;
+            this.display_regression(series);
+        }
+        
         // store the series for future redraw
-        series.lr = lr; // forse non serve...
         this.serieses.push(series);
 
         this.update();
-        this.display_regression(series);
     };
 
     display_regression(series) {
@@ -578,6 +603,7 @@ class ChartWrapper {
     clear() {
         this.chart.data.datasets = [];
         this.serieses = [];
+        this.chart.options.annotation.annotation = [];
         this.update();
         this.$info.find("li").remove();
     }

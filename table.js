@@ -33,6 +33,20 @@ class Table {
         return values;
     }
 
+    get_column_distinct(id_name) {
+        var distinct = [];
+        var last = null;
+        this.get_column(id_name)
+            .sort(function cmp(x,y) {return x.localeCompare(y)})        
+            .forEach(function (val) {
+                    if (val !== last) {
+                        distinct.push(val);
+                        last = val;
+                    }
+            });
+        return distinct;
+    }
+
     filter(column, value) {
         var i = this.headers.indexOf(column);
         return new Table(this.headers,

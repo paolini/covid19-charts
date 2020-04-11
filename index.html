@@ -16,6 +16,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
         <script src="chartjs-plugin-colorschemes.min.js"></script>
+        <script src="chartjs-plugin-annotation.min.js"></script>
         <!--script src="utf8.js"></script-->
 
 
@@ -51,9 +52,10 @@
                 <li>Data source:
                     <select name="data_source">
                         <!-- option value=""><i>** select data source **</i></option -->
-                        <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
                         <option value="hopkins">World data by John Hopkins Univ.</option>
-                        <option value="epcalc">epidemic calculator</option>
+                        <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
+                        <option value="events">aura vision lockdown events</option>
+                        <option value="epcalc">epidemic calculator</option>                        
                     </select>
                     <ul id="dpc_box" class="data_source">
                         <li>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></li>
@@ -95,6 +97,12 @@
                             <select name="recovered_column" class="hopkins recovered dataset_option"></select>
                         </li>
                     </ul>
+                    <ul id="events_box" class="data_source">
+                        <li>data has been extracted from here <a href="https://auravision.ai/covid19-lockdown-tracker/">aura vision lockdown tracker</a></li>
+                        <li>Series:
+                            <select name="events_filter" class="events"></select>
+                        </li>
+                    </ul>
                     <ul id="epcalc_box" class="data_source">
                         <li>code based on <a href="https://github.com/gabgoh/epcalc">gagboh</a> epidemic calculator <a href="https://gabgoh.github.io/COVID/index.html">live</a></li>
                         <li>Calculator parameters: 
@@ -116,7 +124,7 @@
                         </li>
                     </ul>
                 </li>
-                <li>Filter:
+                <li id="series_filter_li">Filter:
                     <select name="filter">
                         <option value="0">no filter</option>
                         <option value="3">binomial 3</option>

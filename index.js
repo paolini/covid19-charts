@@ -9,7 +9,8 @@ var datasets = {
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
     'hopkins_recoverd': new HopkinsRecoveredDataset(),
-    'epcalc': new EpcalcDataset()
+    'epcalc': new EpcalcDataset(),
+    'events': new EventsDataset()
 }
 
 var chart;
@@ -41,7 +42,8 @@ function get_location_hash() {
             confirmed: "hopkins_confirmed",
             deaths: "hopkins_deaths",
             recovered: "hopkins_recovered",    
-            epcalc: "epcalc"        
+            epcalc: "epcalc",
+            events: "events"
         }[item.dataset];
         if (item.options.column === "nuovi_attualmente_positivi") {
             item.options.column = "nuovi_positivi";
@@ -59,16 +61,10 @@ $(function () {
             $("button[name='create_url']").click(set_location_hash);
         });
 
-    var $data_source = $("select[name='data_source']");
-    var data_source;
-    var data_set = {'epcalc': 'epcalc'};
-
-    $data_source.change(function(){
-        var val = $(this).val();
-        $(".data_source").hide();
-        $("#" + val + "_box").show();
-        data_source = val;
-    }).change();
+    var data_set = {
+        'epcalc': 'epcalc',
+        'events': 'events'
+    };
 
     $(".dataset_select").change(function(){
         var val = $(this).val();
@@ -77,6 +73,22 @@ $(function () {
         $("." + vals[0] + "." + vals[1]).show();
         data_set[vals[0]] = val;
     }).change();
+
+    var $data_source = $("select[name='data_source']");
+    var data_source;
+    
+    $data_source.change(function(){
+        var val = $(this).val();
+        $(".data_source").hide();
+        $("#" + val + "_box").show();
+        data_source = val;
+        $filter_li = $("#series_filter_li");
+        if (datasets[data_set[data_source]].can_be_filtered) {
+            $filter_li.show();
+        } else {
+            $filter_li.hide();
+        }    
+    }).change();    
 
     $("button[name='plot']").click(function(){
         datasets[data_set[data_source]].click();
