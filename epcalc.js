@@ -45,6 +45,13 @@ function integrate(m,f,y,t,h){
 
 // dt, N, I0, R0, D_incubation, D_infectious, D_recovery_mild, D_hospital_lag, D_recovery_severe, D_death, P_SEVERE, CFR, InterventionTime, InterventionAmt
 
+epcalc_params = [
+  "dt", "N", "I0", 
+  "D_incubation", "D_infectious", "D_recovery_mild", "D_hospital_lag", "D_recovery_severe", 
+  "Time_to_death", "P_SEVERE", "CFR",
+  "R0", "day_1", "R1", "day_2", "R2", "day_end"
+];
+
 function get_solution(params) {
     const params_dt = params.dt; // days between output samples
     const N = params.N; // population
