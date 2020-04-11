@@ -42,10 +42,6 @@ var chart_config = {
                 ticks: {
                         major: {
                             enabled: true, 
-                            // there is a bug in Chart.js happening 
-                            // when multiple months are spanned.
-                            // the bug is fixed in https://github.com/chartjs/Chart.js/pull/6853
-                            // but, however, is not currently deployed in the last stable version (2.9.7)
                             fontStyle: 'bold'
                         },
                         source: 'data',
@@ -66,6 +62,11 @@ var chart_config = {
                         if (! ticks) return;
                         var firstTick = ticks[0];
                         var i, ilen, val, tick, currMajor, lastMajor;
+                        var patch = true;
+                        // there is a bug in Chart.js happening 
+                        // when multiple months are spanned.
+                        // the bug is fixed in https://github.com/chartjs/Chart.js/pull/6853
+                        // but, however, is not currently deployed in the last stable version (2.9.7)
 
                         val = moment(ticks[0].value);
                         if ((majorUnit === 'minute' && val.second() === 0)
@@ -77,6 +78,7 @@ var chart_config = {
                         } else {
                             firstTick.major = false;
                         }
+                        if (patch) firstTick.major = true;                        
                         lastMajor = val.get(majorUnit);
 
                         for (i = 1, ilen = ticks.length; i < ilen; i++) {
@@ -84,6 +86,7 @@ var chart_config = {
                             val = moment(tick.value);
                             currMajor = val.get(majorUnit);
                             tick.major = currMajor !== lastMajor;
+                            if (patch) tick.major = true;
                             lastMajor = currMajor;
                         }
                         return ticks;
