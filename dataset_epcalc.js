@@ -211,30 +211,27 @@ class EpcalcDataset {
     }
 
     add_series(options) {
-        var column;
-        if (options.hasOwnProperty('column')) {
-            column = options.column;
-        } else {
-            column = this.$column.val();
-        }
         if (options.auto_update) {
-            // series is being loading from url hash
-            options = this.options;
-            var auto_update = true;
-        } else {
-            var auto_update = this.$auto_update.prop('checked');            
+            options = Object.assign({
+                auto_update: true,
+                column: options.column
+            }, this.options);
         }
         this.update_solution(options);
-        var series = this.get_series(column);
-        series.epcalc_auto_update = auto_update;
+        var series = this.get_series(options.column);
+        series.epcalc_auto_update = options.auto_update;
         chart.add_series(series);
-        if (auto_update) {
+
+        if (options.auto_update) {
             // to be stored in the url hash
             options = {
                 auto_update: true,
-                column: series.epcalc_column
+                column: options.column
             };
+        } else {
+            options = Object.assign({}, options); // duplicate before storing
         }
+
         replay.push({
             dataset: this.prefix,
             options: options
@@ -242,6 +239,8 @@ class EpcalcDataset {
     }  
       
     click() {
-      this.add_series(this.options);
+        this.options.auto_update = this.$auto_update.prop('checked');
+        this.options.column = this.$column.val();
+        this.add_series(this.options);
     }
   }
