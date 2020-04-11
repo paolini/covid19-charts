@@ -190,9 +190,10 @@ class EpcalcDataset {
         var f = {
             'S': function(x){return N*x[0]},
             'E': function(x){return N*x[1]},
-            'I': function(x){return N*(x[2] + x[3] + x[4] + x[5] + x[6])},
+            'I': function(x){return N*x[2]},
             'R': function(x){return N*(x[7]+x[8]+x[9])},
             'hospital': function(x){return N*(x[5] + x[6])},
+            'hospital_recovered': function(x){return N*x[8]},
             'recovered': function(x){return N*(x[7] + x[8])},
             'deceased': function(x){return N*x[9]}
           }[column];
