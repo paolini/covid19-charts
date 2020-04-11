@@ -603,7 +603,7 @@ class ChartWrapper {
     clear() {
         this.chart.data.datasets = [];
         this.serieses = [];
-        this.chart.options.annotation.annotation = [];
+        this.chart.options.annotation.annotations = [];
         this.update();
         this.$info.find("li").remove();
     }
