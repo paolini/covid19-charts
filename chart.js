@@ -33,7 +33,8 @@ var chart_config = {
                 id: 'date',
                 type: 'time',
                 time: {
-                    tooltipFormat: 'll HH:mm'
+                    tooltipFormat: 'll HH:mm',
+                    unit: 'day'
                 },
                 scaleLabel: {
                     display: true,
@@ -41,7 +42,7 @@ var chart_config = {
                 },
                 ticks: {
                         major: {
-                            enabled: true, 
+                            enabled: false, 
                             fontStyle: 'bold'
                         },
                         source: 'data',
