@@ -8,7 +8,7 @@ var datasets = {
     'dpc_province': new DpcProvinceDataset(),
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
-    'hopkins_recoverd': new HopkinsRecoveredDataset(),
+    'hopkins_recovered': new HopkinsRecoveredDataset(),
     'epcalc': new EpcalcDataset(),
     'lockdown': new LockdownDataset()
 }
