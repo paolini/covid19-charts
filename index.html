@@ -129,12 +129,13 @@
                         </li>
                     </ul>
                 </li>
-                <li id="series_filter_li">Filter:
+                <li id="series_filter_li">Smoothing:
                     <select name="filter">
-                        <option value="0">no filter</option>
-                        <option value="3">binomial 3</option>
-                        <option value="5">binomial 5</option>
-                        <option value="7">binomial 7</option>
+                        <option value="identity 0">no filter</option>
+                        <option value="flat 7">flat 7</option>
+                        <option value="binomial 7">binomial 7</option>
+                        <option value="binomial 5">binomial 5</option>
+                        <option value="binomial 3">binomial 3</option>
                     </select>
                 </li>
                 <li>
@@ -161,6 +162,10 @@
                     -- consider
                     <select name="n_points">
                         <option value="">all data points</option>
+                        <option value="56">last 56 points</option>
+                        <option value="49">last 49 points</option>
+                        <option value="42">last 42 points</option>
+                        <option value="35">last 35 points</option>
                         <option value="28">last 28 points</option>
                         <option value="21">last 21 points</option>
                         <option value="14">last 14 points</option>

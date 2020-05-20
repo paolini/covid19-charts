@@ -52,14 +52,23 @@ function binomial_coeff(n) {
     return coeff;
 }
 
-function filter(data, coeff) {
-    var center = Math.floor(coeff.length/2);
+function flat_coeff(n) {
+    var coeff = [];
+    for (;n>0;n--) {
+        coeff.push(1);
+    }
+    return coeff;
+}
+
+function filter(data, coeff, center) {
+    var offset = center ? Math.floor(coeff.length/2) : coeff.length-1;
+
     var out = new Array(data.length);
     for (var i=0; i<data.length; ++i) {
         var s = 0;
         var n = 0;
         for (var j=0;j<coeff.length;j++) {
-            var k = i + j - center;
+            var k = i + j - offset;
             if (k>=0 && k<data.length) {
                 s += data[k] * coeff[j];
                 n += coeff[j];
