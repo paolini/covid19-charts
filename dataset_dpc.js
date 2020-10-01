@@ -16,6 +16,7 @@ class DpcDataset extends BaseDataset {
             "deceduti",
             "totale_casi",
             "tamponi",
+            "casi_testati",
 
             // computed fields:
             "incremento deceduti",
@@ -27,6 +28,7 @@ class DpcDataset extends BaseDataset {
             "incremento dimessi_guariti",
             "incremento totale_casi",
             "incremento tamponi",
+            "incremento casi_testati",
 
             "ricoverati_con_sintomi / totale_casi",
             "terapia_intensiva / totale_casi",
@@ -38,6 +40,7 @@ class DpcDataset extends BaseDataset {
             "deceduti / totale_casi",
 
             "totale_casi / tamponi",
+            "totale_casi / casi_testati",
             "tamponi / popolazione",
 
             "totale_casi / popolazione",
@@ -49,6 +52,7 @@ class DpcDataset extends BaseDataset {
             "nuovi_positivi / popolazione",
             "dimessi_guariti / popolazione",
             "deceduti / popolazione",
+            "nuovi_positivi / incremento casi_testati",
             "nuovi_positivi / incremento tamponi",
         ];
         this.filter_column = options.filter_column || null;
