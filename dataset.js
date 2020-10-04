@@ -8,9 +8,9 @@ class BaseDataset {
     setup() {
         var self = this;
         this.init_html();
-        
+
         return this.load().then(function() {
-            self.populate_html();            
+            self.populate_html();
         });
     }
 
@@ -33,14 +33,14 @@ class BaseDataset {
                     rows = rows.filter(function(row){return row.length>= headers.length});
                     rows = rows.slice(1);
                     self.table = new Table(headers, rows);
-                    
+
                     self.post_load_hook();
 
                     console.log("finished fetching dataset " + self.prefix);
                     return resolve();
                 });
             })
-        });    
+        });
     }
 
     init_html() {
@@ -70,7 +70,10 @@ class BaseDataset {
             } else if (s[0] == "flat") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 0);
                 series.label += " (" + label + ")";
-            } 
+            } else if (s[0] == "flat_centered") {
+                series.data_y = filter(series.data_y, flat_coeff(size), 1);
+                series.label += " (" + label + ")";
+            }
         }
         chart.add_series(series);
         replay.push({
