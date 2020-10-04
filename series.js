@@ -70,15 +70,10 @@ function filter(data, coeff, center) {
         for (var j=0;j<coeff.length;j++) {
             var k = i + j - offset;
             var k_var = i + (coeff.length-1-j) - offset;
-            //console.log(data.length,i,j,k,k_var,k>=0,k<data.length,k_var<data.length,k_var>=0);
             if (k>=0 && k<data.length && k_var<data.length && k_var>=0) {
-                //console.log("Ho pigliato");
                 s += data[k] * coeff[j];
                 n += coeff[j];
             }
-            // if (n==0) {
-            //   console.log(i);
-            // }
         }
         out[i] = s / n;
     }
