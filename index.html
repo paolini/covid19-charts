@@ -1,11 +1,11 @@
 <!DOCTYPE HTML>
 <html>
-    <head>  
+    <head>
         <title>covid-19 charts</title>
 
         <link rel="stylesheet" href="index.css">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-        
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
@@ -48,7 +48,7 @@
             <div class="warning">
                 <h1>Disclaimer</h1>
                 <p>This application is fetching data from the sources described below (namely italian dpc for italian data, and Hopkins University for world data).
-                    Only a very simplistic and objective analysis is performed: 
+                    Only a very simplistic and objective analysis is performed:
                     see the explanations given below before giving any significance to the data plotted.
                     You are encouraged to report any problem by <a href="https://github.com/paolini/covid19-charts/issues">opening an issue on github</a>.</p>
             </div>
@@ -59,7 +59,7 @@
                         <option value="hopkins">World data by John Hopkins Univ.</option>
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
                         <option value="lockdown">aura vision lockdown dates</option>
-                        <option value="epcalc">epidemic calculator</option>                        
+                        <option value="epcalc">epidemic calculator</option>
                     </select>
                     <ul id="dpc_box" class="data_source">
                         <li>data collected from <a href="https://github.com/pcm-dpc/COVID-19">here</a></li>
@@ -76,7 +76,7 @@
                             <select name="regioni_column" class="dpc regioni dataset_option"></select>
                             <select name="province_codice_provincia" class="dpc province dataset_option"></select>
                             <select name="province_column" class="dpc province dataset_option"></select>
-                        </li>   
+                        </li>
                     </ul>
                     <ul id="hopkins_box" class="data_source">
                         <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>
@@ -112,7 +112,7 @@
                         <li>Calculator parameters:
                             <span id="epcalc_params">
                             </span>
-                            --- auto_update: <input name="epcalc_auto_update" type="checkbox" checked="checked"> 
+                            --- auto_update: <input name="epcalc_auto_update" type="checkbox" checked="checked">
                         </li>
                         <li>Series:
                             <select name="epcalc_column">
@@ -133,6 +133,7 @@
                     <select name="filter">
                         <option value="identity 0">no filter</option>
                         <option value="flat 7">flat 7</option>
+                        <option value="flat_centered 7">flat_centered 7</option>
                         <option value="binomial 7">binomial 7</option>
                         <option value="binomial 5">binomial 5</option>
                         <option value="binomial 3">binomial 3</option>
@@ -157,7 +158,7 @@
                         <option value="log">logaritmic</option>
                         <option value="rate">growth rate</option>
                         <option value="rate_smooth">growth rate smooth</option>
-                    </select> 
+                    </select>
                     -- draw fitting exponential <input type="checkbox" name="draw_fit">
                     -- consider
                     <select name="n_points">
@@ -206,22 +207,22 @@
             <div class="warning">
                 <h1>Explanation</h1>
                 <p>
-                    From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user 
-                    up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field). 
-                    We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>. 
-                    This gives the exponential fit curve <i>y=exp(mt+q)</i>. 
-                    The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>. 
-                    The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>. 
+                    From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user
+                    up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field).
+                    We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>.
+                    This gives the exponential fit curve <i>y=exp(mt+q)</i>.
+                    The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>.
+                    The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>.
                     The <i>growth rate</i> plot shows the percentual increase in each day with respect to the previous day.
                     The <i>growth rate smooth</i> smooth also adds a smoothing filter.
-                    The <i>time alignment</i> selection translates each curve in time with respect to the first curve 
+                    The <i>time alignment</i> selection translates each curve in time with respect to the first curve
                     plotted.
-                    If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach 
+                    If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach
                     the level of the first curve following the current exponential trend.
-                    If <i>history shift</i> is selected, each curve is shifted by the number of days in the past 
-                    when the first curve had the same value (when the first curve is larger than the current) or 
-                    in the future when it has the same value of the first curve (when the first curve is smaller than the current). 
-                    If you press the button <i>set url for this chart</i> the url of the page is changed 
+                    If <i>history shift</i> is selected, each curve is shifted by the number of days in the past
+                    when the first curve had the same value (when the first curve is larger than the current) or
+                    in the future when it has the same value of the first curve (when the first curve is smaller than the current).
+                    If you press the button <i>set url for this chart</i> the url of the page is changed
                     so that you can save or share a link to the current chart.
                     To perform your own analysis you can download the data in CSV format.
                 </p>

@@ -6,16 +6,17 @@ class DpcDataset extends BaseDataset {
     constructor(options) {
         super(options);
         this.fields = [
-            "ricoverati_con_sintomi", 
-            "terapia_intensiva", 
-            "totale_ospedalizzati", 
-            "isolamento_domiciliare", 
-            "totale_positivi", 
-            "nuovi_positivi", 
-            "dimessi_guariti", 
-            "deceduti", 
-            "totale_casi", 
+            "ricoverati_con_sintomi",
+            "terapia_intensiva",
+            "totale_ospedalizzati",
+            "isolamento_domiciliare",
+            "totale_positivi",
+            "nuovi_positivi",
+            "dimessi_guariti",
+            "deceduti",
+            "totale_casi",
             "tamponi",
+            "casi_testati",
 
             // computed fields:
             "incremento deceduti",
@@ -27,29 +28,32 @@ class DpcDataset extends BaseDataset {
             "incremento dimessi_guariti",
             "incremento totale_casi",
             "incremento tamponi",
-            
-            "ricoverati_con_sintomi / totale_casi", 
-            "terapia_intensiva / totale_casi", 
-            "totale_ospedalizzati / totale_casi", 
-            "isolamento_domiciliare / totale_casi", 
-            "totale_positivi / totale_casi", 
+            "incremento casi_testati",
+
+            "ricoverati_con_sintomi / totale_casi",
+            "terapia_intensiva / totale_casi",
+            "totale_ospedalizzati / totale_casi",
+            "isolamento_domiciliare / totale_casi",
+            "totale_positivi / totale_casi",
             "nuovi_positivi / totale_casi",
-            "dimessi_guariti / totale_casi", 
+            "dimessi_guariti / totale_casi",
             "deceduti / totale_casi",
 
-            "totale_casi / tamponi", 
+            "totale_casi / tamponi",
+            "totale_casi / casi_testati",
             "tamponi / popolazione",
 
             "totale_casi / popolazione",
-            "ricoverati_con_sintomi / popolazione", 
-            "terapia_intensiva / popolazione", 
-            "totale_ospedalizzati / popolazione", 
-            "isolamento_domiciliare / popolazione", 
-            "totale_positivi / popolazione", 
+            "ricoverati_con_sintomi / popolazione",
+            "terapia_intensiva / popolazione",
+            "totale_ospedalizzati / popolazione",
+            "isolamento_domiciliare / popolazione",
+            "totale_positivi / popolazione",
             "nuovi_positivi / popolazione",
-            "dimessi_guariti / popolazione", 
+            "dimessi_guariti / popolazione",
             "deceduti / popolazione",
-            
+            "nuovi_positivi / incremento casi_testati",
+            "nuovi_positivi / incremento tamponi",
         ];
         this.filter_column = options.filter_column || null;
         this.filter_name_column = options.filter_name_column || this.filter_column;
@@ -60,8 +64,8 @@ class DpcDataset extends BaseDataset {
         super.init_html();
         this.$column = $("select[name='" + this.prefix + "_column']");
         this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "']") : null;
-    }    
-    
+    }
+
     populate_html() {
         var self = this;
         if (this.filter_column) {
@@ -117,7 +121,7 @@ class DpcDataset extends BaseDataset {
             series.y_axis = 'rate';
         } else if (column.startsWith(increment_prefix)) {
             column = column.slice(increment_prefix.length);
-            series = this.get_series_extended(column, options); 
+            series = this.get_series_extended(column, options);
             var new_data_y = new Array(series.data_y.length);
             var last = 0;
             for (var i=0; i < new_data_y.length; ++i) {
@@ -137,7 +141,7 @@ class DpcDataset extends BaseDataset {
         var value = null;
         var value_name = null;
         var population;
-        
+
         if (this.filter_column) {
             value = options['value'];
             value_name = options['value_name'];
@@ -146,7 +150,7 @@ class DpcDataset extends BaseDataset {
         } else {
             population = country_population['Italy'];
         }
-        
+
         var data_x = [];
         var data_y = [];
 
@@ -165,7 +169,7 @@ class DpcDataset extends BaseDataset {
         });
 
         var y_axis = 'count';
-        
+
         var label = column;
         var series = new Series(data_x, data_y, label);
         series.population = population;
