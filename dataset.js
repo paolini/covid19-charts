@@ -57,8 +57,7 @@ class BaseDataset {
         return options;
     }
 
-    add_series(options) {
-        var series = this.get_series(options);
+    apply_filter(series, options) {
         if (options.filter) {
             var label = options.filter;
             var s = options.filter.split(" ");
@@ -75,6 +74,11 @@ class BaseDataset {
                 series.label += " (" + label + ")";
             }
         }
+    }
+
+    add_series(options) {
+        var series = this.get_series(options);
+        // this.apply_filter(series, options);
         chart.add_series(series);
         replay.push({
             dataset: this.prefix,

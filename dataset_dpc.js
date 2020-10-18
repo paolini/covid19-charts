@@ -116,7 +116,7 @@ class DpcDataset extends BaseDataset {
             } else {
                 var s = this.get_series_extended(columns[1], options);
                 series.data_y = series.data_y.map(function(x, i) {return 100.0 * x / s.data_y[i]});
-                series.label += " / " + columns[1];
+                series.label += " / " + s.label;
             }
             series.y_axis = 'rate';
         } else if (column.startsWith(increment_prefix)) {
@@ -174,6 +174,7 @@ class DpcDataset extends BaseDataset {
         var series = new Series(data_x, data_y, label);
         series.population = population;
         series.y_axis = y_axis;
+        this.apply_filter(series, options);
         return series;
     }
 }

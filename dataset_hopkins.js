@@ -130,6 +130,7 @@ class HopkinsDataset extends BaseDataset {
         var series = new Series(data_x, data_y, label);
         series.y_axis = 'count';
         series.population = population;
+        this.apply_filter(series, options);
         return series;
     }
 
