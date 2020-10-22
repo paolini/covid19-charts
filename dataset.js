@@ -60,10 +60,8 @@ class BaseDataset {
     apply_filter(series, options) {
         if (options.filter) {
             var label = options.filter;
-            //var perlabel = this.period;
             var s = options.filter.split(" ");
             var size = document.getElementById("period").value;
-            //var size = 7;
             var f = null;
             if (s[0] == "binomial") {
                 series.data_y = filter(series.data_y, binomial_coeff(size), 1);
