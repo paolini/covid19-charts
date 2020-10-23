@@ -53,6 +53,7 @@ class BaseDataset {
         var options = {};
         if (this.can_be_filtered) {
             options.filter = this.$filter.val();
+            options.period = document.getElementById("period").value;
         }
         return options;
     }
@@ -61,17 +62,17 @@ class BaseDataset {
         if (options.filter) {
             var label = options.filter;
             var s = options.filter.split(" ");
-            var size = parseInt(s[1]);
+            var size = options.period;
             var f = null;
             if (s[0] == "binomial") {
                 series.data_y = filter(series.data_y, binomial_coeff(size), 1);
-                series.label += " (" + label + ")";
+                series.label += " (" + label + " " + size + ")";
             } else if (s[0] == "flat") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 0);
-                series.label += " (" + label + ")";
+                series.label += " (" + label + " " + size + ")";
             } else if (s[0] == "flat_centered") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 1);
-                series.label += " (" + label + ")";
+                series.label += " (" + label + " " + size + ")";
             }
         }
     }
