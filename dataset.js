@@ -53,6 +53,7 @@ class BaseDataset {
         var options = {};
         if (this.can_be_filtered) {
             options.filter = this.$filter.val();
+            options.period = document.getElementById("period").value;
         }
         return options;
     }
@@ -61,7 +62,7 @@ class BaseDataset {
         if (options.filter) {
             var label = options.filter;
             var s = options.filter.split(" ");
-            var size = document.getElementById("period").value;
+            var size = options.period;
             var f = null;
             if (s[0] == "binomial") {
                 series.data_y = filter(series.data_y, binomial_coeff(size), 1);
