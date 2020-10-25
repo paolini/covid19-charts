@@ -100,19 +100,22 @@ class HopkinsDataset extends BaseDataset {
         return series;
     }
 
+    get_population(options) {
+        if (options['subvalue'] === "") {
+            return country_population[options['value']];
+        }
+        return 0; // population of region is unknown
+    }
+
     get_series_basic(column, options) {
         var self = this;
         var value = options['value'];
         var subvalue = options['subvalue'];
         var subtable = this.table;
         var label = column + " " + value;
-        var population = 0;
         
         subtable = subtable.filter(this.filter_column, value);
-        if (subvalue === "") {
-            population = country_population[value];
-        } else {
-            population = 0; // population of regions is unknown
+        if (subvalue !== "") {
             subtable = subtable.filter(this.subfilter_column, subvalue);
             label += " " + subvalue;
         }
@@ -129,7 +132,7 @@ class HopkinsDataset extends BaseDataset {
 
         var series = new Series(data_x, data_y, label);
         series.y_axis = 'count';
-        series.population = population;
+        series.population = this.get_population(options);
         this.apply_filter(series, options);
         return series;
     }

@@ -140,15 +140,11 @@ class DpcDataset extends BaseDataset {
         var subtable = this.table;
         var value = null;
         var value_name = null;
-        var population;
 
         if (this.filter_column) {
             value = options['value'];
             value_name = options['value_name'];
             subtable = subtable.filter(this.filter_column, value);
-            population = popolazione_regioni[value_name];
-        } else {
-            population = country_population['Italy'];
         }
 
         var data_x = [];
@@ -172,7 +168,7 @@ class DpcDataset extends BaseDataset {
 
         var label = column;
         var series = new Series(data_x, data_y, label);
-        series.population = population;
+        series.population = this.get_population(options);
         series.y_axis = y_axis;
         this.apply_filter(series, options);
         return series;
@@ -185,6 +181,10 @@ class DpcNazionaleDataset extends DpcDataset {
             name: "italia",
             path: "dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv"
         });
+    }
+
+    get_population(options) {
+        return country_population['Italy'];
     }
 
     series_label(column, value) {
@@ -201,6 +201,10 @@ class DpcRegioniDataset extends DpcDataset {
             filter_column: "codice_regione"
         });
     }
+
+    get_population(options) {
+        return popolazione_regioni[options['value_name']];
+    }
 }
 
 class DpcProvinceDataset extends DpcDataset {
@@ -211,7 +215,12 @@ class DpcProvinceDataset extends DpcDataset {
             filter_name_column: "denominazione_provincia",
             filter_column: "codice_provincia"
         });
-        this.fields = ['totale_casi', 'incremento totale_casi'];
+        this.fields = ['totale_casi', 'incremento totale_casi', 'totale_casi / popolazione'];
+    }
+
+    get_population(options) {
+        var provincia = options['value_name'].split(": ")[1];
+        return popolazione_province[provincia];
     }
 
     post_load_hook() {

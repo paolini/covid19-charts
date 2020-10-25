@@ -14,6 +14,10 @@ class BaseDataset {
         });
     }
 
+    get_population(options) {
+        return null;
+    }
+
     post_load_hook() {}
 
     series_label(column, value) {
