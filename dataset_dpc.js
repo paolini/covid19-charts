@@ -70,6 +70,11 @@ class DpcDataset extends BaseDataset {
         this.filter_column = options.filter_column || null;
         this.filter_name_column = options.filter_name_column || this.filter_column;
         this.REPOSITORY_URL = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/";
+        this.language = 'italian';
+        this.translate = {
+            'population': 'popolazione',
+            'increment': 'incremento'
+        };
     }
 
     init_html() {
@@ -113,38 +118,6 @@ class DpcDataset extends BaseDataset {
         const increment_prefix = 'incremento ';
         var series = this.get_series_extended(column, options);
         series.label = this.series_label(series.label, options['value_name']);
-        return series;
-    }
-
-    get_series_extended(column, options) {
-        var series;
-        const increment_prefix = "incremento ";
-        var columns = column.split('/').map(function(x){return x.trim();});
-        if (columns.length === 2) {
-            series = this.get_series_extended(columns[0], options);
-            if (columns[1] === "popolazione") {
-                series.data_y = series.data_y.map(function(x) {return 100.0 * x / series.population;});
-                series.label += " / popolazione";
-            } else {
-                var s = this.get_series_extended(columns[1], options);
-                series.data_y = series.data_y.map(function(x, i) {return 100.0 * x / s.data_y[i]});
-                series.label += " / " + s.label;
-            }
-            series.y_axis = 'rate';
-        } else if (column.startsWith(increment_prefix)) {
-            column = column.slice(increment_prefix.length);
-            series = this.get_series_extended(column, options);
-            var new_data_y = new Array(series.data_y.length);
-            var last = 0;
-            for (var i=0; i < new_data_y.length; ++i) {
-                new_data_y[i] = series.data_y[i] - last;
-                last = series.data_y[i];
-            }
-            series.data_y = new_data_y;
-            series.label = "incremento " + series.label;
-        } else {
-            series = this.get_series_basic(column, options);
-        }
         return series;
     }
 

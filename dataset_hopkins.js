@@ -71,35 +71,6 @@ class HopkinsDataset extends BaseDataset {
         return series;
     }
 
-    get_series_extended(column, options) {
-        var series;
-        const increment_postfix = " increment";
-        var columns = column.split('/').map(function(x) {return x.trim();});
-        if (columns.length === 2) {
-            series = this.get_series_extended(columns[0], options);
-            // columns[1] should be "population"
-            if (series.population > 0) {
-                series.data_y = series.data_y.map(function(x) {return  100.0 * x / series.population;});
-                series.label += ' percent'; 
-                series.y_axis = 'rate';
-            }
-        } else if (column.endsWith(increment_postfix)) {
-            column = column.slice(0, -increment_postfix.length);
-            series = this.get_series_extended(column, options);
-            var new_data_y = new Array(series.data_y.length);
-            var last = 0;
-            for (var i=0; i < new_data_y.length; ++i) {
-                new_data_y[i] = series.data_y[i] - last;
-                last = series.data_y[i];
-            }
-            series.data_y = new_data_y;
-            series.label += increment_postfix;
-        } else {
-            series = this.get_series_basic(column, options);
-        }
-        return series;
-    }
-
     get_population(options) {
         if (options['subvalue'] === "") {
             return country_population[options['value']];
