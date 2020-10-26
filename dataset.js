@@ -68,6 +68,7 @@ class BaseDataset {
     }
 
     apply_filter(series, options) {
+        if (series.has_been_filtered) return;
         if (options.filter) {
             var label = options.filter;
             var size = options.period;
@@ -82,6 +83,7 @@ class BaseDataset {
                 series.data_y = filter(series.data_y, flat_coeff(size), 1);
                 series.label += " (" + label + " " + size + ")";
             }
+            series.has_been_filtered = true;
         }
     }
 
@@ -94,6 +96,8 @@ class BaseDataset {
                 series.label += " / " + this.translate['population'];
             } else {
                 var s = this.get_series_extended(columns[1], options);
+                this.apply_filter(series, options);
+                this.apply_filter(s, options);
                 series.data_y = series.data_y.map(function(x, i) {return 100.0 * x / s.data_y[i]});
                 series.label += " / " + s.label;
             }
@@ -122,7 +126,16 @@ class BaseDataset {
             }
             return series;
         } 
-        return this.get_series_basic(column, options);
+        var series = this.get_series_basic(column, options);
+        return series;
+    }
+
+    get_series(options) {
+        var column = options['column'] || 'count';
+        var series = this.get_series_extended(column, options);
+        this.apply_filter(series, options);
+        series.label = this.series_label(series.label, options['value_name']);
+        return series;
     }
 
     add_series(options) {

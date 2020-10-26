@@ -65,12 +65,6 @@ class HopkinsDataset extends BaseDataset {
         });
     }
 
-    get_series(options) {
-        var column = options['column'] || 'count';
-        var series = this.get_series_extended(column, options);
-        return series;
-    }
-
     get_population(options) {
         if (options['subvalue'] === "") {
             return country_population[options['value']];
@@ -104,7 +98,6 @@ class HopkinsDataset extends BaseDataset {
         var series = new Series(data_x, data_y, label);
         series.y_axis = 'count';
         series.population = this.get_population(options);
-        this.apply_filter(series, options);
         return series;
     }
 

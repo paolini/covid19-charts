@@ -113,14 +113,6 @@ class DpcDataset extends BaseDataset {
         return options;
     }
 
-    get_series(options) {
-        var column = options['column'];
-        const increment_prefix = 'incremento ';
-        var series = this.get_series_extended(column, options);
-        series.label = this.series_label(series.label, options['value_name']);
-        return series;
-    }
-
     get_series_basic(column, options) {
         var subtable = this.table;
         var value = null;
@@ -155,7 +147,6 @@ class DpcDataset extends BaseDataset {
         var series = new Series(data_x, data_y, label);
         series.population = this.get_population(options);
         series.y_axis = y_axis;
-        this.apply_filter(series, options);
         return series;
     }
 }
