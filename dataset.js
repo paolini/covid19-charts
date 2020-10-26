@@ -57,7 +57,7 @@ class BaseDataset {
         var options = {};
         if (this.can_be_filtered) {
             options.filter = this.$filter.val();
-            options.period = document.getElementById("period").value;
+            options.period = $("input[name='period']").val();
         }
         return options;
     }
@@ -65,16 +65,15 @@ class BaseDataset {
     apply_filter(series, options) {
         if (options.filter) {
             var label = options.filter;
-            var s = options.filter.split(" ");
             var size = options.period;
             var f = null;
-            if (s[0] == "binomial") {
+            if (options.filter == "binomial") {
                 series.data_y = filter(series.data_y, binomial_coeff(size), 1);
                 series.label += " (" + label + " " + size + ")";
-            } else if (s[0] == "flat") {
+            } else if (options.filter == "flat") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 0);
                 series.label += " (" + label + " " + size + ")";
-            } else if (s[0] == "flat_centered") {
+            } else if (options.filter == "flat_centered") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 1);
                 series.label += " (" + label + " " + size + ")";
             }

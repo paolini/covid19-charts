@@ -105,4 +105,14 @@ $(function () {
         datasets[data_set[data_source]].click();
     });
 
+    $("select[name='filter']").change(function(){ 
+        var val = $(this).val();
+        var $period_span = $("#period_span");
+        if (val === "identity") {
+            $period_span.hide();
+        } else {
+            $period_span.show();
+        }
+    }).change();
+
 });
