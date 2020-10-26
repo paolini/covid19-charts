@@ -227,7 +227,12 @@ class DpcProvinceDataset extends DpcDataset {
             filter_name_column: "denominazione_provincia",
             filter_column: "codice_provincia"
         });
-        this.fields = ['totale_casi', 'incremento totale_casi', 'totale_casi / popolazione'];
+        this.fields = [
+            'totale_casi', 
+            'incremento totale_casi', 
+            'totale_casi / popolazione',
+            'incremento totale_casi / popolazione'
+        ];
     }
 
     get_population(options) {
