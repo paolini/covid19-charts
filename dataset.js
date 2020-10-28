@@ -26,7 +26,11 @@ class BaseDataset {
     post_load_hook() {}
 
     series_label(column, value) {
-        return value + " " + dash_to_space(column);
+        if (value) {
+            return value + " " + dash_to_space(column);
+        } else {
+            return column;
+        }
     }
 
     load() {
