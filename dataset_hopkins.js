@@ -24,6 +24,8 @@ class HopkinsDataset extends BaseDataset {
         var i = this.table.headers.indexOf(this.filter_column);
         var j = this.table.headers.indexOf(this.subfilter_column);
 
+		console.log(this.table.rows);
+        this.table.rows.push(["", "EU"]);
         this.table.rows.forEach(function(row) {
             var value = row[i];
             var subvalue = row[j];
@@ -36,6 +38,7 @@ class HopkinsDataset extends BaseDataset {
         this.$select.find("option").remove();
         var options = Object.getOwnPropertyNames(obj);
         options.sort();
+
         options.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
@@ -96,8 +99,30 @@ class HopkinsDataset extends BaseDataset {
         });
 
         var series = new Series(data_x, data_y, label);
+        var EU = ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"];
+		var ASEAN = ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"];
+        if (options['value']=="EU"){
+        	self=this;
+        	series.data_y.fill(0);
+        	series.population = 0;
+        	console.log(series.data_y);
+        	EU.forEach(function get_sum(item) {
+        		var temp = options['value'];
+        		options['value']=item;
+        		console.log(options['value']);
+        		//console.log(options);
+        		for (var i=0; i<series.data_y.length; i++){  		
+        			series.data_y[i] += self.get_series_basic(column, options).data_y[i];
+        		}
+        		series.population += self.get_population(options);
+        		options['value']=temp;
+        	});
+        }
+        else{
+        	series.population = this.get_population(options);
+        }
         series.y_axis = 'count';
-        series.population = this.get_population(options);
+        console.log(series.population);
         return series;
     }
 
