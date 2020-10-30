@@ -40,7 +40,6 @@ class HopkinsDataset extends BaseDataset {
         var options = Object.getOwnPropertyNames(obj);
         var temp1 = options;
         var temp2 = temp1.splice(temp1.length-Object.keys(supranat_comp).length, temp1.length-1);
-        console.log(temp1);
         //options.sort();
 		temp1.sort();
 		temp2.sort();
@@ -124,7 +123,6 @@ class HopkinsDataset extends BaseDataset {
         }
         series.population = this.get_population(options);
         series.y_axis = 'count';
-        console.log(series.population);
         return series;
     }
 
