@@ -38,12 +38,21 @@ class HopkinsDataset extends BaseDataset {
 
         this.$select.find("option").remove();
         var options = Object.getOwnPropertyNames(obj);
-        options.sort();
-
-        options.forEach(function(option) {
+        var temp1 = options;
+        var temp2 = temp1.splice(temp1.length-Object.keys(supranat_comp).length, temp1.length-1);
+        console.log(temp1);
+        //options.sort();
+		temp1.sort();
+		temp2.sort();
+		
+        temp2.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
-
+        self.$select.append("<option>-----------</option>");
+		temp1.forEach(function(option) {
+            self.$select.append("<option value='" + option + "'>" + option + "</option>");
+        });
+		
         this.$select.change(function() {
             var value = self.$select.children("option:selected").val();
             self.$subselect.find("option").remove();
