@@ -142,6 +142,9 @@ var popolazione_province = {
 // https://datahub.io/JohnSnowLabs/population-figures-by-country#resource-population-figures-by-country_zip
 
 var country_population = {
+	"EU": 445860176,	//sum
+	"ASEAN": 628937000, //2015, https://www.aseanstats.org/publication/population-density/
+	"CIS": 234551489,	//sum
     "Afghanistan": 34656032,
     "Albania": 2876101,
     "Algeria": 40606052,
@@ -292,6 +295,7 @@ var country_population = {
     "Sweden": 9903122,
     "Switzerland": 8372098,
     "Syria": 18430453,
+    "Tajikistan": 8734951,
     "Tanzania": 55572201,
     "Thailand": 68863514,
     "Timor-Leste": 1268671,
@@ -313,3 +317,8 @@ var country_population = {
     "Zimbabwe": 16150362
 };
 
+var supranat_comp = {
+	"EU" : ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"],
+	"ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"],
+	"CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"]
+};

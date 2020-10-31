@@ -24,6 +24,9 @@ class HopkinsDataset extends BaseDataset {
         var i = this.table.headers.indexOf(this.filter_column);
         var j = this.table.headers.indexOf(this.subfilter_column);
 
+		for (var iloop=0; iloop<Object.keys(supranat_comp).length; iloop++){
+        	this.table.rows.push(["", Object.keys(supranat_comp)[iloop]]);
+        }
         this.table.rows.forEach(function(row) {
             var value = row[i];
             var subvalue = row[j];
@@ -35,11 +38,20 @@ class HopkinsDataset extends BaseDataset {
 
         this.$select.find("option").remove();
         var options = Object.getOwnPropertyNames(obj);
-        options.sort();
-        options.forEach(function(option) {
+        var temp1 = options;
+        var temp2 = temp1.splice(temp1.length-Object.keys(supranat_comp).length, temp1.length-1);
+        //options.sort();
+		temp1.sort();
+		temp2.sort();
+		
+        temp2.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
-
+        self.$select.append("<option>-----------</option>");
+		temp1.forEach(function(option) {
+            self.$select.append("<option value='" + option + "'>" + option + "</option>");
+        });
+		
         this.$select.change(function() {
             var value = self.$select.children("option:selected").val();
             self.$subselect.find("option").remove();
@@ -96,8 +108,21 @@ class HopkinsDataset extends BaseDataset {
         });
 
         var series = new Series(data_x, data_y, label);
-        series.y_axis = 'count';
+        if (options['value'] in supranat_comp){
+        	self = this;
+        	series.data_y.fill(0);
+        	series.population = 0;
+        	supranat_comp[options['value']].forEach(function get_sum(item) {
+        		var temp = options['value'];
+        		options['value']=item;
+        		for (var i=0; i<series.data_y.length; i++){  		
+        			series.data_y[i] += self.get_series_basic(column, options).data_y[i];
+        		}
+        		options['value']=temp;
+        	});
+        }
         series.population = this.get_population(options);
+        series.y_axis = 'count';
         return series;
     }
 
