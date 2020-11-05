@@ -138,13 +138,10 @@ var popolazione_province = {
     "Ogliastra": 57185
 };
 
-// in year 2016
-// https://datahub.io/JohnSnowLabs/population-figures-by-country#resource-population-figures-by-country_zip
 
 var country_population = {
-	"EU": 445860176,	//sum
-	"ASEAN": 628937000, //2015, https://www.aseanstats.org/publication/population-density/
-	"CIS": 234551489,	//sum
+    // https://datahub.io/JohnSnowLabs/population-figures-by-country#resource-population-figures-by-country_zip
+    // year 2016
     "Afghanistan": 34656032,
     "Albania": 2876101,
     "Algeria": 40606052,
@@ -314,11 +311,10 @@ var country_population = {
     "Vietnam": 92701100,
     "West Bank and Gaza": 4551566,
     "Zambia": 16591390,
-    "Zimbabwe": 16150362
-};
+    "Zimbabwe": 16150362,
 
-var supranat_comp = {
-	"EU" : ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"],
-	"ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"],
-	"CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"]
+    // missing countries 
+    // from google year 2018
+    "Laos": 7062000,
+    "Myanmar": 53710000
 };

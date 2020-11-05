@@ -7,6 +7,13 @@ class HopkinsDataset extends BaseDataset {
         this.fields = options.fields;
         this.first_time_column = 4;
         this.fields = options.fields;
+        this.supranat_comp = {
+            "ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"],
+            "CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"],
+            "EU" : ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", 
+                    "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", 
+                    "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"]
+        };
     }
 
     init_html() {
@@ -20,13 +27,16 @@ class HopkinsDataset extends BaseDataset {
         var self = this;
 
         var obj = {};
+        this.$select.find("option").remove();
+        for(var option in this.supranat_comp) {
+            self.$select.append("<option value='" + option + "'>" + option + "</option>");
+            obj[option] = {};
+        }
+        self.$select.append("<option value=''>-----------</option>");
 
         var i = this.table.headers.indexOf(this.filter_column);
         var j = this.table.headers.indexOf(this.subfilter_column);
 
-		for (var iloop=0; iloop<Object.keys(supranat_comp).length; iloop++){
-        	this.table.rows.push(["", Object.keys(supranat_comp)[iloop]]);
-        }
         this.table.rows.forEach(function(row) {
             var value = row[i];
             var subvalue = row[j];
@@ -36,24 +46,18 @@ class HopkinsDataset extends BaseDataset {
             }
         });
 
-        this.$select.find("option").remove();
+
         var options = Object.getOwnPropertyNames(obj);
-        var temp1 = options;
-        var temp2 = temp1.splice(temp1.length-Object.keys(supranat_comp).length, temp1.length-1);
-        //options.sort();
-		temp1.sort();
-		temp2.sort();
-		
-        temp2.forEach(function(option) {
-            self.$select.append("<option value='" + option + "'>" + option + "</option>");
-        });
-        self.$select.append("<option>-----------</option>");
-		temp1.forEach(function(option) {
+        options.sort();
+        
+        
+        options.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
 		
         this.$select.change(function() {
             var value = self.$select.children("option:selected").val();
+            if (value==="") return;
             self.$subselect.find("option").remove();
             self.$subselect.append("<option value=''>-- all states --</option>");
             var options = Object.getOwnPropertyNames(obj[value]);
@@ -78,10 +82,20 @@ class HopkinsDataset extends BaseDataset {
     }
 
     get_population(options) {
-        if (options['subvalue'] === "") {
-            return country_population[options['value']];
+        if (options['subvalue'] !== "") {
+            return 0; // population of region is unknown
         }
-        return 0; // population of region is unknown
+        var value = options['value'];
+        if (value in this.supranat_comp) {
+            var population = 0;
+            this.supranat_comp[options['value']].forEach(function(country){
+                var p = country_population[country];
+                if (!p) {console.log(country + " has no population data");}
+                population += country_population[country];
+            });
+            return population;
+        }
+        return country_population[value];
     }
 
     get_series_basic(column, options) {
@@ -91,10 +105,20 @@ class HopkinsDataset extends BaseDataset {
         var subtable = this.table;
         var label = column + " " + value;
         
-        subtable = subtable.filter(this.filter_column, value);
-        if (subvalue !== "") {
-            subtable = subtable.filter(this.subfilter_column, subvalue);
-            label += " " + subvalue;
+        if (value in this.supranat_comp) {
+            var k = subtable.headers.indexOf(this.filter_column); // column with country name
+            var lst = this.supranat_comp[value];
+            subtable = new Table(
+                subtable.headers, 
+                subtable.rows.filter(function(row) {
+                    return lst.indexOf(row[k]) >= 0;
+                }));
+        } else {
+            subtable = subtable.filter(this.filter_column, value);
+            if (subvalue !== "") {
+                subtable = subtable.filter(this.subfilter_column, subvalue);
+                label += " " + subvalue;
+            }
         }
 
         var data_x = this.table.headers.slice(this.first_time_column).map(anglo_to_date);
@@ -108,19 +132,6 @@ class HopkinsDataset extends BaseDataset {
         });
 
         var series = new Series(data_x, data_y, label);
-        if (options['value'] in supranat_comp){
-        	self = this;
-        	series.data_y.fill(0);
-        	series.population = 0;
-        	supranat_comp[options['value']].forEach(function get_sum(item) {
-        		var temp = options['value'];
-        		options['value']=item;
-        		for (var i=0; i<series.data_y.length; i++){  		
-        			series.data_y[i] += self.get_series_basic(column, options).data_y[i];
-        		}
-        		options['value']=temp;
-        	});
-        }
         series.population = this.get_population(options);
         series.y_axis = 'count';
         return series;
