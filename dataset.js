@@ -65,8 +65,7 @@ class BaseDataset {
     get_options() {
         var options = {};
         if (this.can_be_filtered) {
-            options.filter = this.$filter.val();
-            options.period = $("input[name='period']").val();
+            options.filter = this.$filter.val() + ' ' + $("input[name='period']").val();
         }
         return options;
     }
@@ -74,17 +73,20 @@ class BaseDataset {
     apply_filter(series, options) {
         if (series.has_been_filtered) return;
         if (options.filter) {
-            var label = options.filter;
-            var size = options.period;
-            var f = null;
-            if (options.filter == "binomial") {
+            // typical value: options.filter === "flat_centered 7"
+            var name = options.filter.split(' ')[0];
+            var size = parseInt(options.filter.split(' ')[1]);
+            var label = options.filter.replace('_', ' ');
+            if (name == "binomial") {
                 series.data_y = filter(series.data_y, binomial_coeff(size), 1);
-                series.label += " (" + label + " " + size + ")";
-            } else if (options.filter == "flat") {
+            } else if (name == "flat") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 0);
-                series.label += " (" + label + " " + size + ")";
-            } else if (options.filter == "flat_centered") {
+            } else if (name == "flat_centered") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 1);
+            } else {
+                label = null;
+            }
+            if (label !== null) {
                 series.label += " (" + label + " " + size + ")";
             }
             series.has_been_filtered = true;

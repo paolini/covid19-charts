@@ -19,7 +19,7 @@ const hash_prefix = "#options=";
 
 function set_location_hash() {
     var options = {
-        version: 1,
+        version: 2,
         datasets: replay, // should be named serieses
         chart: chart.get_options(),
         epcalc_input: datasets.epcalc.current_input
@@ -34,6 +34,11 @@ function get_location_hash() {
     hash = hash.substring(hash_prefix.length);
     var json = decodeURIComponent(hash);
     var options = JSON.parse(json);
+    if (options.version === 1) {
+        if (options.period) {
+            options.filter += ' ' + options.period;
+        }
+    }
     return options;
 }
 
