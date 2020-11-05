@@ -83,11 +83,15 @@ class BaseDataset {
                 series.data_y = filter(series.data_y, flat_coeff(size), 0);
             } else if (name == "flat_centered") {
                 series.data_y = filter(series.data_y, flat_coeff(size), 1);
+            } else if (name == "log_flat") {
+                series.data_y = filter(series.data_y, flat_coeff(size), 0, 1);
+            } else if (name == "log_flat_centered") {
+                series.data_y = filter(series.data_y, flat_coeff(size), 1, 1);
             } else {
                 label = null;
             }
             if (label !== null) {
-                series.label += " (" + label + " " + size + ")";
+                series.label += " (" + label + ")";
             }
             series.has_been_filtered = true;
         }

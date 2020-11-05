@@ -143,7 +143,9 @@
                     <select name="filter">
                         <option value="identity">no filter</option>
                         <option value="flat">flat</option>
-                        <option value="flat_centered">flat_centered</option>
+                        <option value="flat_centered">flat centered</option>
+                        <option value="log_flat">log flat</option>
+                        <option value="log_flat_centered">log flat centered</option>
                         <option value="binomial">binomial</option>
                     </select>
 		        <span id="period_span">filter days: <input id="period" name="period" value="7" size="2"></span>
@@ -216,6 +218,14 @@
             <div class="warning">
                 <h1>Explanation</h1>
                 <p>
+                    Each series is possibly filtered with the specified filter; 
+                    <i>flat:</i> is a running average over the specified number of days in the past, 
+                    <i>flat centered:</i> as flat but the average is centered on the current day (no delay, but there is an effect on boundary points),
+                    <i>log flat:</i> as flat but the logariths of the values are averaged,
+                    <i>log flat centered:</i> as flat centered but the logarithms are averaged,
+                    <i>binomial:</i> is a filter with binomial coefficients (approximating a gaussian filter).
+                    If the series is a ratio of two dataset the filters are applied to each series before making 
+                    the ratio.
                     From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user
                     up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field).
                     We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>.

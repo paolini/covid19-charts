@@ -60,8 +60,14 @@ function flat_coeff(n) {
     return coeff;
 }
 
-function filter(data, coeff, center) {
+function filter(data, coeff, center, logaritmic) {
     var offset = center ? Math.floor(coeff.length/2) : coeff.length-1;
+    var pre_filter = function(x) {return x}; 
+    var post_filter = function(x) {return x};
+    if (logaritmic) {
+        pre_filter = Math.log;
+        post_filter = Math.exp;
+    }
 
     var out = new Array(data.length);
     for (var i=0; i<data.length; ++i) {
@@ -71,11 +77,11 @@ function filter(data, coeff, center) {
             var k = i + j - offset;
             var k_var = i + (coeff.length-1-j) - offset;
             if (k>=0 && k<data.length && k_var<data.length && k_var>=0) {
-                s += data[k] * coeff[j];
+                s += pre_filter(data[k]) * coeff[j];
                 n += coeff[j];
             }
         }
-        out[i] = s / n;
+        out[i] = post_filter(s / n);
     }
     return out;
 }
