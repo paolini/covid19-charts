@@ -140,7 +140,12 @@ class HopkinsConfirmedDataset extends HopkinsDataset {
         super({
             name: "confirmed",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
-            fields: ['confirmed', 'confirmed / population', 'confirmed increment'],
+            fields: [
+                'confirmed', 
+                'confirmed / population', 
+                'confirmed increment',
+                'confirmed increment rate'
+            ],
         });
     }
 }
@@ -150,7 +155,12 @@ class HopkinsDeathsDataset extends HopkinsDataset {
         super({
             name: "deaths",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
-            fields: ['deaths', 'deaths / population', 'deaths increment'],
+            fields: [
+                'deaths', 
+                'deaths / population', 
+                'deaths increment',
+                'deaths increment rate'    
+            ],
         });
     }
 }
@@ -161,7 +171,12 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
             name: "recovered",
             // path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
-            fields: ['recovered', 'recovered / population', 'recovered increment'],
+            fields: [
+                'recovered', 
+                'recovered / population', 
+                'recovered increment',
+                'recovered increment rate'
+            ],
         });
     }
 }

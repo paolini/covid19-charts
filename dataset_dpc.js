@@ -18,54 +18,7 @@ class DpcDataset extends BaseDataset {
             "tamponi",
             "casi_testati",
             "casi_da_sospetto_diagnostico",
-            "casi_da_screening",
-
-            // computed fields:
-            "incremento deceduti",
-            "incremento ricoverati_con_sintomi",
-            "incremento terapia_intensiva",
-            "incremento totale_ospedalizzati",
-            "incremento isolamento_domiciliare",
-            "incremento totale_positivi",
-            "incremento dimessi_guariti",
-            "incremento totale_casi",
-            "incremento tamponi",
-            "incremento casi_testati",
-            "incremento casi_da_sospetto_diagnostico",
-            "incremento casi_da_screening",
-
-            "ricoverati_con_sintomi / totale_casi",
-            "terapia_intensiva / totale_casi",
-            "totale_ospedalizzati / totale_casi",
-            "isolamento_domiciliare / totale_casi",
-            "totale_positivi / totale_casi",
-            "nuovi_positivi / totale_casi",
-            "dimessi_guariti / totale_casi",
-            "deceduti / totale_casi",
-            "casi_da_sospetto_diagnostico / totale_casi",
-            "casi_da_screening / totale_casi",
-
-            "totale_casi / tamponi",
-            "totale_casi / casi_testati",
-            "tamponi / popolazione",
-
-            "totale_casi / popolazione",
-            "ricoverati_con_sintomi / popolazione",
-            "terapia_intensiva / popolazione",
-            "totale_ospedalizzati / popolazione",
-            "isolamento_domiciliare / popolazione",
-            "totale_positivi / popolazione",
-            "nuovi_positivi / popolazione",
-            "dimessi_guariti / popolazione",
-            "deceduti / popolazione",
-            "incremento deceduti / popolazione",
-            "incremento tamponi / popolazione",
-            "incremento casi_testati / popolazione",
-            "nuovi_positivi / incremento casi_testati",
-            "nuovi_positivi / incremento tamponi",
-            
-            "incremento casi_da_sospetto_diagnostico / nuovi_positivi",
-            "incremento casi_da_screening / nuovi_positivi",
+            "casi_da_screening"
         ];
         this.filter_column = options.filter_column || null;
         this.filter_name_column = options.filter_name_column || this.filter_column;
@@ -73,7 +26,8 @@ class DpcDataset extends BaseDataset {
         this.language = 'italian';
         this.translate = {
             'population': 'popolazione',
-            'increment': 'incremento'
+            'increment': 'incremento',
+            'rate': 'tasso'
         };
     }
 
@@ -81,6 +35,7 @@ class DpcDataset extends BaseDataset {
         super.init_html();
         this.$column = $("select[name='" + this.prefix + "_column']");
         this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "']") : null;
+        this.$modifier = $("select[name='dpc_modifier']");
     }
 
     populate_html() {
@@ -109,6 +64,10 @@ class DpcDataset extends BaseDataset {
         if (this.filter_column) {
             options.value = this.$select.children("option:selected").val();
             options.value_name = this.$select.children("option:selected").text()
+        }
+        var modifier = this.$modifier.val();
+        if (modifier && modifier.indexOf('*')>=0) {
+            options.column = modifier.replace('*', options.column);
         }
         return options;
     }

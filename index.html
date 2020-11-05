@@ -87,6 +87,22 @@
                             <select name="province_codice_provincia" class="dpc province dataset_option"></select>
                             <select name="province_column" class="dpc province dataset_option"></select>
                         </li>
+                        <li>Modifier:
+                            <select name="dpc_modifier">
+                                <option value="*">dato originale</option>
+                                <option value="incremento *">incremento</option>
+                                <option value="tasso *">tasso di crescita</option>
+                                <option value="tasso incremento *">tasso di crescita incremento</option>
+                                <option value="* / popolazione">dato / popolazione</option>
+                                <option value="incremento * / popolazione">incremento dato / popolazione</option>
+                                <option value="* / totale_casi">dato / totale casi</option>
+                                <option value="* / tamponi">dato / tamponi</option>
+                                <option value="* / casi_testati">dato / casi testati</option>
+                                <option value="* / nuovi_positivi">dato / nuovi positivi</option>
+                                <option value="* / incremento casi_testati">dato / incremento casi testati</option>
+                                <option value="* / incremento tamponi">dato / incremento tamponi</option>
+                            </select>
+                        </li>
                     </ul>
                     <ul id="hopkins_box" class="data_source">
                         <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>
@@ -218,17 +234,24 @@
             <div class="warning">
                 <h1>Explanation</h1>
                 <p>
-                    Each series is possibly filtered with the specified filter; 
+                    A <b>data series</b> is loaded from the selected <b>data set</b> 
+                    of the given <b>data source</b>.
+                    For DPC series a <b>modifier</b> option is available;
+                    <i>incremento:</i> daily increment of given series,
+                    <i>tasso:</i> daily percentual increment,
+                    <i>tasso incremento:</i> daily percentual increment of increment,
+                    <i>ratio:</i> percentual ratio between two series or with population.
+                    Each series is possibly filtered with the specified <b>smoothing</b> filter; 
                     <i>flat:</i> is a running average over the specified number of days in the past, 
                     <i>flat centered:</i> as flat but the average is centered on the current day (no delay, but there is an effect on boundary points),
                     <i>log flat:</i> as flat but the logariths of the values are averaged,
                     <i>log flat centered:</i> as flat centered but the logarithms are averaged,
                     <i>binomial:</i> is a filter with binomial coefficients (approximating a gaussian filter).
-                    If the series is a ratio of two dataset the filters are applied to each series before making 
-                    the ratio.
+                    If the series is a ratio of two dataset (or a rate of growth) 
+                    the filters are applied to each series before computing the ratio.
                     From each series <i>y=y(t)</i> we consider as many data points in the past as specified by the user
-                    up to the date specified (or today if no date is specified in the &quot;up to date&quot; input field).
-                    We compute the linear regression of the logarithms of the values: <i>log(y) = mt + q</i>.
+                    up to the date specified (or today if no date is specified in the <b>up to date</b> input field).
+                    We compute the <b>linear regression</b> of the logarithms of the values: <i>log(y) = mt + q</i>.
                     This gives the exponential fit curve <i>y=exp(mt+q)</i>.
                     The <i>average daily increase</i> is the average daily percentual increase: <i>exp(m)-1</i>.
                     The <i>origin</i> is the time when the exponential fit has a unit value: <i>t=-q/m</i>.
@@ -236,12 +259,12 @@
                     The <i>growth rate smooth</i> smooth also adds a smoothing filter.
                     The <i>time alignment</i> selection translates each curve in time with respect to the first curve
                     plotted.
-                    If <i>prediction shift</i> is selected, each curve is shifted by the number of days required to reach
+                    If <b>prediction shift</b> is selected, each curve is shifted by the number of days required to reach
                     the level of the first curve following the current exponential trend.
-                    If <i>history shift</i> is selected, each curve is shifted by the number of days in the past
+                    If <b>history shift</B> is selected, each curve is shifted by the number of days in the past
                     when the first curve had the same value (when the first curve is larger than the current) or
                     in the future when it has the same value of the first curve (when the first curve is smaller than the current).
-                    If you press the button <i>set url for this chart</i> the url of the page is changed
+                    If you press the button <b>set url for this chart</b> the url of the page is changed
                     so that you can save or share a link to the current chart.
                     To perform your own analysis you can download the data in CSV format.
                 </p>

@@ -6,7 +6,8 @@ class BaseDataset {
         this.language = 'english';
         this.translate = {
             'population': 'population',
-            'increment': 'increment'
+            'increment': 'increment',
+            'rate': 'rate'
         }
     }
 
@@ -114,25 +115,43 @@ class BaseDataset {
             series.y_axis = 'rate';
             return series;
         }
-        var increment_column = null
-        if (column.startsWith(this.translate['increment']+' ')) {
-            increment_column = column.slice(this.translate['increment'].length +  1);
-        } else if (column.endsWith(' '+this.translate['increment'])) {
-            increment_column = column.slice(0, -this.translate['increment'].length-1);
+        var increment_column = null;
+        var rate_column = null;
+        var word = this.translate['increment'];
+        if (column.startsWith(word + ' ')) {
+            increment_column = column.slice(word.length +  1);
+        } else if (column.endsWith(' ' + word)) {
+            increment_column = column.slice(0, -word.length-1);
+        } else {
+            word = this.translate['rate'];
+            if (column.startsWith(word + ' ')) {
+                rate_column = column.slice(word.length +  1);
+            } else if (column.endsWith(' ' + word)) {
+                rate_column = column.slice(0, -word.length-1);
+            }
         }
-        if (increment_column) {
-            var series = this.get_series_extended(increment_column, options);
+        if (increment_column || rate_column) {
+            var series = this.get_series_extended(increment_column || rate_column, options);
+            if (rate_column) {
+                this.apply_filter(series, options);
+            }
             var new_data_y = new Array(series.data_y.length);
             var last = 0;
             for (var i=0; i < new_data_y.length; ++i) {
                 new_data_y[i] = series.data_y[i] - last;
+                if (rate_column) {
+                    new_data_y[i] *= 100.0 / last;
+                }
                 last = series.data_y[i];
             }
             series.data_y = new_data_y;
             if (this.language == 'italian') {
-                series.label = this.translate['increment'] + ' ' + series.label;
+                series.label = word + ' ' + series.label;
             } else {
-                series.label += ' ' + this.translate['increment'];
+                series.label += ' ' + word;
+            }
+            if (rate_column) {
+                series.y_axis = 'rate';
             }
             return series;
         } 
