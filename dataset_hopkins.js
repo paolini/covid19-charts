@@ -155,6 +155,7 @@ class HopkinsConfirmedDataset extends HopkinsDataset {
                 'confirmed', 
                 'confirmed / population', 
                 'confirmed increment',
+                'confirmed increment / population',
                 'confirmed increment rate'
             ],
         });
@@ -170,6 +171,7 @@ class HopkinsDeathsDataset extends HopkinsDataset {
                 'deaths', 
                 'deaths / population', 
                 'deaths increment',
+                'deaths increment / population',
                 'deaths increment rate'    
             ],
         });
@@ -186,6 +188,7 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
                 'recovered', 
                 'recovered / population', 
                 'recovered increment',
+                'recovered increment / population',
                 'recovered increment rate'
             ],
         });
