@@ -9,10 +9,15 @@ class HopkinsDataset extends BaseDataset {
         this.fields = options.fields;
         this.supranat_comp = {
             "ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"],
+            "AU" : ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cabo Verde", "Central African Republic", "Chad", "Comoros", "Congo (Kinshasa)", "Congo (Brazzaville)", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Cote d'Ivoire", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Western Sahara", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"],
             "CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"],
+            "ECO" : ["Afghanistan", "Azerbaijan", "Iran", "Kazakhstan", "Kyrgyzstan", "Pakistan", "Tajikistan", "Turkey", "Turkmenistan", "Uzbekistan"],
             "EU" : ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", 
                     "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", 
-                    "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"]
+                    "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"],
+            "GCC" : ["Bahrain", "Kuwait", "Oman", "Qatar", "Saudi Arabia", "United Arab Emirates"],
+            "Pacific Alliance" : ["Chile", "Colombia", "Mexico", "Peru"],
+            "Turkic Council" : ["Azerbaijan", "Kazakhstan", "Kyrgyzstan", "Turkey", "Uzbekistan"]
         };
     }
 
@@ -50,8 +55,11 @@ class HopkinsDataset extends BaseDataset {
         var options = Object.getOwnPropertyNames(obj);
         options.sort();
         
-        
-        options.forEach(function(option) {
+        var temp=options;
+        for(var union in this.supranat_comp){
+            temp.splice(temp.indexOf(union), 1);
+        }
+        temp.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
 		
@@ -155,6 +163,7 @@ class HopkinsConfirmedDataset extends HopkinsDataset {
                 'confirmed', 
                 'confirmed / population', 
                 'confirmed increment',
+                'confirmed increment / population',
                 'confirmed increment rate'
             ],
         });
@@ -170,6 +179,7 @@ class HopkinsDeathsDataset extends HopkinsDataset {
                 'deaths', 
                 'deaths / population', 
                 'deaths increment',
+                'deaths increment / population',
                 'deaths increment rate'    
             ],
         });
@@ -186,6 +196,7 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
                 'recovered', 
                 'recovered / population', 
                 'recovered increment',
+                'recovered increment / population',
                 'recovered increment rate'
             ],
         });
