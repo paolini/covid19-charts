@@ -55,8 +55,11 @@ class HopkinsDataset extends BaseDataset {
         var options = Object.getOwnPropertyNames(obj);
         options.sort();
         
-        
-        options.forEach(function(option) {
+        var temp=options;
+        for(var union in this.supranat_comp){
+            temp.splice(temp.indexOf(union), 1);
+        }
+        temp.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
 		
