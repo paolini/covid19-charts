@@ -19,10 +19,12 @@ class HopkinsDataset extends BaseDataset {
             "Pacific Alliance" : ["Chile", "Colombia", "Mexico", "Peru"],
             "Turkic Council" : ["Azerbaijan", "Kazakhstan", "Kyrgyzstan", "Turkey", "Uzbekistan"]
         };
+        this.country_dict = null;
     }
 
     init_html() {
         super.init_html();
+        this.$supranat = $("select[name='" + this.prefix + "_supranat']");
         this.$select = $("select[name='" + this.prefix + "_filter']");
         this.$subselect = $("select[name='" + this.prefix + "_subfilter']");
         this.$column = $("select[name='" + this.prefix + "_column']");
@@ -31,53 +33,65 @@ class HopkinsDataset extends BaseDataset {
     populate_html() {
         var self = this;
 
-        var obj = {};
-        this.$select.find("option").remove();
-        for(var option in this.supranat_comp) {
-            self.$select.append("<option value='" + option + "'>" + option + "</option>");
+        if (self.country_dict === null) { // execute once
+            self.country_dict = {};
+            var i = this.table.headers.indexOf(this.filter_column);
+            var j = this.table.headers.indexOf(this.subfilter_column);
+            
+            this.table.rows.forEach(function(row) {
+                var value = row[i];
+                var subvalue = row[j];
+                if (!self.country_dict.hasOwnProperty(value)) self.country_dict[value] = {};
+                if (subvalue !== "") {
+                    self.country_dict[value][subvalue] = true;
+                }
+            });
         }
-        self.$select.append("<option value=''>-----------</option>");
 
-        var i = this.table.headers.indexOf(this.filter_column);
-        var j = this.table.headers.indexOf(this.subfilter_column);
+        self.$supranat.find("option").remove();
+        self.$supranat.append("<option value=''>world</option>");
+        for(var option in this.supranat_comp) {
+            self.$supranat.append("<option value='" + option + "'>" + option + "</option>");
+        }
 
-        this.table.rows.forEach(function(row) {
-            var value = row[i];
-            var subvalue = row[j];
-            if (!obj.hasOwnProperty(value)) obj[value] = {};
-            if (subvalue !== "") {
-                obj[value][subvalue] = true;
+        function populate_select(options) {
+            self.$select.find("option").remove();
+            self.$select.append("<option value=''>-- all states --</option>");
+            options.sort();
+            options.forEach(function(option) {
+                self.$select.append("<option value='" + option + "'>" + option + "</option>");
+            });        
+        }
+
+        self.$supranat.change(function() {
+            var value = self.$supranat.val();
+            if (value === "") { // world
+                populate_select(Object.getOwnPropertyNames(self.country_dict));
+            } else {
+                populate_select(self.supranat_comp[value]);
             }
         });
-
-
-        var options = Object.getOwnPropertyNames(obj);
-        options.sort();
-        
-        options.forEach(function(option) {
-            self.$select.append("<option value='" + option + "'>" + option + "</option>");
-        });
-		
-        this.$select.change(function() {
+        self.$supranat.change();
+                
+        self.$select.change(function() {
             var value = self.$select.children("option:selected").val();
-            if (value==="") return;
             self.$subselect.find("option").remove();
-            self.$subselect.append("<option value=''>-- all states --</option>");
-            var options;
-            if (!(value in self.supranat_comp)) {
-                options = Object.getOwnPropertyNames(obj[value]);
+            self.$subselect.append("<option value=''>-- all regions --</option>");
+            var options = [];
+            if (value) {
+                options = Object.getOwnPropertyNames(self.country_dict[value]);
                 options.sort();
                 options.forEach(function(option) {
                     self.$subselect.append("<option value='" + option + "'>" + option + "</option>");
                 });
             }
-            self.$subselect.prop("disabled", false);
+            self.$subselect.toggle(options.length>0);
         });
         this.$select.change();
 
         this.$subselect.change(function() {
             var value = self.$subselect.children("option:selected").val();
-            self.$column.prop('disabled', value !== "");
+            self.$column.prop("disabled", false);
         });
         this.$subselect.change();
 
@@ -92,7 +106,9 @@ class HopkinsDataset extends BaseDataset {
             return 0; // population of region is unknown
         }
         var value = options['value'];
-        if (value in this.supranat_comp) {
+        if (value === '') {
+            return 7800000000; // world population
+        } else if (value in this.supranat_comp) {
             var population = 0;
             this.supranat_comp[options['value']].forEach(function(country){
                 var p = country_population[country];
@@ -111,7 +127,10 @@ class HopkinsDataset extends BaseDataset {
         var subtable = this.table;
         var label = column + " " + value;
         
-        if (value in this.supranat_comp) {
+        if (value === '') { // world population
+            // no filtering!
+            label += "world";
+        } else if (value in this.supranat_comp) {
             var k = subtable.headers.indexOf(this.filter_column); // column with country name
             var lst = this.supranat_comp[value];
             subtable = new Table(
@@ -146,6 +165,9 @@ class HopkinsDataset extends BaseDataset {
     get_options() {
         var options = super.get_options();
         options.value = this.$select.children("option:selected").val();
+        if (options.value === '') {
+            options.value = this.$supranat.val();
+        }
         options.subvalue = this.$subselect.children("option:selected").val();
         options.column = this.$column.children("option:selected").val();
         return options;

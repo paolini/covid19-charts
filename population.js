@@ -258,7 +258,8 @@ var country_population = {
     "Montenegro": 622781,
     "Morocco": 35276786,
     "Mozambique": 28829476,
-    "Burma": 52885223, //Myanmar
+    "Burma": 52885223, 
+    "Myanmar": 52885223, // other name for Burma used in ASEAN supernat
     "Namibia": 2479713,
     "Nepal": 28982771,
     "Netherlands": 17018408,

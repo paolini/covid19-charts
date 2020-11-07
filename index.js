@@ -87,6 +87,7 @@ $(function () {
         var vals = val.split("_");
         $("." + vals[0]).hide();
         $("." + vals[0] + "." + vals[1]).show();
+        $("." + vals[0] + "." + vals[1] + ".hide").hide();
         data_set[vals[0]] = val;
     }).change();
 
