@@ -8,15 +8,17 @@ class HopkinsDataset extends BaseDataset {
         this.first_time_column = 4;
         this.fields = options.fields;
         this.supranat_comp = {
-            "ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Myanmar", "Philippines", "Singapore", "Thailand", "Vietnam"],
+            "ASEAN" : ["Brunei", "Cambodia", "Indonesia", "Laos", "Malaysia", "Burma", "Philippines", "Singapore", "Thailand", "Vietnam"],
             "AU" : ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cabo Verde", "Central African Republic", "Chad", "Comoros", "Congo (Kinshasa)", "Congo (Brazzaville)", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Cote d'Ivoire", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Western Sahara", "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"],
-            "CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"],
+            "CARICOM" : ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Dominica", "Grenada", "Guyana", "Haiti", "Jamaica", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Suriname", "Trinidad and Tobago"],
+"CIS": ["Armenia", "Azerbaijan", "Belarus", "Kazakhstan", "Kyrgyzstan", "Moldova", "Russia", "Tajikistan", "Uzbekistan"],
             "ECO" : ["Afghanistan", "Azerbaijan", "Iran", "Kazakhstan", "Kyrgyzstan", "Pakistan", "Tajikistan", "Turkey", "Turkmenistan", "Uzbekistan"],
             "EU" : ["Belgium", "Bulgaria", "Czechia", "Denmark", "Germany" , "Estonia", "Ireland", "Greece", "Spain", "France", "Croatia", 
                     "Italy", "Cyprus", "Latvia", "Lithuania", "Luxembourg", "Hungary", "Malta", "Netherlands", "Austria", "Poland", 
                     "Portugal", "Romania", "Slovenia", "Slovakia", "Finland", "Sweden"],
             "GCC" : ["Bahrain", "Kuwait", "Oman", "Qatar", "Saudi Arabia", "United Arab Emirates"],
             "Pacific Alliance" : ["Chile", "Colombia", "Mexico", "Peru"],
+            "PIF" : ["Australia", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Zealand", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu"],
             "Turkic Council" : ["Azerbaijan", "Kazakhstan", "Kyrgyzstan", "Turkey", "Uzbekistan"]
         };
         this.country_dict = null;
