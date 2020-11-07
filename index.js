@@ -123,7 +123,6 @@ $(function () {
 
     $("select[class='dataset_select']").change(function(){ 
         var val = $(this).val();
-        console.log(val);
         var $modifier_span = $("#modifier_span");
         if (val === "dpc_province") {
             $modifier_span.hide();
