@@ -35,7 +35,6 @@ class HopkinsDataset extends BaseDataset {
         this.$select.find("option").remove();
         for(var option in this.supranat_comp) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
-            obj[option] = {};
         }
         self.$select.append("<option value=''>-----------</option>");
 
@@ -55,11 +54,7 @@ class HopkinsDataset extends BaseDataset {
         var options = Object.getOwnPropertyNames(obj);
         options.sort();
         
-        var temp=options;
-        for(var union in this.supranat_comp){
-            temp.splice(temp.indexOf(union), 1);
-        }
-        temp.forEach(function(option) {
+        options.forEach(function(option) {
             self.$select.append("<option value='" + option + "'>" + option + "</option>");
         });
 		
@@ -68,11 +63,14 @@ class HopkinsDataset extends BaseDataset {
             if (value==="") return;
             self.$subselect.find("option").remove();
             self.$subselect.append("<option value=''>-- all states --</option>");
-            var options = Object.getOwnPropertyNames(obj[value]);
-            options.sort();
-            options.forEach(function(option) {
-                self.$subselect.append("<option value='" + option + "'>" + option + "</option>");
-            });
+            var options;
+            if (!(value in self.supranat_comp)) {
+                options = Object.getOwnPropertyNames(obj[value]);
+                options.sort();
+                options.forEach(function(option) {
+                    self.$subselect.append("<option value='" + option + "'>" + option + "</option>");
+                });
+            }
             self.$subselect.prop("disabled", false);
         });
         this.$select.change();
