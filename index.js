@@ -68,7 +68,9 @@ $(function () {
                         deaths: "hopkins_deaths",
                         recovered: "hopkins_recovered",    
                         epcalc: "epcalc",
-                        lockdown: "lockdown"
+                        lockdown: "lockdown",
+                        deathsUS: "hopkinsUS_deathsUS",
+                        confirmedUS: "hopkinsUS_confirmedUS"
                     }[item.dataset];
                     if (item.options.column === "nuovi_attualmente_positivi") {
                         item.options.column = "nuovi_positivi";
