@@ -152,7 +152,8 @@ class DpcProvinceDataset extends DpcDataset {
         });
         this.fields = [
             'totale_casi', 
-            'incremento totale_casi', 
+            'incremento totale_casi',
+            'tasso incremento totale_casi',
             'totale_casi / popolazione',
             'incremento totale_casi / popolazione'
         ];
