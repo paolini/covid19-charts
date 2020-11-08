@@ -66,7 +66,7 @@ class DpcDataset extends BaseDataset {
             options.value_name = this.$select.children("option:selected").text()
         }
         var modifier = this.$modifier.val();
-        if (modifier && modifier.indexOf('*')>=0) {
+        if (this.$modifier.is(':visible') && modifier && modifier.indexOf('*')>=0) {
             options.column = modifier.replace('*', options.column);
         }
         return options;
