@@ -114,21 +114,13 @@ $(function () {
     $("select[name='filter']").change(function(){ 
         var val = $(this).val();
         var $period_span = $("#period_span");
-        if (val === "identity") {
-            $period_span.hide();
-        } else {
-            $period_span.show();
-        }
+        $period_span.toggle(val !== "identity")
     }).change();
 
-    $("select[class='dataset_select']").change(function(){ 
+    $("select.dataset_select").change(function(){ 
         var val = $(this).val();
         var $modifier_span = $("#modifier_span");
-        if (val === "dpc_province") {
-            $modifier_span.hide();
-        } else {
-            $modifier_span.show();
-        }
+        $modifier_span.toggle(val !== "dpc_province");
     }).change();
 
 
