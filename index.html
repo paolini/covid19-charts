@@ -67,6 +67,7 @@
                     <select name="data_source">
                         <!-- option value=""><i>** select data source **</i></option -->
                         <option value="hopkins">World data by John Hopkins Univ.</option>
+                        <option value="hopkinsUS">US data by John Hopkins Univ.</option>
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
                         <option value="lockdown">aura vision lockdown dates</option>
                         <option value="epcalc">epidemic calculator</option>
@@ -129,6 +130,24 @@
                             <select name="recovered_filter" class="hopkins recovered dataset_option"></select>
                             <select name="recovered_subfilter" class="hopkins recovered dataset_option hide"></select>
                             <select name="recovered_column" class="hopkins recovered dataset_option"></select>
+                        </li>
+                    </ul>
+                    <ul id="hopkinsUS_box" class="data_source">
+                        <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>
+                        <li>Data set:
+                            <select class="dataset_select">
+                                <option value="hopkinsUS_confirmedUS">Confirmed</option>
+                                <option value="hopkinsUS_deathsUS">Deaths</option>
+                            </select>
+                        </li>
+                        <li>Series:
+                            <select name="confirmedUS_filter" class="hopkinsUS confirmedUS dataset_option"></select>
+                            <select name="confirmedUS_subfilter" class="hopkinsUS confirmedUS dataset_option hide"></select>
+                            <select name="confirmedUS_column" class="hopkinsUS confirmedUS dataset_option"></select>
+
+                            <select name="deathsUS_filter" class="hopkinsUS deathsUS dataset_option"></select>
+                            <select name="deathsUS_subfilter" class="hopkinsUS deathsUS dataset_option hide"></select>
+                            <select name="deathsUS_column" class="hopkinsUS deathsUS dataset_option"></select>
                         </li>
                     </ul>
                     <ul id="lockdown_box" class="data_source">

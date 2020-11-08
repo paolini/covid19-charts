@@ -9,6 +9,8 @@ var datasets = {
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
     'hopkins_recovered': new HopkinsRecoveredDataset(),
+    'hopkinsUS_confirmedUS': new HopkinsConfirmedUSDataset(),
+    'hopkinsUS_deathsUS': new HopkinsDeathsUSDataset(),
     'epcalc': new EpcalcDataset(),
     'lockdown': new LockdownDataset()
 }

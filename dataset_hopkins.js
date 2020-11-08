@@ -22,11 +22,15 @@ class HopkinsDataset extends BaseDataset {
             "Turkic Council" : ["Azerbaijan", "Kazakhstan", "Kyrgyzstan", "Turkey", "Uzbekistan"]
         };
         this.country_dict = null;
+        this.population_field = null;
+        this.world_label = 'world';
     }
 
     init_html() {
         super.init_html();
-        this.$supranat = $("select[name='" + this.prefix + "_supranat']");
+        if (this.supranat_comp) {
+            this.$supranat = $("select[name='" + this.prefix + "_supranat']");
+        }
         this.$select = $("select[name='" + this.prefix + "_filter']");
         this.$subselect = $("select[name='" + this.prefix + "_subfilter']");
         this.$column = $("select[name='" + this.prefix + "_column']");
@@ -50,10 +54,12 @@ class HopkinsDataset extends BaseDataset {
             });
         }
 
-        self.$supranat.find("option").remove();
-        self.$supranat.append("<option value=''>world</option>");
-        for(var option in this.supranat_comp) {
-            self.$supranat.append("<option value='" + option + "'>" + option + "</option>");
+        if (self.supranat_comp) {
+            self.$supranat.find("option").remove();
+            self.$supranat.append("<option value=''>world</option>");
+            for(var option in this.supranat_comp) {
+                self.$supranat.append("<option value='" + option + "'>" + option + "</option>");
+            }
         }
 
         function populate_select(options) {
@@ -65,15 +71,19 @@ class HopkinsDataset extends BaseDataset {
             });        
         }
 
-        self.$supranat.change(function() {
-            var value = self.$supranat.val();
-            if (value === "") { // world
-                populate_select(Object.getOwnPropertyNames(self.country_dict));
-            } else {
-                populate_select(self.supranat_comp[value]);
-            }
-        });
-        self.$supranat.change();
+        if (self.supranat_comp) {
+            self.$supranat.change(function() {
+                var value = self.$supranat.val();
+                if (value === "") { // world
+                    populate_select(Object.getOwnPropertyNames(self.country_dict));
+                } else {
+                    populate_select(self.supranat_comp[value]);
+                }
+            });
+            self.$supranat.change();
+        } else {
+            populate_select(Object.getOwnPropertyNames(self.country_dict));
+        }
                 
         self.$select.change(function() {
             var value = self.$select.children("option:selected").val();
@@ -131,8 +141,8 @@ class HopkinsDataset extends BaseDataset {
         
         if (value === '') { // world population
             // no filtering!
-            label += "world";
-        } else if (value in this.supranat_comp) {
+            label += self.world_label;
+        } else if (this.supranat_comp && (value in this.supranat_comp)) {
             var k = subtable.headers.indexOf(this.filter_column); // column with country name
             var lst = this.supranat_comp[value];
             subtable = new Table(
@@ -152,14 +162,27 @@ class HopkinsDataset extends BaseDataset {
         var data_y = new Array(data_x.length)
         data_y.fill(0);
 
+        var population_i = null;
+        var population = 0;
+        if (self.population_field) {
+            population_i = subtable.headers.indexOf(self.population_field);
+        }
+
         subtable.rows.forEach(function(row){
+            if (population_i !== null) {
+                population += parseInt(row[population_i]);
+            }
             for (var i=0; i < data_y.length; i++) {
                 data_y[i] += parseInt(row[i+self.first_time_column]);
             }
         });
 
         var series = new Series(data_x, data_y, label);
-        series.population = this.get_population(options);
+        if (self.population_field) {
+            series.population = population;
+        } else {
+            series.population = this.get_population(options);
+        }
         series.y_axis = 'count';
         return series;
     }
@@ -168,7 +191,9 @@ class HopkinsDataset extends BaseDataset {
         var options = super.get_options();
         options.value = this.$select.children("option:selected").val();
         if (options.value === '') {
-            options.value = this.$supranat.val();
+            if (this.supranat_comp) {
+                options.value = this.$supranat.val();
+            }
         }
         options.subvalue = this.$subselect.children("option:selected").val();
         options.column = this.$column.children("option:selected").val();
@@ -212,7 +237,6 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
     constructor() {
         super({
             name: "recovered",
-            // path: "csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv",
             path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
             fields: [
                 'recovered', 
@@ -220,6 +244,54 @@ class HopkinsRecoveredDataset extends HopkinsDataset {
                 'recovered increment',
                 'recovered increment / population',
                 'recovered increment rate'
+            ],
+        });
+    }
+}
+
+class HopkinsUSDataset extends HopkinsDataset {
+    constructor(options) {
+        super(options);
+        this.filter_column = "Province_State";
+        this.subfilter_column = "Admin2";
+        this.first_time_column = 12;
+        this.supranat_comp = null;
+        this.population_field = "Population";
+        this.world_label = "US";
+    }
+
+    get_population(options) {
+        throw new Error("don't use get_population since population_field exists");
+    }
+}
+
+class HopkinsConfirmedUSDataset extends HopkinsUSDataset {
+    constructor() {
+        super({
+            name: "confirmedUS",
+            path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv",
+            fields: [
+                'confirmed', 
+                'confirmed / population', 
+                'confirmed increment',
+                'confirmed increment / population',
+                'confirmed increment rate'
+            ],
+        });
+    }
+}
+
+class HopkinsDeathsUSDataset extends HopkinsUSDataset {
+    constructor() {
+        super({
+            name: "deathsUS",
+            path: "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv",
+            fields: [
+                'deaths', 
+                'deaths / population', 
+                'deaths increment',
+                'deaths increment / population',
+                'deaths increment rate'
             ],
         });
     }
