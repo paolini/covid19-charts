@@ -555,7 +555,7 @@ class ChartWrapper {
                     data: points,
                     fill: false,
                     label: 'fit',
-                    yAxisID: (this.rate_plot ? "rate" : "count"),
+                    yAxisID: (this.rate_plot ? "rate" : series.y_axis),
                     xAxisID: (this.time_shift ? "days" : "date"),
                     pointRadius: 0,
                     borderWidth: 1,
