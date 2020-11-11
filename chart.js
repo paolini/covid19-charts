@@ -587,6 +587,7 @@ class ChartWrapper {
         var msg = "";
         msg += "exponential fit: R<sup>2</sup>=<b>"+lr.r2.toFixed(2)+"</b>, ";
         msg += "average daily increase: <b>"+((Math.exp(lr.m)-1)*100).toFixed(1)+"%</b>, ";
+        msg += "Rt: <b>"+(Math.exp(7*lr.m)).toFixed(2)+"</b>, ";
         if (lr.m>0) {
             msg += "doubling time: <b>"+ (Math.log(2.0)/lr.m).toFixed(1) +"</b> days, ";
             msg += "origin <b>" + days_passed.toFixed(1) + "</b> days ago: "
