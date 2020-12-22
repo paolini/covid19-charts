@@ -8,6 +8,7 @@ class DpcDataset extends BaseDataset {
         this.fields = [
             "ricoverati_con_sintomi",
             "terapia_intensiva",
+            "ingressi_terapia_intensiva",
             "totale_ospedalizzati",
             "isolamento_domiciliare",
             "totale_positivi",
