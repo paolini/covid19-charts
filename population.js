@@ -59,9 +59,11 @@ var popolazione_province = {
     "Latina": 574891,
     "Cagliari": 560373,
     "Reggio Calabria": 553861,
+    "Reggio di Calabria": 553861,
     "Pavia": 547251,
     "Trento": 538604,
     "Reggio Emilia": 532483,
+    "Reggio nell'Emilia": 532483,
     "Udine": 531466,
     "Bolzano": 524256,
     "Frosinone": 493067,
@@ -135,7 +137,8 @@ var popolazione_province = {
     "Carbonia-Iglesias": 126324,
     "Medio Campidano": 98623,
     "Isernia": 85805,
-    "Ogliastra": 57185
+    "Ogliastra": 57185,
+    "Sud Sardegna": 348783
 };
 
 
