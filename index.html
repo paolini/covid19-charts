@@ -36,6 +36,7 @@
         <script src="dataset.js"></script>
         <script src="dataset_hopkins.js"></script>
         <script src="dataset_dpc.js"></script>
+        <script src="dataset_vaccini.js"></script>
         <script src="dataset_lockdown.js"></script>
         <script src="dataset_epcalc.js"></script>
         <script src="epcalc.js"></script>
@@ -69,6 +70,7 @@
                         <option value="hopkins">World data by John Hopkins Univ.</option>
                         <option value="hopkinsUS">US data by John Hopkins Univ.</option>
                         <option value="dpc">Italian data by &quot;protezione civile&quot;</option>
+                        <option value="vaccini">vaccinazioni Italia</option>
                         <option value="lockdown">aura vision lockdown dates</option>
                         <option value="epcalc">epidemic calculator</option>
                     </select>
@@ -88,7 +90,7 @@
                             <select name="province_codice_provincia" class="dpc province dataset_option"></select>
                             <select name="province_column" class="dpc province dataset_option"></select>
                         </li>
-			<li id="modifier_span">Modifier:
+            			<li id="modifier_span">Modifier:
                             <select name="dpc_modifier">
                                 <option value="*">dato originale</option>
                                 <option value="incremento *">incremento</option>
@@ -104,7 +106,18 @@
                                 <option value="* / incremento casi_testati">dato / incremento casi testati</option>
                                 <option value="* / incremento tamponi">dato / incremento tamponi</option>
                             </select>
-			    </li>
+        			    </li>
+                    </ul>
+                    <ul id="vaccini_box" class="data_source">
+                        <li>data collected from <a href="https://github.com/italia/covid19-opendata-vaccini">here</a></li>
+                        <li>Data set:
+                            <select class="dataset_select">
+                                <option value="vaccini_somministrazione">Somministrazione</option>
+                            </select>
+                        </li>
+                        <li>Series:
+                            <select name="somministrazione_column" class="vaccini somministrazione dataset_option"></select>
+                        </li>
                     </ul>
                     <ul id="hopkins_box" class="data_source">
                         <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>

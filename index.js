@@ -6,6 +6,7 @@ var datasets = {
     'dpc_nazione': new DpcNazionaleDataset(),
     'dpc_regioni': new DpcRegioniDataset(),
     'dpc_province': new DpcProvinceDataset(),
+    'vaccini_somministrazione': new VacciniSomministrazioneDataset(),
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
     'hopkins_recovered': new HopkinsRecoveredDataset(),
