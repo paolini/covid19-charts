@@ -66,14 +66,13 @@ class VacciniDataset extends BaseDataset {
 
     get_series_basic(column, options) {
         var subtable = this.table;
-        var value = null;
-        var value_name = null;
+        var label = dash_to_space(column);
 
         if (this.filter_column) {
-            value = options['value'];
+            var value = options['value'];
             if (value) {
-                value_name = options['value_name'];
                 subtable = subtable.filter(this.filter_column, value);
+                label += " " + options['value_name'];
             }
         }
 
@@ -96,7 +95,6 @@ class VacciniDataset extends BaseDataset {
 
         var y_axis = 'count';
 
-        var label = column;
         var series = new Series(data_x, data_y, label);
         series.population = this.get_population(options);
         series.y_axis = y_axis;

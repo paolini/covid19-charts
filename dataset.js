@@ -155,9 +155,6 @@ class BaseDataset {
         var column = options['column'] || 'count';
         var series = this.get_series_extended(column, options);
         this.apply_filter(series, options);
-        if ('value_name' in options) {
-            series.label = options['value_name'] + " " + dash_to_space(series.label);
-        }
         return series;
     }
 
