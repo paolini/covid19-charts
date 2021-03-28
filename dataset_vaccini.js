@@ -5,22 +5,9 @@
 class VacciniDataset extends BaseDataset {
     constructor(options) {
         super(options);
-        this.fields = [
-            "sesso_maschile", 
-            "sesso_femminile", 
-            "categoria_operatori_sanitari_sociosanitari",
-            "categoria_personale_non_sanitario", 
-            "categoria_ospiti_rsa",
-            "categoria_over80", 
-            "categoria_forze_armate",
-            "categoria_personale_scolastico", 
-            "categoria_altro",
-            "prima_dose", 
-            "seconda_dose"
-        ];
         this.filter_column = "codice_regione_ISTAT";
-        this.filter_name_column = "nome_area"
-        this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/"
+        this.filter_name_column = "nome_area";
+        this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/";
     }
 
     init_html() {
@@ -108,11 +95,53 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
             name: "somministrazione",
             path: "dati/somministrazioni-vaccini-latest.csv"
         });
+        this.fields = [
+            "sesso_maschile", 
+            "sesso_femminile", 
+            "categoria_operatori_sanitari_sociosanitari",
+            "categoria_personale_non_sanitario", 
+            "categoria_ospiti_rsa",
+            "categoria_over80", 
+            "categoria_forze_armate",
+            "categoria_personale_scolastico", 
+            "categoria_altro",
+            "prima_dose", 
+            "seconda_dose"
+        ];
     }
 
     get_population(options) {
         return country_population['Italy'];
     }
 }
+
+class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
+    constructor() {
+        super({
+            name: "somministrazione",
+            path: "dati/somministrazioni-vaccini-summary-latest.csv",
+            table_sort_column: "data_somministrazione"
+        });
+        this.fields = [
+            "totale",
+            "sesso_maschile", 
+            "sesso_femminile", 
+            "categoria_operatori_sanitari_sociosanitari",
+            "categoria_personale_non_sanitario", 
+            "categoria_altro",
+            "categoria_ospiti_rsa",
+            "categoria_over80", 
+            "categoria_forze_armate",
+            "categoria_personale_scolastico", 
+            "prima_dose", 
+            "seconda_dose"
+        ];
+    }
+
+    get_population(options) {
+        return country_population['Italy'];
+    }
+}
+
 
 

@@ -54,6 +54,13 @@ class Table {
         );
     }    
     
+    sort(column) {
+        var i = this.headers.indexOf(column);
+        function strcmp(str1, str2) {
+            return ((str1 == str2)?0:((str1 > str2)?1:-1));
+        }
+        this.rows.sort((row1,row2) => strcmp(row1[i],row2[i]));
+    }
 };
 
 function string_to_date(x) {return moment(x).toDate()}
