@@ -36,6 +36,7 @@ class VacciniDataset extends BaseDataset {
             var pairs = this.table.get_column_distinct_pairs(this.filter_column, this.filter_name_column);
             pairs.sort(function(a,b){return a[1].localeCompare(b[1])});
             this.$select.find('option').remove();
+            this.$select.append("<option value=''>-- tutte le regioni --</option>");
             pairs.forEach(function(pair) {
                 self.$select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
             });
@@ -70,8 +71,10 @@ class VacciniDataset extends BaseDataset {
 
         if (this.filter_column) {
             value = options['value'];
-            value_name = options['value_name'];
-            subtable = subtable.filter(this.filter_column, value);
+            if (value) {
+                value_name = options['value_name'];
+                subtable = subtable.filter(this.filter_column, value);
+            }
         }
 
         var data_x = [];
