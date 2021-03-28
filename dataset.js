@@ -26,14 +26,6 @@ class BaseDataset {
 
     post_load_hook() {}
 
-    series_label(column, value) {
-        if (value) {
-            return value + " " + dash_to_space(column);
-        } else {
-            return column;
-        }
-    }
-
     load() {
         var self = this;
         console.log("start fetching dataset " + self.prefix);
@@ -163,7 +155,9 @@ class BaseDataset {
         var column = options['column'] || 'count';
         var series = this.get_series_extended(column, options);
         this.apply_filter(series, options);
-        series.label = this.series_label(series.label, options['value_name']);
+        if ('value_name' in options) {
+            series.label = options['value_name'] + " " + dash_to_space(series.label);
+        }
         return series;
     }
 

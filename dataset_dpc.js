@@ -127,8 +127,12 @@ class DpcNazionaleDataset extends DpcDataset {
         return country_population['Italy'];
     }
 
-    series_label(column, value) {
-        return "Italia " + dash_to_space(column);
+    get_series(options) {
+        var column = options['column'] || 'count';
+        var series = this.get_series_extended(column, options);
+        this.apply_filter(series, options);
+        series.label = "Italia " + dash_to_space(series.label);
+        return series;
     }
 }
 

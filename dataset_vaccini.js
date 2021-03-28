@@ -18,6 +18,8 @@ class VacciniDataset extends BaseDataset {
             "prima_dose", 
             "seconda_dose"
         ];
+        this.filter_column = "codice_regione_ISTAT";
+        this.filter_name_column = "nome_area"
         this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/"
     }
 
@@ -25,7 +27,7 @@ class VacciniDataset extends BaseDataset {
         super.init_html();
         this.$column = $("select[name='" + this.prefix + "_column']");
         this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "']") : null;
-        this.$modifier = $("select[name='dpc_modifier']");
+        this.$modifier = null;
     }
 
     populate_html() {
@@ -52,9 +54,11 @@ class VacciniDataset extends BaseDataset {
             options.value = this.$select.children("option:selected").val();
             options.value_name = this.$select.children("option:selected").text()
         }
-        var modifier = this.$modifier.val();
-        if (this.$modifier.is(':visible') && modifier && modifier.indexOf('*')>=0) {
-            options.column = modifier.replace('*', options.column);
+        if (this.$modifier) {
+            var modifier = this.$modifier.val();
+            if (this.$modifier.is(':visible') && modifier && modifier.indexOf('*')>=0) {
+                options.column = modifier.replace('*', options.column);
+            }
         }
         return options;
     }
@@ -107,10 +111,6 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
 
     get_population(options) {
         return country_population['Italy'];
-    }
-
-    series_label(column, value) {
-        return "somministrazioni " + dash_to_space(column);
     }
 }
 
