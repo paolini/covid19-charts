@@ -77,6 +77,18 @@ class DpcDataset extends BaseDataset {
         return options;
     }
 
+    get_series(options) {
+        var column = options['column'] || 'count';
+        var series = this.get_series_extended(column, options);
+        this.apply_filter(series, options);
+        if (this.filter_column) {
+            series.label = options['value_name'] + " " + dash_to_space(series.label);
+        } else {
+            series.label = "Italia " + dash_to_space(series.label);
+        }
+        return series;
+    }
+
     get_series_basic(column, options) {
         var subtable = this.table;
         var value = null;
@@ -125,10 +137,6 @@ class DpcNazionaleDataset extends DpcDataset {
 
     get_population(options) {
         return country_population['Italy'];
-    }
-
-    series_label(column, value) {
-        return "Italia " + dash_to_space(column);
     }
 }
 

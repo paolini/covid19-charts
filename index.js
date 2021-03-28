@@ -6,7 +6,7 @@ var datasets = {
     'dpc_nazione': new DpcNazionaleDataset(),
     'dpc_regioni': new DpcRegioniDataset(),
     'dpc_province': new DpcProvinceDataset(),
-    'vaccini_somministrazione': new VacciniSomministrazioneDataset(),
+    'vaccini_somministrazione': new VacciniSomministrazioneSummaryDataset(),
     'hopkins_confirmed': new HopkinsConfirmedDataset(),
     'hopkins_deaths': new HopkinsDeathsDataset(),
     'hopkins_recovered': new HopkinsRecoveredDataset(),
@@ -71,7 +71,8 @@ $(function () {
                         epcalc: "epcalc",
                         lockdown: "lockdown",
                         deathsUS: "hopkinsUS_deathsUS",
-                        confirmedUS: "hopkinsUS_confirmedUS"
+                        confirmedUS: "hopkinsUS_confirmedUS",
+                        somministrazione: "vaccini_somministrazione"
                     }[item.dataset];
                     if (item.options.column === "nuovi_attualmente_positivi") {
                         item.options.column = "nuovi_positivi";

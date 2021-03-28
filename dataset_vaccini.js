@@ -5,22 +5,9 @@
 class VacciniDataset extends BaseDataset {
     constructor(options) {
         super(options);
-        this.fields = [
-            "sesso_maschile", 
-            "sesso_femminile", 
-            "categoria_operatori_sanitari_sociosanitari",
-            "categoria_personale_non_sanitario", 
-            "categoria_ospiti_rsa",
-            "categoria_over80", 
-            "categoria_forze_armate",
-            "categoria_personale_scolastico", 
-            "categoria_altro",
-            "prima_dose", 
-            "seconda_dose"
-        ];
         this.filter_column = "codice_regione_ISTAT";
-        this.filter_name_column = "nome_area"
-        this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/"
+        this.filter_name_column = "nome_area";
+        this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/";
     }
 
     init_html() {
@@ -36,6 +23,7 @@ class VacciniDataset extends BaseDataset {
             var pairs = this.table.get_column_distinct_pairs(this.filter_column, this.filter_name_column);
             pairs.sort(function(a,b){return a[1].localeCompare(b[1])});
             this.$select.find('option').remove();
+            this.$select.append("<option value=''>-- tutte le regioni --</option>");
             pairs.forEach(function(pair) {
                 self.$select.append("<option value='" + pair[0] + "'>" + pair[1] + "</option>");
             });
@@ -65,13 +53,14 @@ class VacciniDataset extends BaseDataset {
 
     get_series_basic(column, options) {
         var subtable = this.table;
-        var value = null;
-        var value_name = null;
+        var label = dash_to_space(column);
 
         if (this.filter_column) {
-            value = options['value'];
-            value_name = options['value_name'];
-            subtable = subtable.filter(this.filter_column, value);
+            var value = options['value'];
+            if (value) {
+                subtable = subtable.filter(this.filter_column, value);
+                label += " " + options['value_name'];
+            }
         }
 
         var data_x = [];
@@ -93,7 +82,6 @@ class VacciniDataset extends BaseDataset {
 
         var y_axis = 'count';
 
-        var label = column;
         var series = new Series(data_x, data_y, label);
         series.population = this.get_population(options);
         series.y_axis = y_axis;
@@ -107,11 +95,53 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
             name: "somministrazione",
             path: "dati/somministrazioni-vaccini-latest.csv"
         });
+        this.fields = [
+            "sesso_maschile", 
+            "sesso_femminile", 
+            "categoria_operatori_sanitari_sociosanitari",
+            "categoria_personale_non_sanitario", 
+            "categoria_ospiti_rsa",
+            "categoria_over80", 
+            "categoria_forze_armate",
+            "categoria_personale_scolastico", 
+            "categoria_altro",
+            "prima_dose", 
+            "seconda_dose"
+        ];
     }
 
     get_population(options) {
         return country_population['Italy'];
     }
 }
+
+class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
+    constructor() {
+        super({
+            name: "somministrazione",
+            path: "dati/somministrazioni-vaccini-summary-latest.csv",
+            table_sort_column: "data_somministrazione"
+        });
+        this.fields = [
+            "totale",
+            "sesso_maschile", 
+            "sesso_femminile", 
+            "categoria_operatori_sanitari_sociosanitari",
+            "categoria_personale_non_sanitario", 
+            "categoria_altro",
+            "categoria_ospiti_rsa",
+            "categoria_over80", 
+            "categoria_forze_armate",
+            "categoria_personale_scolastico", 
+            "prima_dose", 
+            "seconda_dose"
+        ];
+    }
+
+    get_population(options) {
+        return country_population['Italy'];
+    }
+}
+
 
 

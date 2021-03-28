@@ -3,6 +3,7 @@ class BaseDataset {
         this.prefix = options.prefix || options.name;
         this.path = options.path;
         this.can_be_filtered = true;
+        this.table_sort_column = options.table_sort_column || null;
         this.language = 'english';
         this.translate = {
             'population': 'population',
@@ -26,14 +27,6 @@ class BaseDataset {
 
     post_load_hook() {}
 
-    series_label(column, value) {
-        if (value) {
-            return value + " " + dash_to_space(column);
-        } else {
-            return column;
-        }
-    }
-
     load() {
         var self = this;
         console.log("start fetching dataset " + self.prefix);
@@ -47,6 +40,9 @@ class BaseDataset {
                     rows = rows.filter(function(row){return row.length>= headers.length});
                     rows = rows.slice(1);
                     self.table = new Table(headers, rows);
+                    if (self.table_sort_column != null) {
+                        self.table.sort(self.table_sort_column);                        
+                    }
 
                     self.post_load_hook();
 
@@ -163,7 +159,6 @@ class BaseDataset {
         var column = options['column'] || 'count';
         var series = this.get_series_extended(column, options);
         this.apply_filter(series, options);
-        series.label = this.series_label(series.label, options['value_name']);
         return series;
     }
 
