@@ -16,6 +16,7 @@ var popolazione_regioni = {
     "Marche": 1525271,
     "Abruzzo": 1311580,
     "Friuli Venezia Giulia": 1215220,
+    "Friuli-Venezia Giulia": 1215220,
     "P.A. Bolzano": 531178,
     "P.A. Trento": 541098,
     "Umbria": 882015,

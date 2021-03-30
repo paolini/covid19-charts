@@ -113,9 +113,12 @@ class BaseDataset {
         }
         var increment_column = null;
         var rate_column = null;
+        var accumulation_column =  null;
         var word = this.translate['increment'];
         if (column.startsWith(word + ' ')) {
             increment_column = column.slice(word.length +  1);
+        } else if (column.startsWith('accumulo ')) {
+            accumulation_column = column.slice('accumulo '.length)
         } else if (column.endsWith(' ' + word)) {
             increment_column = column.slice(0, -word.length-1);
         } else {
@@ -149,6 +152,18 @@ class BaseDataset {
             if (rate_column) {
                 series.y_axis = 'rate';
             }
+            return series;
+        } 
+        if (accumulation_column) {
+            var series = this.get_series_extended(accumulation_column, options);
+            var new_data_y = new Array(series.data_y.length);
+            var last = 0;
+            for (var i=0; i < new_data_y.length; ++i) {
+                new_data_y[i] = series.data_y[i] + last;
+                last = new_data_y[i];
+            }
+            series.data_y = new_data_y;
+            series.label = 'accumulo ' + series.label;
             return series;
         } 
         var series = this.get_series_basic(column, options);
