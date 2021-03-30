@@ -119,6 +119,14 @@
                             <select name="somministrazione_codice_regione_ISTAT" class="vaccini somministrazione dataset_option"></select>
                             <select name="somministrazione_column" class="vaccini somministrazione dataset_option"></select>
                         </li>
+            			<li id="modifier_span">Modifier:
+                            <select name="vaccini_modifier">
+                                <option value="*">dato originale</option>
+                                <option value="accumulo *">accumulo</option>
+                                <option value="* / popolazione">dato / popolazione</option>
+                                <option value="accumulo * / popolazione">accumulo dato / popolazione</option>
+                            </select>
+        			    </li>
                     </ul>
                     <ul id="hopkins_box" class="data_source">
                         <li>data collected from <a href="https://github.com/CSSEGISandData/COVID-19">here</a></li>
@@ -227,6 +235,9 @@
                     -- consider
                     <select name="n_points">
                         <option value="">all data points</option>
+                        <option value="356">last 356 points</option>
+                        <option value="200">last 200 points</option>
+                        <option value="100">last 100 points</option>
                         <option value="56">last 56 points</option>
                         <option value="49">last 49 points</option>
                         <option value="42">last 42 points</option>

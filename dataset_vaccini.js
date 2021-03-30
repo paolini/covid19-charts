@@ -8,13 +8,18 @@ class VacciniDataset extends BaseDataset {
         this.filter_column = "codice_regione_ISTAT";
         this.filter_name_column = "nome_area";
         this.REPOSITORY_URL = "https://raw.githubusercontent.com/italia/covid19-opendata-vaccini/master/";
+        this.translate = {
+            'population': 'popolazione',
+            'increment': 'incremento',
+            'rate': 'tasso'
+        };
     }
 
     init_html() {
         super.init_html();
         this.$column = $("select[name='" + this.prefix + "_column']");
         this.$select = this.filter_column ? $("select[name='" + this.prefix + "_" + this.filter_column + "']") : null;
-        this.$modifier = null;
+        this.$modifier = $("select[name='vaccini_modifier']");
     }
 
     populate_html() {
@@ -49,6 +54,11 @@ class VacciniDataset extends BaseDataset {
             }
         }
         return options;
+    }
+
+    get_population(options) {
+        if (options['value']=='') return country_population['Italy'];
+        return popolazione_regioni[options['value_name']];
     }
 
     get_series_basic(column, options) {
@@ -109,10 +119,6 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
             "seconda_dose"
         ];
     }
-
-    get_population(options) {
-        return country_population['Italy'];
-    }
 }
 
 class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
@@ -136,10 +142,6 @@ class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
             "prima_dose", 
             "seconda_dose"
         ];
-    }
-
-    get_population(options) {
-        return country_population['Italy'];
     }
 }
 
