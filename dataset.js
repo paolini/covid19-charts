@@ -144,6 +144,7 @@ class BaseDataset {
                 last = series.data_y[i];
             }
             series.data_y = new_data_y;
+            series.cumulative = false;
             if (this.language == 'italian') {
                 series.label = word + ' ' + series.label;
             } else {
@@ -164,6 +165,7 @@ class BaseDataset {
             }
             series.data_y = new_data_y;
             series.label = 'accumulo ' + series.label;
+            series.cumulative = true;
             return series;
         } 
         var series = this.get_series_basic(column, options);

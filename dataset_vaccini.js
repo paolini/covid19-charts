@@ -95,6 +95,8 @@ class VacciniDataset extends BaseDataset {
         var series = new Series(data_x, data_y, label);
         series.population = this.get_population(options);
         series.y_axis = y_axis;
+        series.cumulative = false;
+        if (column == 'totale') series.cumulative = true;
         return series;
     }
 }

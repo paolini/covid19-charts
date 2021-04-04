@@ -184,6 +184,7 @@ class HopkinsDataset extends BaseDataset {
             series.population = this.get_population(options);
         }
         series.y_axis = 'count';
+        series.cumulative = true;
         return series;
     }
 

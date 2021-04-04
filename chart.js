@@ -171,6 +171,7 @@ class ChartWrapper {
         this.$axis_count_max = $("input[name='axis_count_max']");
         this.$fit_future_days = $("input[name='fit_future_days']");
         this.$up_to_date = $("input[name='up_to_date']");
+        this.$zero_date = $("input[name='zero_date']");
         this.$download = $("#download_button");
     
         this.$clear.click(function(){ 
@@ -289,6 +290,14 @@ class ChartWrapper {
         })
         this.$fit_future_days.change();
 
+        this.$zero_date.datepicker();
+        this.$zero_date.change(function() {
+            var val = self.$zero_date.val();
+            self.zero_date = val ? new Date(val) : null;
+            self.redraw();
+        })
+        this.$zero_date.change();
+
         this.$download.click(function() {
             if (self.download_url) {
                 URL.revokeObjectURL(self.download_url);
@@ -314,7 +323,8 @@ class ChartWrapper {
             axis_date_max: this.$axis_date_max.val(),
             axis_count_min: this.$axis_count_min.val(),
             axis_count_max: this.$axis_count_max.val(),
-            fit_future_days: this.fit_future_days
+            fit_future_days: this.fit_future_days,
+            zero_date: this.$zero_date.val()
         }
     }
 
@@ -351,6 +361,8 @@ class ChartWrapper {
         this.$axis_count_max.val(options['axis_count_max']);
         this.$axis_count_max.change();
         this.$fit_future_days.val(options['fit_future_days']);
+        this.$zero_date.val(options['zero_date']);
+        this.$zero_date.change();
     }
 
     update() {
@@ -422,6 +434,16 @@ class ChartWrapper {
             for (i=0; i<data_x.length && data_x[i]<this.up_to_date; ++i) {}
             data_x = data_x.slice(0,i);
             data_y = data_y.slice(0,i);
+        }
+        if (this.zero_date && series.cumulative) {
+            var i = 0;
+            for (i=0; i<data_x.length && data_x[i]<this.zero_date; ++i) {}
+            var offset = data_y[i];
+            data_x = data_x.slice(i);
+            data_y = data_y.slice(i);
+            for (i=0; i<data_x.length; ++i) {
+                data_y[i] -= offset;
+            }
         }
         if (this.serieses.length === 0) {
             // this will be the reference series for time shifts
