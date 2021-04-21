@@ -113,9 +113,12 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
             "categoria_operatori_sanitari_sociosanitari",
             "categoria_personale_non_sanitario", 
             "categoria_ospiti_rsa",
+            "categoria_60_69",
+            "categoria_70_79",
             "categoria_over80", 
             "categoria_forze_armate",
             "categoria_personale_scolastico", 
+            "categoria_soggetti_fragili",
             "categoria_altro",
             "prima_dose", 
             "seconda_dose"
@@ -138,9 +141,12 @@ class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
             "categoria_personale_non_sanitario", 
             "categoria_altro",
             "categoria_ospiti_rsa",
+            "categoria_60_69",
+            "categoria_70_79",
             "categoria_over80", 
             "categoria_forze_armate",
             "categoria_personale_scolastico", 
+            "categoria_soggetti_fragili",
             "prima_dose", 
             "seconda_dose"
         ];
