@@ -110,18 +110,9 @@ class VacciniSomministrazioneDataset extends VacciniDataset {
         this.fields = [
             "sesso_maschile", 
             "sesso_femminile", 
-            "categoria_operatori_sanitari_sociosanitari",
-            "categoria_personale_non_sanitario", 
-            "categoria_ospiti_rsa",
-            "categoria_60_69",
-            "categoria_70_79",
-            "categoria_over80", 
-            "categoria_forze_armate",
-            "categoria_personale_scolastico", 
-            "categoria_soggetti_fragili",
-            "categoria_altro",
             "prima_dose", 
-            "seconda_dose"
+            "seconda_dose",
+            "pregressa_infezione"
         ];
     }
 }
@@ -134,21 +125,11 @@ class VacciniSomministrazioneSummaryDataset extends VacciniDataset {
             table_sort_column: "data_somministrazione"
         });
         this.fields = [
-            "totale",
             "sesso_maschile", 
             "sesso_femminile", 
-            "categoria_operatori_sanitari_sociosanitari",
-            "categoria_personale_non_sanitario", 
-            "categoria_altro",
-            "categoria_ospiti_rsa",
-            "categoria_60_69",
-            "categoria_70_79",
-            "categoria_over80", 
-            "categoria_forze_armate",
-            "categoria_personale_scolastico", 
-            "categoria_soggetti_fragili",
             "prima_dose", 
-            "seconda_dose"
+            "seconda_dose",
+            "pregressa_infezione"
         ];
     }
 }
